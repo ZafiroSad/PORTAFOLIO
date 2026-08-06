@@ -1,0 +1,10 @@
+# Material derivado: se regenera con los scripts de herramientas/
+# Se versiona igual porque GitHub Pages necesita servirlo. Si el repositorio
+# se vuelve pesado, descomentar la linea de video y publicar los recorridos
+# en otro lado.
+# assets/video/*.mp4
+
+# Sistema
+Thumbs.db
+desktop.ini
+*.tmp
