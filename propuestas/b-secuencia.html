@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propuesta B · Secuencia — STICK INDUSTRIES</title>
+<style>
+/* =================================================================
+   PROPUESTA B — SECUENCIA CINEMATOGRAFICA
+   La portada no es una imagen: son cinco, encadenadas. Cada una entra
+   con un empuje lateral y sigue acercandose mientras esta en pantalla,
+   asi que el plano nunca se congela. El nombre del proyecto cambia con
+   ella; el titulo principal se queda fijo.
+
+   Es el patron de los estudios grandes de visualizacion: comunica
+   volumen de trabajo en los primeros diez segundos.
+   ================================================================= */
+:root {
+  --fondo: #08080a;
+  --texto: #fafafa;
+  --tenue: #a1a1aa;
+  --salida: cubic-bezier(.16, 1, .3, 1);
+  --fuente: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --duracion: 5s;              /* cuanto dura cada plano */
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background: var(--fondo); color: var(--texto); font-family: var(--fuente); overflow-x:hidden; }
+
+.escena { position:relative; height:100svh; min-height:560px; overflow:hidden; }
+
+/* --- Los planos ------------------------------------------------- */
+.plano {
+  position:absolute; inset:0;
+  opacity:0;
+  transition: opacity 1.25s ease;
+}
+.plano.activo { opacity:1; }
+.plano img {
+  width:100%; height:100%; object-fit:cover;
+  transform: scale(1.08);
+  transition: transform var(--duracion) linear;
+}
+/* El acercamiento arranca en el momento en que el plano se vuelve
+   visible, no antes: por eso se dispara con la clase, no en carga */
+.plano.activo img { transform: scale(1.19); }
+
+.velo {
+  position:absolute; inset:0; z-index:2;
+  background:
+    linear-gradient(to top, rgba(8,8,10,.92) 0%, rgba(8,8,10,.45) 40%, rgba(8,8,10,0) 70%),
+    linear-gradient(to right, rgba(8,8,10,.6) 0%, rgba(8,8,10,0) 45%);
+}
+
+/* --- Entrada general de la pieza -------------------------------- */
+.cortina {
+  position:absolute; inset:0; z-index:20; background:var(--fondo);
+  animation: retirar 1.1s var(--salida) .2s forwards;
+}
+@keyframes retirar { to { transform: translateY(-101%) } }
+
+/* --- Contenido -------------------------------------------------- */
+.contenido {
+  position:relative; z-index:5; height:100%;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding: 0 clamp(1.5rem,5vw,5rem) clamp(3rem,9vh,6rem);
+  max-width:1500px; margin:0 auto;
+}
+.mascara { overflow:hidden; }
+.mascara > * { display:block; transform: translateY(115%); animation: emerger 1.1s var(--salida) forwards; }
+@keyframes emerger { to { transform: translateY(0) } }
+
+h1 {
+  font-size: clamp(2.5rem, 7.6vw, 6.8rem);
+  font-weight:200; line-height:.97; letter-spacing:-.045em;
+  margin-bottom: 1.6rem;
+}
+h1 em { font-style:normal; font-weight:600; }
+.l1 { animation-delay:.75s } .l2 { animation-delay:.85s }
+
+/* --- Rotulo del proyecto en curso ------------------------------- */
+.rotulo {
+  display:flex; align-items:baseline; gap:1.1rem;
+  padding-top:1.4rem;
+  border-top:1px solid rgba(250,250,250,.14);
+  opacity:0; animation: aparecer 1s ease 1.25s forwards;
+}
+@keyframes aparecer { to { opacity:1 } }
+.rotulo .indice { font-size:.72rem; letter-spacing:.2em; color:#71717a; font-variant-numeric: tabular-nums; }
+.rotulo .nombre { font-size:clamp(1rem,2vw,1.35rem); font-weight:400; letter-spacing:-.01em; }
+.rotulo .tipo   { font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:var(--tenue); margin-left:auto; }
+@media (max-width:640px){ .rotulo .tipo { display:none } }
+
+/* El texto del rotulo cambia con un pequeno salto, no con un corte */
+.cambio { animation: saltar .6s var(--salida); }
+@keyframes saltar { from { opacity:0; transform: translateY(9px) } to { opacity:1; transform:none } }
+
+/* --- Barra de progreso segmentada ------------------------------- */
+.progreso {
+  position:absolute; top:0; left:0; right:0; z-index:8;
+  display:flex; gap:4px; padding: 1.15rem clamp(1.5rem,5vw,5rem) 0;
+  opacity:0; animation: aparecer 1s ease 1.4s forwards;
+}
+.tramo { flex:1; height:2px; background:rgba(250,250,250,.16); overflow:hidden; }
+.tramo i { display:block; height:100%; width:100%; background:var(--texto); transform:scaleX(0); transform-origin:left; }
+.tramo.corriendo i { animation: llenar var(--duracion) linear forwards; }
+.tramo.hecho i { transform:scaleX(1); }
+@keyframes llenar { from { transform:scaleX(0) } to { transform:scaleX(1) } }
+
+/* --- Encabezado ------------------------------------------------- */
+.encabezado {
+  position:absolute; top:0; left:0; right:0; z-index:9;
+  display:flex; justify-content:space-between; align-items:center;
+  padding: 2.6rem clamp(1.5rem,5vw,5rem) 0;
+  opacity:0; animation: aparecer 1s ease 1.5s forwards;
+}
+/* Velo superior: sin el, el menu desaparece cuando el plano en curso
+   tiene el cielo claro en la parte de arriba */
+.encabezado::before {
+  content:''; position:absolute; left:0; right:0; top:0; height:150px;
+  background: linear-gradient(to bottom, rgba(8,8,10,.6), transparent);
+  pointer-events:none; z-index:-1;
+}
+.marca { font-size:.8rem; font-weight:700; letter-spacing:.3em; }
+.nav { display:flex; gap:2.2rem; font-size:.74rem; letter-spacing:.16em; text-transform:uppercase; color:var(--tenue); }
+@media (max-width:760px){ .nav { display:none } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::after { animation:none !important; transition:none !important }
+  .cortina { display:none } .mascara > * { transform:none }
+  .rotulo,.progreso,.encabezado { opacity:1 }
+}
+
+.siguiente { padding: clamp(5rem,12vh,9rem) clamp(1.5rem,5vw,5rem); max-width:1500px; margin:0 auto; }
+.siguiente h2 { font-weight:200; font-size:clamp(1.8rem,4vw,3rem); letter-spacing:-.03em; }
+</style>
+</head>
+<body>
+
+<section class="escena">
+  <div id="planos"></div>
+  <div class="velo"></div>
+  <div class="cortina"></div>
+
+  <div class="progreso" id="progreso"></div>
+
+  <header class="encabezado">
+    <div class="marca">STICK INDUSTRIES</div>
+    <nav class="nav"><a>Obra</a><a>Recorridos</a><a>Técnica</a><a>Contacto</a></nav>
+  </header>
+
+  <div class="contenido">
+    <h1>
+      <span class="mascara"><span class="l1">Antes de construirlo,</span></span>
+      <span class="mascara"><em class="l2">véalo terminado.</em></span>
+    </h1>
+    <div class="rotulo">
+      <span class="indice" id="indice">01</span>
+      <span class="nombre" id="nombre">Casa Will</span>
+      <span class="tipo"   id="tipo">Vivienda campestre</span>
+    </div>
+  </div>
+</section>
+
+<section class="siguiente">
+  <h2>Aquí continúa el portafolio.</h2>
+</section>
+
+<script>
+const PLANOS = [
+  { img:'casa-will-01',   nombre:'Casa Will',            tipo:'Vivienda campestre' },
+  { img:'coincafex-03',   nombre:'Coincafex',            tipo:'Sede corporativa' },
+  { img:'cantabria-1-06', nombre:'Lote 1 · Cantabria',   tipo:'Vivienda unifamiliar' },
+  { img:'punta-16',       nombre:'La Punta',             tipo:'Vivienda de lujo' },
+  { img:'ruitoque-02',    nombre:'Casa 34 · Ruitoque',   tipo:'Vivienda urbana' }
+];
+
+const DURACION = 5000;   // debe coincidir con --duracion del CSS
+
+// Monta las capas de imagen y los tramos de la barra
+const capaPlanos = document.getElementById('planos');
+const barra      = document.getElementById('progreso');
+
+capaPlanos.innerHTML = PLANOS.map((p, i) => `
+  <div class="plano" data-i="${i}">
+    <img src="../assets/renders/${p.img}.webp" alt="${p.nombre}"
+         ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>
+  </div>`).join('');
+
+barra.innerHTML = PLANOS.map(() => '<div class="tramo"><i></i></div>').join('');
+
+const capas  = [...capaPlanos.children];
+const tramos = [...barra.children];
+const indice = document.getElementById('indice');
+const nombre = document.getElementById('nombre');
+const tipo   = document.getElementById('tipo');
+
+let actual = -1;
+
+function pasar(i) {
+  actual = i;
+  capas.forEach((c, k) => c.classList.toggle('activo', k === i));
+
+  tramos.forEach((t, k) => {
+    t.classList.remove('corriendo', 'hecho');
+    if (k < i) t.classList.add('hecho');
+  });
+  // Reiniciar la animacion del tramo activo: sin este reflow el navegador
+  // reutiliza la animacion anterior y la barra no vuelve a empezar
+  const t = tramos[i];
+  void t.offsetWidth;
+  t.classList.add('corriendo');
+
+  const p = PLANOS[i];
+  indice.textContent = String(i + 1).padStart(2, '0');
+  nombre.textContent = p.nombre;
+  tipo.textContent   = p.tipo;
+  [indice, nombre, tipo].forEach(el => {
+    el.classList.remove('cambio'); void el.offsetWidth; el.classList.add('cambio');
+  });
+}
+
+// La secuencia arranca cuando la cortina de entrada termina de subir
+setTimeout(() => {
+  pasar(0);
+  setInterval(() => pasar((actual + 1) % PLANOS.length), DURACION);
+}, 1200);
+</script>
+
+</body>
+</html>

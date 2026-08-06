@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propuesta C · Tipografía — STICK INDUSTRIES</title>
+<style>
+/* =================================================================
+   PROPUESTA C — MASCARA TIPOGRAFICA
+   La pieza abre con el nombre de la marca ocupando toda la pantalla,
+   y el render se ve UNICAMENTE por dentro de las letras. Despues las
+   letras se abren y el render toma la pantalla completa.
+
+   El truco es background-clip:text — el fondo de un elemento se recorta
+   con la forma de su propio texto. Es el efecto mas reconocible del
+   diseno web actual y no requiere ninguna libreria.
+   ================================================================= */
+:root {
+  --fondo: #08080a;
+  --texto: #fafafa;
+  --tenue: #a1a1aa;
+  --salida: cubic-bezier(.16, 1, .3, 1);
+  --fuente: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background: var(--fondo); color: var(--texto); font-family: var(--fuente); overflow-x:hidden; }
+
+.escena { position:relative; height:100svh; min-height:560px; overflow:hidden; background:var(--fondo); }
+
+/* --- Render de fondo: entra recortado y se abre ----------------- */
+.lienzo {
+  position:absolute; inset:0;
+  /* Empieza reducido a una franja central y crece hasta ocupar todo */
+  clip-path: inset(38% 0 38% 0);
+  animation: abrirEncuadre 1.6s var(--salida) 2.5s forwards;
+}
+@keyframes abrirEncuadre { to { clip-path: inset(0 0 0 0); } }
+
+.lienzo img {
+  width:100%; height:100%; object-fit:cover;
+  transform: scale(1.3);
+  animation: asentar 2.4s var(--salida) 2.5s forwards,
+             deriva 24s ease-in-out 5s infinite alternate;
+}
+@keyframes asentar { to { transform: scale(1.08) } }
+@keyframes deriva {
+  from { transform: scale(1.08) translate(0,0) }
+  to   { transform: scale(1.16) translate(-1.8%,-1.2%) }
+}
+
+.velo {
+  position:absolute; inset:0; z-index:2;
+  background: linear-gradient(to top, rgba(8,8,10,.9) 0%, rgba(8,8,10,.35) 42%, rgba(8,8,10,0) 72%);
+  opacity:0; animation: aparecer 1.4s ease 3.2s forwards;
+}
+@keyframes aparecer { to { opacity:1 } }
+
+/* --- La palabra-mascara ---------------------------------------- */
+.mascara-marca {
+  position:absolute; inset:0; z-index:6;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--fondo);
+  animation: disolverMarca 1.3s var(--salida) 2.5s forwards;
+}
+@keyframes disolverMarca { to { opacity:0; visibility:hidden } }
+
+.palabra {
+  font-size: clamp(3rem, 13vw, 12rem);
+  font-weight: 800;
+  letter-spacing: -.05em;
+  line-height: .9;
+  text-align:center;
+  text-transform: uppercase;
+}
+
+/* El recorte va en CADA letra, no en el contenedor.
+   El truco esta en background-attachment: fixed — hace que el fondo de cada
+   letra se posicione respecto a la ventana, no respecto a la letra. Asi las
+   letras, cada una con su propia copia del render, componen entre todas una
+   sola imagen continua.
+   Y es la unica forma de animarlas por separado: si se anima transform sobre
+   un elemento recortado con background-clip, el recorte se rompe y el texto
+   sale negro. Por eso aqui solo se animan opacity y filter, que no crean
+   contenedor de posicionamiento. */
+.letra {
+  display: inline-block;
+
+  background-image: url('../assets/renders/casa-will-01.webp');
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center 45%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+
+  opacity: 0;
+  filter: blur(14px);
+  animation: enfocar 1.1s var(--salida) forwards;
+}
+@keyframes enfocar {
+  to { opacity: 1; filter: blur(0); }
+}
+
+/* En pantallas tactiles background-attachment:fixed se ignora, y cada letra
+   mostraria el render entero dentro de si misma. Se recorta el efecto a un
+   encuadre comun para que siga leyendose como una sola imagen. */
+@media (hover: none) {
+  .letra { background-attachment: scroll; background-size: 700% auto; }
+}
+
+.linea2 { display:block; font-size:.42em; letter-spacing:.06em; font-weight:300; margin-top:.35em; }
+
+/* Regla fina que cruza bajo la palabra */
+.regla {
+  position:absolute; left:50%; bottom:34%;
+  width:min(78vw, 900px); height:1px;
+  transform: translateX(-50%) scaleX(0);
+  background: linear-gradient(to right, transparent, rgba(250,250,250,.55), transparent);
+  animation: cruzar 1.5s var(--salida) 1.5s forwards;
+}
+@keyframes cruzar { to { transform: translateX(-50%) scaleX(1) } }
+
+/* --- Contenido que queda tras la apertura ---------------------- */
+.contenido {
+  position:relative; z-index:5; height:100%;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding: 0 clamp(1.5rem,5vw,5rem) clamp(3rem,9vh,6rem);
+  max-width:1500px; margin:0 auto;
+}
+.bloque { overflow:hidden; }
+.bloque > * { display:block; transform: translateY(115%); animation: emerger 1.2s var(--salida) forwards; }
+@keyframes emerger { to { transform: translateY(0) } }
+
+h1 {
+  font-size: clamp(2.3rem, 6.6vw, 5.6rem);
+  font-weight:200; line-height:.98; letter-spacing:-.045em;
+}
+h1 em { font-style:normal; font-weight:600; }
+.t1 { animation-delay: 3.5s } .t2 { animation-delay: 3.62s }
+
+.sub {
+  display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap;
+  margin-top:1.8rem; padding-top:1.4rem;
+  border-top:1px solid rgba(250,250,250,.14);
+  opacity:0; animation: aparecer 1.1s ease 4s forwards;
+}
+.sub p { color:var(--tenue); max-width:42ch; font-size:clamp(.95rem,1.5vw,1.1rem); line-height:1.6; }
+.sub .dato { font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:#71717a; }
+
+.encabezado {
+  position:absolute; top:0; left:0; right:0; z-index:7;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:1.6rem clamp(1.5rem,5vw,5rem);
+  opacity:0; animation: aparecer 1s ease 4.1s forwards;
+}
+/* Velo superior: sostiene el menu cuando el render tiene cielo claro arriba */
+.encabezado::before {
+  content:''; position:absolute; left:0; right:0; top:0; height:150px;
+  background: linear-gradient(to bottom, rgba(8,8,10,.6), transparent);
+  pointer-events:none; z-index:-1;
+}
+.marca { font-size:.8rem; font-weight:700; letter-spacing:.3em; }
+.nav { display:flex; gap:2.2rem; font-size:.74rem; letter-spacing:.16em; text-transform:uppercase; color:var(--tenue); }
+@media (max-width:760px){ .nav { display:none } }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation:none !important }
+  .mascara-marca { display:none } .lienzo { clip-path:none }
+  .bloque > * { transform:none } .sub,.encabezado,.velo { opacity:1 }
+}
+
+.siguiente { padding: clamp(5rem,12vh,9rem) clamp(1.5rem,5vw,5rem); max-width:1500px; margin:0 auto; }
+.siguiente h2 { font-weight:200; font-size:clamp(1.8rem,4vw,3rem); letter-spacing:-.03em; }
+</style>
+</head>
+<body>
+
+<section class="escena">
+  <div class="lienzo">
+    <img src="../assets/renders/casa-will-01.webp" alt="Vivienda campestre al atardecer" fetchpriority="high">
+  </div>
+  <div class="velo"></div>
+
+  <div class="mascara-marca">
+    <div class="palabra" id="palabra">
+      <span class="linea1" id="linea1"></span>
+      <span class="linea2" id="linea2"></span>
+    </div>
+    <div class="regla"></div>
+  </div>
+
+  <header class="encabezado">
+    <div class="marca">STICK INDUSTRIES</div>
+    <nav class="nav"><a>Obra</a><a>Recorridos</a><a>Técnica</a><a>Contacto</a></nav>
+  </header>
+
+  <div class="contenido">
+    <h1>
+      <span class="bloque"><span class="t1">Antes de construirlo,</span></span>
+      <span class="bloque"><em class="t2">véalo terminado.</em></span>
+    </h1>
+    <div class="sub">
+      <p>Renders y recorridos 3D para vivienda, comercio y espacios corporativos.</p>
+      <div class="dato">Bucaramanga · Colombia</div>
+    </div>
+  </div>
+</section>
+
+<section class="siguiente">
+  <h2>Aquí continúa el portafolio.</h2>
+</section>
+
+<script>
+// Envuelve cada letra en su propio span para poder escalonar la entrada.
+// El espacio se mantiene con un caracter no separable para que no colapse.
+function repartir(elemento, texto, retrasoInicial) {
+  elemento.innerHTML = [...texto].map((c, i) => {
+    const salto = (retrasoInicial + i * 0.045).toFixed(3);
+    const glifo = c === ' ' ? '&nbsp;' : c;
+    return `<span class="letra" style="animation-delay:${salto}s">${glifo}</span>`;
+  }).join('');
+}
+
+repartir(document.getElementById('linea1'), 'STICK', 0.35);
+repartir(document.getElementById('linea2'), 'INDUSTRIES', 0.75);
+</script>
+
+</body>
+</html>

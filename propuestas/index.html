@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propuestas de portada — STICK INDUSTRIES</title>
+<style>
+:root{--fondo:#08080a;--suave:#131316;--borde:#27272a;--texto:#fafafa;--tenue:#a1a1aa;--debil:#71717a;
+--fuente:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--fondo);color:var(--texto);font-family:var(--fuente);line-height:1.6}
+a{color:inherit;text-decoration:none}
+.envoltorio{max-width:1100px;margin:0 auto;padding:clamp(3rem,9vh,6rem) clamp(1.5rem,5vw,3rem)}
+.sello{font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;color:var(--debil);margin-bottom:1rem}
+h1{font-size:clamp(2rem,5vw,3.4rem);font-weight:200;letter-spacing:-.035em;line-height:1.05;margin-bottom:1rem}
+.intro{color:var(--tenue);max-width:60ch;margin-bottom:3.5rem}
+.lista{display:grid;gap:1rem}
+.op{display:block;border:1px solid var(--borde);border-radius:3px;padding:1.8rem;transition:border-color .3s ease,background .3s ease}
+.op:hover{border-color:var(--tenue);background:var(--suave)}
+.op .letra{font-size:.72rem;letter-spacing:.24em;color:var(--debil);text-transform:uppercase}
+.op h2{font-size:1.35rem;font-weight:500;margin:.5rem 0 .6rem;letter-spacing:-.015em}
+.op p{color:var(--tenue);font-size:.95rem;max-width:64ch}
+.op .rasgos{margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap}
+.op .rasgos span{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--debil);
+border:1px solid var(--borde);border-radius:2px;padding:.28rem .6rem}
+.nota{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--borde);color:var(--debil);font-size:.85rem;max-width:64ch}
+</style>
+</head>
+<body>
+<div class="envoltorio">
+  <div class="sello">Stick Industries</div>
+  <h1>Tres portadas.<br>Elija una.</h1>
+  <p class="intro">Cada enlace abre una portada completa y funcionando. Conviene verlas
+     en pantalla grande y recargar un par de veces: lo que hay que juzgar es la
+     entrada, y dura tres segundos.</p>
+
+  <div class="lista">
+    <a class="op" href="a-cortinas.html">
+      <div class="letra">Propuesta A</div>
+      <h2>Cortinas</h2>
+      <p>La pantalla arranca cerrada por seis franjas verticales que se retiran en
+         cascada, como un telón. El texto entra por líneas, cada una emergiendo desde
+         detrás de su propia máscara. La imagen nunca se queda quieta.</p>
+      <div class="rasgos"><span>Sobria</span><span>Entrada rápida</span><span>Una sola imagen</span></div>
+    </a>
+
+    <a class="op" href="b-secuencia.html">
+      <div class="letra">Propuesta B</div>
+      <h2>Secuencia</h2>
+      <p>La portada son cinco proyectos encadenados. Cada plano se acerca mientras está
+         en pantalla y cede al siguiente; el nombre del proyecto cambia con él y una
+         barra segmentada marca el avance. Comunica volumen de trabajo en diez segundos.</p>
+      <div class="rasgos"><span>Muestra 5 proyectos</span><span>Movimiento continuo</span><span>La más comercial</span></div>
+    </a>
+
+    <a class="op" href="c-tipografia.html">
+      <div class="letra">Propuesta C</div>
+      <h2>Tipografía</h2>
+      <p>Abre con el nombre ocupando toda la pantalla y el render visible únicamente
+         por dentro de las letras, que entran desenfocadas y van tomando foco. Después
+         el encuadre se abre y la imagen se queda con la pantalla completa.</p>
+      <div class="rasgos"><span>La más audaz</span><span>Construye marca</span><span>Entrada de 4 s</span></div>
+    </a>
+  </div>
+
+  <p class="nota">Las tres usan el mismo render de portada y el mismo texto, para que la
+     comparación sea entre movimientos y no entre imágenes. Todo es CSS y JavaScript
+     propio: ninguna librería externa, nada que cargar.</p>
+</div>
+</body>
+</html>
