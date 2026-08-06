@@ -225,7 +225,12 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 }
 
 /* ============ Secciones ======================================== */
-.seccion { max-width:var(--ancho); margin:0 auto; padding:clamp(5rem,13vh,10rem) var(--margen); }
+.seccion {
+  max-width:var(--ancho); margin:0 auto;
+  padding:clamp(5rem,13vh,10rem) var(--margen);
+  /* Deja aire bajo el encabezado fijo cuando se salta desde el menu */
+  scroll-margin-top:80px;
+}
 .cabeza { margin-bottom:clamp(2.5rem,6vh,4.5rem); }
 .etiqueta { font-size:.7rem; letter-spacing:.26em; text-transform:uppercase; color:var(--debil); margin-bottom:1rem; }
 .cabeza h2 { font-size:clamp(1.9rem,4.6vw,3.4rem); font-weight:200; letter-spacing:-.035em; line-height:1.08; }
