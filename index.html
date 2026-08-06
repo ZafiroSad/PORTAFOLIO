@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VISUAL 3D STUDIO — Visualización arquitectónica</title>
+<meta name="description" content="Renders y recorridos 3D de arquitectura. Vivienda, comercio y espacios corporativos. Bucaramanga, Colombia.">
+<link rel="icon" href="assets/marca/favicon.png">
+
+<meta property="og:title" content="VISUAL 3D STUDIO — Visualización arquitectónica">
+<meta property="og:description" content="Renders y recorridos 3D de arquitectura.">
+<meta property="og:image" content="assets/renders/casa-will-01.webp">
+<meta property="og:type" content="website">
+
+<style>
+/* ---------------------------------------------------------------
+   Sistema de color: oscuro. En un portafolio de render el fondo debe
+   desaparecer para que la imagen mande. Todo el resto es tipografia.
+   --------------------------------------------------------------- */
+:root {
+  --fondo:        #09090b;
+  --fondo-suave:  #131316;
+  --borde:        #27272a;
+  --texto:        #fafafa;
+  --texto-tenue:  #a1a1aa;
+  --texto-debil:  #71717a;
+  --acento:       #ffffff;
+
+  --ancho:        1440px;
+  --gutter:       clamp(1.25rem, 4vw, 4rem);
+
+  --fuente: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            "Helvetica Neue", Arial, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--fuente);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img, video { display: block; max-width: 100%; }
+
+a { color: inherit; text-decoration: none; }
+
+::selection { background: var(--texto); color: var(--fondo); }
+
+/* ---------------------------------------------------------------
+   Barra superior
+   --------------------------------------------------------------- */
+.barra {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.15rem var(--gutter);
+  transition: background .4s ease, backdrop-filter .4s ease, border-color .4s ease;
+  border-bottom: 1px solid transparent;
+}
+/* Sobre la portada la barra es transparente, y si el render es claro el menu
+   se pierde. Este velo superior le devuelve contraste sin ensuciar la imagen. */
+.barra::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(9,9,11,.55), transparent);
+  pointer-events: none;
+  transition: opacity .4s ease;
+}
+.barra.solida::before { opacity: 0; }
+.barra > * { position: relative; z-index: 1; }
+
+.barra.solida {
+  background: rgba(9, 9, 11, .82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom-color: var(--borde);
+}
+
+.marca { display: flex; align-items: center; gap: .7rem; }
+.marca img { width: 30px; height: 30px; }
+.marca span {
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.menu { display: flex; gap: 2rem; }
+.menu a {
+  font-size: .8rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+  transition: color .25s ease;
+}
+.menu a:hover { color: var(--texto); }
+
+.menu-btn {
+  display: none;
+  background: none; border: none; cursor: pointer;
+  color: var(--texto); padding: .4rem;
+}
+
+/* ---------------------------------------------------------------
+   Portada
+   --------------------------------------------------------------- */
+.portada {
+  position: relative;
+  height: 100svh;
+  min-height: 560px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+.portada img {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+/* Degradado inferior: sostiene el texto sin oscurecer la imagen entera */
+.portada::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top,
+    rgba(9,9,11,.94) 0%, rgba(9,9,11,.55) 32%, rgba(9,9,11,.05) 62%, rgba(9,9,11,.35) 100%);
+}
+.portada-texto {
+  position: relative;
+  z-index: 2;
+  padding: 0 var(--gutter) clamp(3rem, 8vh, 6rem);
+  width: 100%;
+  max-width: var(--ancho);
+  margin: 0 auto;
+}
+.portada h1 {
+  font-size: clamp(2.4rem, 7.5vw, 6rem);
+  font-weight: 300;
+  line-height: 1.02;
+  letter-spacing: -.035em;
+  margin-bottom: 1.4rem;
+}
+.portada h1 strong { font-weight: 600; }
+.portada p {
+  font-size: clamp(1rem, 1.7vw, 1.2rem);
+  color: var(--texto-tenue);
+  max-width: 46ch;
+}
+
+.bajada {
+  position: absolute;
+  bottom: 1.6rem; left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  color: var(--texto-debil);
+  font-size: .7rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  animation: latido 2.6s ease-in-out infinite;
+}
+@keyframes latido { 0%,100% { opacity:.35 } 50% { opacity:.9 } }
+
+/* ---------------------------------------------------------------
+   Estructura de secciones
+   --------------------------------------------------------------- */
+.seccion {
+  max-width: var(--ancho);
+  margin: 0 auto;
+  padding: clamp(4.5rem, 11vh, 8.5rem) var(--gutter);
+}
+
+.seccion-cabeza { margin-bottom: clamp(2.5rem, 5vh, 4rem); }
+.etiqueta {
+  font-size: .72rem;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--texto-debil);
+  margin-bottom: .9rem;
+}
+.seccion-cabeza h2 {
+  font-size: clamp(1.9rem, 4.2vw, 3.1rem);
+  font-weight: 300;
+  letter-spacing: -.03em;
+  line-height: 1.1;
+}
+.seccion-cabeza p {
+  color: var(--texto-tenue);
+  max-width: 62ch;
+  margin-top: 1.1rem;
+}
+
+/* ---------------------------------------------------------------
+   Proyecto: encabezado + rejilla de imagenes
+   --------------------------------------------------------------- */
+.proyecto { margin-bottom: clamp(3.5rem, 8vh, 6rem); }
+.proyecto:last-child { margin-bottom: 0; }
+
+.proyecto-cabeza {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding-bottom: 1rem;
+  margin-bottom: 1.6rem;
+  border-bottom: 1px solid var(--borde);
+}
+.proyecto-cabeza h3 {
+  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+  font-weight: 400;
+  letter-spacing: -.02em;
+}
+.proyecto-meta {
+  font-size: .78rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--texto-debil);
+  white-space: nowrap;
+}
+
+.rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: .75rem;
+}
+/* La primera imagen de cada proyecto ocupa el doble de ancho: da jerarquia
+   y evita que la rejilla se lea como un contacto de fotos plano.
+   Ocupa tambien dos filas: con la misma proporcion 16/9, el doble de ancho
+   equivale al doble de alto, asi que sin esto quedaria un hueco a su derecha. */
+.rejilla .destacada { grid-column: span 2; grid-row: span 2; }
+@media (max-width: 700px) {
+  .rejilla .destacada { grid-column: span 1; grid-row: span 1; }
+}
+
+.pieza {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--fondo-suave);
+  cursor: zoom-in;
+  border-radius: 2px;
+}
+.pieza img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .7s cubic-bezier(.2,.8,.2,1), opacity .5s ease;
+  opacity: 0;
+}
+.pieza img.cargada { opacity: 1; }
+.pieza:hover img { transform: scale(1.045); }
+
+/* Las piezas de mobiliario son verticales y traen su propio fondo plano.
+   Se dejan en 3/4 y se recortan igual que el resto: mostrarlas con contain
+   sobre un tapete blanco llenaba la pagina de rectangulos claros flotando. */
+.rejilla.mobiliario .pieza { aspect-ratio: 3 / 4; }
+.rejilla.mobiliario .destacada { grid-column: span 1; grid-row: span 1; }
+
+/* Una lamina de presentacion se muestra completa, nunca recortada */
+.lamina {
+  max-width: 900px;
+  margin: 0 auto;
+  cursor: zoom-in;
+  border: 1px solid var(--borde);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.lamina img { width: 100%; height: auto; opacity: 1; }
+.lamina-pie {
+  text-align: center;
+  font-size: .78rem;
+  color: var(--texto-debil);
+  margin-top: .9rem;
+}
+
+/* ---------------------------------------------------------------
+   Recorridos en video
+   --------------------------------------------------------------- */
+.videos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 1.5rem;
+}
+@media (max-width: 560px) {
+  .videos { grid-template-columns: 1fr; }
+}
+.video-bloque h4 {
+  font-size: .82rem;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+  margin-top: .85rem;
+}
+.video-marco {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--fondo-suave);
+  overflow: hidden;
+  border-radius: 2px;
+}
+.video-marco video { width: 100%; height: 100%; object-fit: cover; }
+
+/* ---------------------------------------------------------------
+   Servicios y proceso
+   --------------------------------------------------------------- */
+.columnas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2.5rem 3rem;
+}
+.columna h4 {
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin-bottom: .6rem;
+}
+.columna .num {
+  font-size: .72rem;
+  letter-spacing: .2em;
+  color: var(--texto-debil);
+  display: block;
+  margin-bottom: .8rem;
+}
+.columna p { color: var(--texto-tenue); font-size: .95rem; }
+
+/* ---------------------------------------------------------------
+   Software
+   --------------------------------------------------------------- */
+/* Cada tarjeta lleva su propio borde. Antes el borde lo pintaba el fondo del
+   contenedor a traves de un gap de 1px, y la ultima fila incompleta dejaba un
+   bloque gris vacio del ancho de dos columnas. */
+.apps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1rem;
+}
+.app {
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: 2px;
+  padding: 1.6rem;
+  transition: background .3s ease, border-color .3s ease;
+}
+.app:hover { border-color: var(--texto-debil); }
+.app:hover { background: var(--fondo-suave); }
+.app h4 {
+  font-size: .95rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  margin-bottom: .45rem;
+}
+.app p { font-size: .88rem; color: var(--texto-tenue); }
+.app .stack {
+  font-size: .72rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--texto-debil);
+  margin-top: .9rem;
+}
+.app .enlace {
+  display: inline-block;
+  margin-top: .7rem;
+  font-size: .78rem;
+  color: var(--texto);
+  border-bottom: 1px solid var(--texto-debil);
+  padding-bottom: 1px;
+}
+
+/* ---------------------------------------------------------------
+   Contacto
+   --------------------------------------------------------------- */
+.contacto {
+  border-top: 1px solid var(--borde);
+  background: var(--fondo-suave);
+}
+.contacto .seccion { padding-top: clamp(4rem, 9vh, 7rem); }
+.contacto h2 {
+  font-size: clamp(2rem, 5.5vw, 3.6rem);
+  font-weight: 300;
+  letter-spacing: -.03em;
+  margin-bottom: 1.2rem;
+}
+.contacto p { color: var(--texto-tenue); max-width: 52ch; margin-bottom: 2.2rem; }
+
+.acciones { display: flex; gap: .8rem; flex-wrap: wrap; }
+.boton {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  padding: .9rem 1.7rem;
+  border-radius: 2px;
+  font-size: .88rem;
+  font-weight: 500;
+  letter-spacing: .02em;
+  transition: opacity .25s ease, background .25s ease, border-color .25s ease;
+}
+.boton-primario { background: var(--acento); color: var(--fondo); }
+.boton-primario:hover { opacity: .85; }
+.boton-secundario { border: 1px solid var(--borde); color: var(--texto); }
+.boton-secundario:hover { border-color: var(--texto-debil); background: rgba(255,255,255,.03); }
+
+.pie {
+  border-top: 1px solid var(--borde);
+  padding: 1.8rem var(--gutter);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  max-width: var(--ancho);
+  margin: 0 auto;
+  font-size: .78rem;
+  color: var(--texto-debil);
+}
+
+/* ---------------------------------------------------------------
+   Visor a pantalla completa
+   --------------------------------------------------------------- */
+.visor {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(6,6,8,.97);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vh, 3rem);
+}
+.visor.abierto { display: flex; }
+.visor img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  animation: aparecer .35s ease;
+}
+@keyframes aparecer { from { opacity: 0; transform: scale(.985) } to { opacity: 1; transform: none } }
+
+.visor-cerrar, .visor-nav {
+  position: absolute;
+  background: none;
+  border: none;
+  color: var(--texto-tenue);
+  cursor: pointer;
+  padding: 1rem;
+  font-size: 1.5rem;
+  line-height: 1;
+  transition: color .2s ease;
+}
+.visor-cerrar:hover, .visor-nav:hover { color: var(--texto); }
+.visor-cerrar { top: .8rem; right: 1rem; }
+.visor-nav.prev { left: .4rem; top: 50%; transform: translateY(-50%); }
+.visor-nav.sig  { right: .4rem; top: 50%; transform: translateY(-50%); }
+.visor-pie {
+  position: absolute;
+  bottom: 1.1rem; left: 50%;
+  transform: translateX(-50%);
+  font-size: .75rem;
+  letter-spacing: .14em;
+  color: var(--texto-debil);
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------
+   Aparicion al desplazar
+   --------------------------------------------------------------- */
+.revelar { opacity: 0; transform: translateY(22px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.8,.2,1); }
+.revelar.visible { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+  .revelar { opacity: 1; transform: none; }
+}
+
+@media (max-width: 760px) {
+  .menu {
+    position: fixed;
+    inset: 0;
+    background: rgba(9,9,11,.98);
+    backdrop-filter: blur(16px);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    transform: translateX(100%);
+    transition: transform .35s cubic-bezier(.2,.8,.2,1);
+  }
+  .menu.abierto { transform: none; }
+  .menu a { font-size: 1.05rem; }
+  .menu-btn { display: block; z-index: 101; }
+  .rejilla { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header class="barra" id="barra">
+  <a href="#" class="marca">
+    <img src="assets/marca/logo-blanco.webp" alt="Logotipo de Visual 3D Studio">
+    <span>Visual 3D Studio</span>
+  </a>
+  <nav class="menu" id="menu">
+    <a href="#arquitectura">Arquitectura</a>
+    <a href="#recorridos">Recorridos</a>
+    <a href="#interiorismo">Interiorismo</a>
+    <a href="#tecnica">Técnica</a>
+    <a href="#software">Software</a>
+    <a href="#contacto">Contacto</a>
+  </nav>
+  <button class="menu-btn" id="menu-btn" aria-label="Abrir menú" aria-expanded="false">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M3 7h18M3 17h18"/>
+    </svg>
+  </button>
+</header>
+
+<section class="portada">
+  <img src="assets/renders/casa-will-01.webp" alt="Render de vivienda campestre al atardecer" fetchpriority="high">
+  <div class="portada-texto">
+    <h1>Antes de construirlo,<br><strong>véalo terminado.</strong></h1>
+    <p>Visualización arquitectónica 3D para vivienda, comercio y espacios
+       corporativos. Bucaramanga, Colombia.</p>
+  </div>
+  <div class="bajada">Desplace</div>
+</section>
+
+<!-- ================= ARQUITECTURA ================= -->
+<section class="seccion" id="arquitectura">
+  <div class="seccion-cabeza revelar">
+    <div class="etiqueta">Obra</div>
+    <h2>Arquitectura</h2>
+    <p>Vivienda unifamiliar, espacios corporativos y comercio. Cada proyecto parte
+       del modelo BIM y termina en imágenes listas para vender el diseño.</p>
+  </div>
+
+  <!-- Los proyectos se generan desde el inventario en JavaScript, al final del
+       archivo. Asi el catalogo se edita en un solo lugar. -->
+  <div id="proyectos-arquitectura"></div>
+</section>
+
+<!-- ================= RECORRIDOS ================= -->
+<section class="seccion" id="recorridos">
+  <div class="seccion-cabeza revelar">
+    <div class="etiqueta">Movimiento</div>
+    <h2>Recorridos</h2>
+    <p>Animaciones que atraviesan el proyecto completo. Sin audio, pensadas para
+       verse en el teléfono durante una reunión.</p>
+  </div>
+  <div class="videos" id="lista-videos"></div>
+</section>
+
+<!-- ================= INTERIORISMO ================= -->
+<section class="seccion" id="interiorismo">
+  <div class="seccion-cabeza revelar">
+    <div class="etiqueta">Detalle</div>
+    <h2>Interiorismo y mobiliario</h2>
+    <p>Cocinas, closets y comercio. Piezas a medida representadas con el material
+       y la herrajería reales, para aprobar en obra sin sorpresas.</p>
+  </div>
+  <div id="proyectos-interiorismo"></div>
+</section>
+
+<!-- ================= TECNICA ================= -->
+<section class="seccion" id="tecnica">
+  <div class="seccion-cabeza revelar">
+    <div class="etiqueta">Fundamento</div>
+    <h2>Base técnica</h2>
+    <p>Detrás de cada imagen hay un modelo que se sostiene: geometría real,
+       planos coordinados y criterio de ingeniería civil.</p>
+  </div>
+
+  <div class="columnas revelar" style="margin-bottom: 3.5rem;">
+    <div class="columna">
+      <span class="num">01</span>
+      <h4>Modelado BIM</h4>
+      <p>El proyecto se levanta en Revit con elementos reales, no volúmenes
+         decorativos. De ahí salen cortes, plantas y cantidades coherentes entre sí.</p>
+    </div>
+    <div class="columna">
+      <span class="num">02</span>
+      <h4>Planos coordinados</h4>
+      <p>Planos arquitectónicos que acompañan la entrega, alineados con el modelo
+         que produjo los renders.</p>
+    </div>
+    <div class="columna">
+      <span class="num">03</span>
+      <h4>Criterio estructural</h4>
+      <p>Formación en ingeniería civil (UPB Bucaramanga). Las luces, los espesores
+         y los apoyos que se dibujan son construibles.</p>
+    </div>
+  </div>
+
+  <div id="proyectos-tecnica"></div>
+
+  <div class="proyecto revelar" style="margin-top: 3.5rem;">
+    <div class="proyecto-cabeza">
+      <h3>Lámina de propuesta · Coincafex</h3>
+      <span class="proyecto-meta">Fachada en acero corten microperforado</span>
+    </div>
+    <figure class="lamina pieza" data-slug="lamina" data-indice="0"
+            data-titulo="Lámina Coincafex" style="aspect-ratio:auto;"
+            data-orden='["assets/renders/coincafex-07.webp"]'>
+      <img src="assets/renders/coincafex-07.webp"
+           alt="Lámina de propuesta arquitectónica para la fachada de Coincafex"
+           loading="lazy" decoding="async">
+    </figure>
+    <p class="lamina-pie">Justificación, premisas de diseño y detalle constructivo del panel modular.</p>
+  </div>
+</section>
+
+<!-- ================= SOFTWARE ================= -->
+<section class="seccion" id="software">
+  <div class="seccion-cabeza revelar">
+    <div class="etiqueta">Además</div>
+    <h2>Software propio</h2>
+    <p>Herramientas construidas para resolver problemas concretos de obra y de
+       gestión. Todas en uso real, no prototipos.</p>
+  </div>
+
+  <div class="apps revelar">
+    <div class="app">
+      <h4>STICK AROS</h4>
+      <p>Gestión de obra con asistencia de IA. Diseñada para funcionar con señal
+         pobre en campo: cada byte cuenta.</p>
+      <div class="stack">React 19 · Express · Gemini</div>
+      <a class="enlace" href="https://stick-aros.vercel.app" target="_blank" rel="noopener">Ver aplicación</a>
+    </div>
+    <div class="app">
+      <h4>STICK QUANTITY</h4>
+      <p>Calculadora de cantidades de obra por capítulos. Sin dependencias, abre
+         en cualquier navegador.</p>
+      <div class="stack">HTML · Sin dependencias</div>
+      <a class="enlace" href="https://zafirosad.github.io/STICK-QUANTITY/" target="_blank" rel="noopener">Ver aplicación</a>
+    </div>
+    <div class="app">
+      <h4>STICK PROJECTS</h4>
+      <p>Suite financiera empresarial: control de proyectos, costos y flujo de
+         caja en un solo tablero.</p>
+      <div class="stack">React · Supabase</div>
+      <a class="enlace" href="https://stick-projects.vercel.app" target="_blank" rel="noopener">Ver aplicación</a>
+    </div>
+    <div class="app">
+      <h4>STICK ASSETS</h4>
+      <p>Seguimiento de portafolio de inversiones con histórico y rendimiento por
+         posición.</p>
+      <div class="stack">React · Vite · Supabase</div>
+    </div>
+    <div class="app">
+      <h4>PINDI</h4>
+      <p>Propuesta de identidad y producto para una aplicación de eventos:
+         pantallas, marca y flujo de acceso.</p>
+      <div class="stack">Diseño de producto</div>
+    </div>
+    <div class="app">
+      <h4>Bot de informes</h4>
+      <p>Automatización que recibe reportes por WhatsApp, los estructura con IA y
+         los archiva en Drive.</p>
+      <div class="stack">Apps Script · Gemini · Drive</div>
+    </div>
+  </div>
+
+  <div class="rejilla revelar" style="margin-top: 2.5rem;" id="rejilla-pindi"></div>
+</section>
+
+<!-- ================= CONTACTO ================= -->
+<section class="contacto" id="contacto">
+  <div class="seccion">
+    <div class="revelar">
+      <h2>Hablemos de su proyecto.</h2>
+      <p>Envíe los planos o un boceto y le indico alcance, tiempo y valor.
+         Respuesta el mismo día.</p>
+      <div class="acciones">
+        <a class="boton boton-primario" id="btn-whatsapp" href="#" target="_blank" rel="noopener">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 01-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.2 8.2 0 015.83 2.42 8.18 8.18 0 012.41 5.82c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.43.06-.65.31-.22.25-.85.83-.85 2.03s.87 2.35.99 2.51c.12.17 1.71 2.61 4.15 3.66.58.25 1.03.4 1.39.51.58.19 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29z"/>
+          </svg>
+          Escribir por WhatsApp
+        </a>
+        <a class="boton boton-secundario" id="btn-correo" href="#">Enviar correo</a>
+      </div>
+    </div>
+  </div>
+  <div class="pie">
+    <span>VISUAL 3D STUDIO — Bucaramanga, Colombia</span>
+    <span>Kevin Gil · Ingeniería civil UPB</span>
+  </div>
+</section>
+
+<!-- Visor -->
+<div class="visor" id="visor" role="dialog" aria-modal="true" aria-label="Imagen ampliada">
+  <button class="visor-cerrar" id="visor-cerrar" aria-label="Cerrar">&times;</button>
+  <button class="visor-nav prev" id="visor-prev" aria-label="Anterior">&#8249;</button>
+  <img id="visor-img" src="" alt="">
+  <button class="visor-nav sig" id="visor-sig" aria-label="Siguiente">&#8250;</button>
+  <div class="visor-pie" id="visor-pie"></div>
+</div>
+
+<script>
+/* =================================================================
+   DATOS DE CONTACTO — editar aquí
+   El numero va en formato internacional sin signos: 57 + celular.
+   ================================================================= */
+const CONTACTO = {
+  whatsapp: '573000000000',
+  mensaje:  'Hola, vi el portafolio de Visual 3D Studio y quiero cotizar un proyecto.',
+  correo:   'kevingilarevalo10@gmail.com'
+};
+
+/* =================================================================
+   INVENTARIO DE PROYECTOS
+   slug     prefijo de los archivos en assets/renders
+   n        cuantas imagenes tiene (nombradas slug-01.webp ... slug-NN.webp)
+   portada  cual de ellas abre el bloque, ocupando doble ancho
+   ================================================================= */
+const ARQUITECTURA = [
+  { slug:'casa-will',    titulo:'Casa Will',            meta:'Vivienda campestre',        n:3,  portada:1 },
+  { slug:'cazadores',    titulo:'Lote 1 · Cazadores',   meta:'Vivienda unifamiliar · En curso', n:14, portada:9 },
+  { slug:'cantabria-1',  titulo:'Lote 1 · Cantabria',   meta:'Vivienda unifamiliar · En curso', n:15, portada:6 },
+  { slug:'cantabria-23', titulo:'Lote 23 · Cantabria',  meta:'Vivienda unifamiliar · En curso', n:13, portada:7 },
+  { slug:'punta',        titulo:'La Punta',             meta:'Vivienda de lujo',          n:22, portada:16 },
+  { slug:'ruitoque',     titulo:'Casa 34 · Ruitoque',   meta:'Vivienda urbana · Día y noche', n:2, portada:1 },
+  // La imagen 7 es la lamina de presentacion: se muestra completa en la
+  // seccion tecnica, no recortada dentro de la galeria
+  { slug:'coincafex',    titulo:'Coincafex',            meta:'Sede corporativa',          n:10, portada:3, omitir:[7] }
+];
+
+const INTERIORISMO = [
+  { slug:'lebrija',        titulo:'Lebrija',         meta:'Closets y cocinas a medida', n:17, portada:1, mobiliario:true },
+  { slug:'cocina-comedor', titulo:'Cocina comedor',  meta:'Interiorismo residencial',   n:3,  portada:1 },
+  { slug:'snacks',         titulo:'Snacks',          meta:'Local comercial',            n:3,  portada:1 }
+];
+
+const TECNICA = [
+  { slug:'estudio-solar', titulo:'Estudio de asoleamiento', meta:'Análisis de iluminación natural', n:3, portada:1 }
+];
+
+const VIDEOS = [
+  { slug:'coincafex',    titulo:'Coincafex' },
+  { slug:'cazadores',    titulo:'Lote 1 · Cazadores' },
+  { slug:'cantabria-1',  titulo:'Lote 1 · Cantabria' },
+  { slug:'cantabria-23', titulo:'Lote 23 · Cantabria' },
+  { slug:'punta',        titulo:'La Punta' },
+  { slug:'ruitoque',     titulo:'Casa 34 · Ruitoque' }
+];
+
+/* =================================================================
+   CONSTRUCCION DE LA PAGINA
+   ================================================================= */
+
+// Devuelve la ruta de la imagen numero i de un proyecto
+const ruta = (slug, i) => `assets/renders/${slug}-${String(i).padStart(2,'0')}.webp`;
+
+function crearProyecto(p) {
+  const bloque = document.createElement('article');
+  bloque.className = 'proyecto';
+
+  const fuera = p.omitir || [];
+  const orden = [p.portada];
+  for (let i = 1; i <= p.n; i++) {
+    if (i !== p.portada && !fuera.includes(i)) orden.push(i);
+  }
+
+  // El revelado se aplica solo al encabezado. Si envolviera el bloque entero,
+  // un proyecto de 22 imagenes quedaria invisible hasta que el navegador
+  // decidiera que ya intersecta lo suficiente.
+  bloque.innerHTML = `
+    <div class="proyecto-cabeza revelar">
+      <h3>${p.titulo}</h3>
+      <span class="proyecto-meta">${p.meta}</span>
+    </div>
+    <div class="rejilla${p.mobiliario ? ' mobiliario' : ''}">
+      ${orden.map((i, pos) => `
+        <figure class="pieza${(pos === 0 && orden.length >= 5) ? ' destacada' : ''}"
+                data-slug="${p.slug}" data-indice="${pos}" data-titulo="${p.titulo}">
+          <img src="${ruta(p.slug, i)}" alt="${p.titulo} — imagen ${pos + 1}"
+               loading="lazy" decoding="async">
+        </figure>`).join('')}
+    </div>`;
+
+  // Guarda el orden real para que el visor recorra las imagenes como se ven
+  bloque.dataset.orden = JSON.stringify(orden.map(i => ruta(p.slug, i)));
+  return bloque;
+}
+
+function pintar(contenedor, lista) {
+  const destino = document.getElementById(contenedor);
+  lista.forEach(p => destino.appendChild(crearProyecto(p)));
+}
+
+pintar('proyectos-arquitectura', ARQUITECTURA);
+pintar('proyectos-interiorismo', INTERIORISMO);
+pintar('proyectos-tecnica', TECNICA);
+
+// Videos: no se precargan, solo el fotograma de portada. Asi la pagina
+// no descarga 65 MB al abrirse.
+document.getElementById('lista-videos').innerHTML = VIDEOS.map(v => `
+  <div class="video-bloque revelar">
+    <div class="video-marco">
+      <video controls preload="none" playsinline
+             poster="assets/video/${v.slug}-poster.webp">
+        <source src="assets/video/${v.slug}.mp4" type="video/mp4">
+      </video>
+    </div>
+    <h4>${v.titulo}</h4>
+  </div>`).join('');
+
+// Piezas de PINDI
+document.getElementById('rejilla-pindi').innerHTML = [1,2,3,4].map((i, pos) => `
+  <figure class="pieza" data-slug="pindi" data-indice="${pos}" data-titulo="PINDI">
+    <img src="assets/producto/pindi-${String(i).padStart(2,'0')}.webp"
+         alt="PINDI — pantalla ${i}" loading="lazy" decoding="async">
+  </figure>`).join('');
+document.getElementById('rejilla-pindi').dataset.orden =
+  JSON.stringify([1,2,3,4].map(i => `assets/producto/pindi-${String(i).padStart(2,'0')}.webp`));
+
+/* -----------------------------------------------------------------
+   Aparicion progresiva de las imagenes ya descargadas
+   ----------------------------------------------------------------- */
+function marcarCargada(img) { img.classList.add('cargada'); }
+document.querySelectorAll('.pieza img').forEach(img => {
+  if (img.complete) marcarCargada(img);
+  else img.addEventListener('load', () => marcarCargada(img), { once: true });
+});
+
+/* -----------------------------------------------------------------
+   Visor a pantalla completa
+   ----------------------------------------------------------------- */
+const visor    = document.getElementById('visor');
+const visorImg = document.getElementById('visor-img');
+const visorPie = document.getElementById('visor-pie');
+let galeria = [], indice = 0, tituloActual = '';
+
+function mostrar(i) {
+  indice = (i + galeria.length) % galeria.length;
+  visorImg.src = galeria[indice];
+  visorPie.textContent = `${tituloActual} — ${indice + 1} / ${galeria.length}`;
+}
+
+function abrir(pieza) {
+  const contenedor = pieza.closest('[data-orden]');
+  galeria = JSON.parse(contenedor.dataset.orden);
+  tituloActual = pieza.dataset.titulo;
+  visor.classList.add('abierto');
+  document.body.style.overflow = 'hidden';
+  mostrar(Number(pieza.dataset.indice));
+}
+
+function cerrar() {
+  visor.classList.remove('abierto');
+  document.body.style.overflow = '';
+  visorImg.src = '';
+}
+
+document.addEventListener('click', e => {
+  const pieza = e.target.closest('.pieza');
+  if (pieza) abrir(pieza);
+});
+
+document.getElementById('visor-cerrar').addEventListener('click', cerrar);
+document.getElementById('visor-prev').addEventListener('click', e => { e.stopPropagation(); mostrar(indice - 1); });
+document.getElementById('visor-sig').addEventListener('click',  e => { e.stopPropagation(); mostrar(indice + 1); });
+visor.addEventListener('click', e => { if (e.target === visor) cerrar(); });
+
+document.addEventListener('keydown', e => {
+  if (!visor.classList.contains('abierto')) return;
+  if (e.key === 'Escape')     cerrar();
+  if (e.key === 'ArrowLeft')  mostrar(indice - 1);
+  if (e.key === 'ArrowRight') mostrar(indice + 1);
+});
+
+// Deslizar con el dedo en el visor
+let tactilX = null;
+visor.addEventListener('touchstart', e => { tactilX = e.changedTouches[0].clientX; }, { passive: true });
+visor.addEventListener('touchend', e => {
+  if (tactilX === null) return;
+  const salto = e.changedTouches[0].clientX - tactilX;
+  if (Math.abs(salto) > 55) mostrar(indice + (salto < 0 ? 1 : -1));
+  tactilX = null;
+}, { passive: true });
+
+/* -----------------------------------------------------------------
+   Barra superior y menu
+   ----------------------------------------------------------------- */
+const barra = document.getElementById('barra');
+addEventListener('scroll', () => {
+  barra.classList.toggle('solida', scrollY > 60);
+}, { passive: true });
+
+const menu = document.getElementById('menu');
+const menuBtn = document.getElementById('menu-btn');
+menuBtn.addEventListener('click', () => {
+  const abierto = menu.classList.toggle('abierto');
+  menuBtn.setAttribute('aria-expanded', String(abierto));
+});
+menu.addEventListener('click', e => {
+  if (e.target.tagName === 'A') {
+    menu.classList.remove('abierto');
+    menuBtn.setAttribute('aria-expanded', 'false');
+  }
+});
+
+/* -----------------------------------------------------------------
+   Revelado al desplazar
+   ----------------------------------------------------------------- */
+const observador = new IntersectionObserver((entradas) => {
+  entradas.forEach(en => {
+    if (en.isIntersecting) {
+      en.target.classList.add('visible');
+      observador.unobserve(en.target);
+    }
+  });
+}, { threshold: .08, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.revelar').forEach(el => observador.observe(el));
+
+/* -----------------------------------------------------------------
+   Enlaces de contacto
+   ----------------------------------------------------------------- */
+document.getElementById('btn-whatsapp').href =
+  `https://wa.me/${CONTACTO.whatsapp}?text=${encodeURIComponent(CONTACTO.mensaje)}`;
+document.getElementById('btn-correo').href =
+  `mailto:${CONTACTO.correo}?subject=${encodeURIComponent('Cotización de renders — Visual 3D Studio')}`;
+</script>
+
+</body>
+</html>
