@@ -16,8 +16,16 @@ $RAIZ    = Split-Path -Parent $PSScriptRoot
 $DESTINO = Join-Path $RAIZ 'assets\renders'
 $BASE    = 'C:\Users\kevin\Documents\KEVIN\VISUAL 3D STUDIO'
 
-$ANCHO_MAX = 1920
-$CALIDAD   = 82
+# Dos tamanos por imagen. El navegador elige segun el ancho real que va a
+# ocupar y segun la densidad de la pantalla: en un portatil normal baja la
+# de 1600, en un monitor grande o una pantalla retina baja la de 2560.
+# Servir una sola imagen obliga a elegir entre castigar el movil o
+# desperdiciar la pantalla buena.
+$ANCHO_MAX = 1600
+$CALIDAD   = 86
+
+$ANCHO_ALTA = 2560
+$CALIDAD_ALTA = 90
 
 # Los renders generados con IA (Whisk / Gemini) traen una marca de agua fija en la
 # esquina superior izquierda, que ocupa hasta el 6% del ancho y el 11% del alto.
@@ -127,6 +135,16 @@ foreach ($proy in $PROYECTOS) {
             -vf $filtro `
             -c:v libwebp -quality $CALIDAD -compression_level 6 `
             $salida 2>&1 | Out-Null
+
+        # Version de alta densidad, para pantallas grandes y retina
+        $salidaAlta = Join-Path $DESTINO ('{0}-{1:d2}@2x.webp' -f $slug, $i)
+        $filtroAlta = if ($proy.marca) { "$RECORTE,scale='min($ANCHO_ALTA,iw)':-2" }
+                      else             { "scale='min($ANCHO_ALTA,iw)':-2" }
+
+        & ffmpeg -y -loglevel error -i $img.FullName `
+            -vf $filtroAlta `
+            -c:v libwebp -quality $CALIDAD_ALTA -compression_level 6 `
+            $salidaAlta 2>&1 | Out-Null
 
         if (Test-Path $salida) { $totalOk++ } else { $totalErr++; Write-Warning "Fallo: $($img.Name)" }
     }
