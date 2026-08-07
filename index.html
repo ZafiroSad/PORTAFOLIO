@@ -158,7 +158,15 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 @keyframes aparecer { to { opacity:1 } }
 
 /* ============ Secciones ======================================= */
-.seccion { padding:clamp(4rem,11vh,8rem) var(--margen); scroll-margin-top:var(--barra); }
+/* Cada seccion ocupa al menos la pantalla completa por debajo de la
+   barra: al saltar desde el menu, la seccion queda encuadrada de arriba
+   a abajo en vez de aparecer a media altura */
+.seccion {
+  padding:clamp(3rem,7vh,5rem) var(--margen);
+  scroll-margin-top:var(--barra);
+  min-height:calc(100svh - var(--barra));
+  display:flex; flex-direction:column; justify-content:center;
+}
 .cabeza { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(1.5rem,4vw,4rem); align-items:end;
   margin-bottom:clamp(2.5rem,6vh,4rem); padding-bottom:1.6rem; border-bottom:1px solid rgba(39,39,42,.1); }
 @media (max-width:860px){ .cabeza { grid-template-columns:1fr; gap:1rem } }
@@ -226,39 +234,69 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 .bio p { color:var(--tenue); font-size:1rem; margin-bottom:1.1rem; max-width:60ch; }
 .bio p strong { color:var(--tinta); font-weight:500; }
 
-.hitos { border-top:1px solid rgba(39,39,42,.1); }
-.hito { display:grid; grid-template-columns:auto 1fr; gap:1.4rem; padding:1.1rem 0; border-bottom:1px solid rgba(39,39,42,.1); }
-.hito .anio { font-family:var(--mono); font-size:.64rem; letter-spacing:.12em; color:var(--debil); padding-top:.3rem; white-space:nowrap; }
-.hito .escudo { width:38px; height:38px; border-radius:10px; border:1px solid rgba(39,39,42,.14);
-  display:flex; align-items:center; justify-content:center; overflow:hidden; flex:none;
-  font-family:var(--mono); font-size:.58rem; font-weight:700; letter-spacing:.02em; color:var(--tenue); }
-.hito .escudo img { width:100%; height:100%; object-fit:contain; padding:5px; }
-.hito .cuerpo { display:flex; gap:1rem; align-items:flex-start; }
-.hito h4 { font-size:.98rem; font-weight:500; margin-bottom:.15rem; }
-.hito p { font-size:.85rem; color:var(--tenue); margin:0; }
-.hito .marca-estado { font-family:var(--mono); font-size:.58rem; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--debil); border:1px solid rgba(39,39,42,.14); border-radius:8px; padding:.15rem .45rem; margin-left:.5rem; }
+/* --- Trayecto: linea de tiempo con hilo continuo -------------- */
+.hitos { position:relative; padding-left:2.6rem; }
+/* El hilo se dibuja de arriba abajo cuando la seccion entra en pantalla */
+.hitos::before {
+  content:''; position:absolute; left:13px; top:.6rem; bottom:.6rem; width:1px;
+  background:rgba(39,39,42,.16);
+  transform:scaleY(0); transform-origin:top;
+  transition:transform 1.6s var(--salida);
+}
+.hitos.visible::before { transform:scaleY(1); }
 
-/* --- Herramientas ------------------------------------------- */
-.herramientas { display:grid; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); gap:.7rem; margin-top:1.6rem; }
+.hito { position:relative; padding:0 0 clamp(1.6rem,3vh,2.4rem) 0;
+  opacity:0; transform:translateX(14px);
+  transition:opacity .8s var(--suave), transform .9s var(--salida); }
+.hitos.visible .hito { opacity:1; transform:none; }
+.hito:last-child { padding-bottom:0; }
+
+/* El escudo se posa sobre el hilo */
+.hito .escudo {
+  position:absolute; left:-2.6rem; top:0;
+  width:28px; height:28px; border-radius:8px;
+  background:var(--fondo); border:1px solid rgba(39,39,42,.14);
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+  font-family:var(--mono); font-size:.46rem; font-weight:700; color:var(--debil);
+  transition:border-color .4s var(--suave), transform .6s var(--salida);
+}
+.hito:hover .escudo { border-color:rgba(39,39,42,.42); transform:scale(1.12); }
+.hito .escudo img { width:100%; height:100%; object-fit:contain; padding:3px; }
+
+.hito .anio { font-family:var(--mono); font-size:.6rem; letter-spacing:.18em; color:var(--debil); }
+.hito h4 { font-size:1.02rem; font-weight:500; margin:.3rem 0 .2rem; }
+.hito p { font-size:.86rem; color:var(--tenue); margin:0; max-width:52ch; }
+.hito .marca-estado { font-family:var(--mono); font-size:.55rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--tenue); background:rgba(39,39,42,.06); border-radius:6px; padding:.18rem .5rem; margin-left:.6rem;
+  vertical-align:middle; }
+
+/* --- Herramientas: tira continua, sin cajas ------------------- */
+/* Los logos vienen de marcas distintas y con formas muy diferentes.
+   Encerrarlos en tarjetas iguales hacia evidente ese desorden; sueltos
+   sobre el papel, alineados por una linea base comun, se leen como un
+   inventario y no como una parrilla de botones. */
+.herramientas { display:flex; flex-wrap:wrap; gap:clamp(1.6rem,3vw,2.8rem) clamp(1.8rem,3.5vw,3.2rem); margin-top:2rem; align-items:flex-end; }
 .util {
-  position:relative; aspect-ratio:1; border-radius:14px;
-  border:1px solid rgba(39,39,42,.12); background:#fff;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.5rem;
-  opacity:0; transform:translateY(18px) rotateX(-22deg);
-  transform-origin:center bottom;
-  transition:opacity .7s var(--suave), transform .9s var(--salida),
-             border-color .4s var(--suave), box-shadow .4s var(--suave);
+  display:flex; flex-direction:column; align-items:center; gap:.7rem;
+  opacity:0; transform:translateY(20px);
+  transition:opacity .8s var(--suave), transform .9s var(--salida);
 }
 .herramientas.visible .util { opacity:1; transform:none; }
-.util:hover { border-color:rgba(39,39,42,.34); box-shadow:0 10px 30px rgba(0,0,0,.07); }
 .util .simbolo {
-  width:38px; height:38px; display:flex; align-items:center; justify-content:center;
-  transition:transform .6s var(--salida);
+  width:clamp(34px,3.4vw,46px); height:clamp(34px,3.4vw,46px);
+  display:flex; align-items:center; justify-content:center;
+  filter:grayscale(1) opacity(.55);
+  transition:filter .5s var(--suave), transform .7s var(--salida);
 }
-.util:hover .simbolo { transform:scale(1.14) rotate(-4deg); }
-.util .nombre { font-family:var(--mono); font-size:.55rem; letter-spacing:.13em; text-transform:uppercase; color:var(--tenue); text-align:center; padding:0 .3rem; }
-.util svg { width:100%; height:100%; }
+/* En reposo van en gris: el conjunto se ve ordenado pese a venir de
+   paletas ajenas. El color aparece solo en el que se senala. */
+.util:hover .simbolo { filter:grayscale(0) opacity(1); transform:translateY(-6px) scale(1.1); }
+.util .nombre {
+  font-family:var(--mono); font-size:.56rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--debil); transition:color .4s var(--suave);
+}
+.util:hover .nombre { color:var(--tinta); }
+.util img, .util svg { width:100%; height:100%; object-fit:contain; }
 
 /* ============ CONTACTO ======================================== */
 .acciones { display:flex; gap:.7rem; flex-wrap:wrap; margin-top:.5rem; }
@@ -332,20 +370,60 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 }
 
 /* ============ Índice de todos los proyectos =================== */
-.ver-todos { display:flex; justify-content:center; margin-top:clamp(1.5rem,4vh,2.5rem); }
+.ver-todos { display:flex; justify-content:center; margin-top:clamp(1.8rem,4vh,3rem); }
+/* Boton ancho, con la cuenta de proyectos y una franja que lo cruza al
+   pasar el cursor: pesa lo suficiente para no perderse bajo la vitrina */
+.btn-todos {
+  position:relative; overflow:hidden;
+  display:inline-flex; align-items:center; gap:1.2rem;
+  padding:1.1rem 2.4rem; border-radius:14px;
+  background:var(--tinta); color:var(--fondo);
+  font-size:.9rem; font-weight:500;
+  transition:transform .25s var(--suave), box-shadow .5s var(--suave);
+}
+.btn-todos:hover { transform:translateY(-2px); box-shadow:0 14px 34px rgba(0,0,0,.16); }
+.btn-todos:active { transform:scale(.98); }
+.btn-todos .cuenta { font-family:var(--mono); font-size:.65rem; letter-spacing:.16em; opacity:.6; }
+.btn-todos .flecha { width:22px; height:1px; background:currentColor; transition:width .5s var(--salida); }
+.btn-todos:hover .flecha { width:40px; }
+.btn-todos::before {
+  content:''; position:absolute; inset:0; background:rgba(255,255,255,.16);
+  transform:translateX(-101%); transition:transform .6s var(--salida);
+}
+.btn-todos:hover::before { transform:translateX(101%); }
+.btn-todos > * { position:relative; z-index:1; }
 .indice-capa { position:fixed; inset:0; z-index:210; background:var(--fondo);
   overflow-y:auto; overscroll-behavior:contain;
   opacity:0; visibility:hidden; transition:opacity .45s var(--suave), visibility .45s; }
 .indice-capa.abierta { opacity:1; visibility:visible; }
-.rejilla-todos { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-  gap:clamp(1rem,2vw,1.8rem); padding:clamp(1.5rem,4vh,3rem) var(--margen) clamp(4rem,9vh,6rem); }
-.tarjeta { cursor:pointer; opacity:0; transform:translateY(24px); }
+/* Retícula de doce columnas: las piezas alternan tamaño para que el
+   indice tenga el mismo pulso que la galeria y no sea un catalogo plano */
+.rejilla-todos { display:grid; grid-template-columns:repeat(12,1fr);
+  gap:clamp(.7rem,1.4vw,1.2rem); padding:clamp(1.5rem,4vh,3rem) var(--margen) clamp(4rem,9vh,6rem); }
+.tarjeta { position:relative; cursor:pointer; grid-column:span 4; opacity:0; transform:translateY(26px); }
 .rejilla-todos.visible .tarjeta { opacity:1; transform:none; transition:opacity .8s var(--suave), transform .9s var(--salida); }
-.tarjeta-marco { position:relative; aspect-ratio:4/3; overflow:hidden; border-radius:14px; background:var(--z-150); }
-.tarjeta-marco img { width:100%; height:104%; object-fit:cover; transition:transform 1.2s var(--salida); }
-.tarjeta:hover .tarjeta-marco img { transform:scale(1.045); }
-.tarjeta h4 { font-size:1rem; font-weight:500; margin-top:.8rem; }
-.tarjeta .tipo { font-family:var(--mono); font-size:.6rem; letter-spacing:.18em; text-transform:uppercase; color:var(--debil); margin-top:.15rem; }
+.tarjeta:nth-child(7n+1) { grid-column:span 7; }
+.tarjeta:nth-child(7n+2) { grid-column:span 5; }
+.tarjeta:nth-child(7n+3),
+.tarjeta:nth-child(7n+4),
+.tarjeta:nth-child(7n+5) { grid-column:span 4; }
+.tarjeta:nth-child(7n+6) { grid-column:span 5; }
+.tarjeta:nth-child(7n)   { grid-column:span 7; }
+@media (max-width:860px){ .tarjeta, .tarjeta:nth-child(n) { grid-column:span 12; } }
+
+.tarjeta-marco { position:relative; aspect-ratio:16/10; overflow:hidden; border-radius:14px; background:var(--z-150); }
+.tarjeta-marco img { width:100%; height:106%; object-fit:cover; transition:transform 1.3s var(--salida), filter .6s var(--suave); filter:brightness(.97); }
+.tarjeta:hover .tarjeta-marco img { transform:scale(1.05); filter:brightness(.72); }
+/* El rotulo sube desde el borde inferior de la lamina */
+.tarjeta-pie { position:absolute; left:0; right:0; bottom:0; z-index:2; padding:1.2rem 1.3rem; color:#fff; overflow:hidden; }
+.tarjeta-pie > * { display:block; transform:translateY(115%); transition:transform .65s var(--salida); }
+.tarjeta:hover .tarjeta-pie > * { transform:translateY(0); }
+.tarjeta:hover .tarjeta-pie > *:nth-child(2) { transition-delay:.05s }
+.tarjeta-pie h4 { font-size:1.05rem; font-weight:500; }
+.tarjeta-pie .tipo { font-family:var(--mono); font-size:.58rem; letter-spacing:.18em; text-transform:uppercase; opacity:.85; margin-top:.15rem; }
+/* Fuera de foco, el nombre va debajo en negro sobre el papel */
+.tarjeta-nombre { margin-top:.7rem; font-size:.92rem; font-weight:500; transition:opacity .4s var(--suave); }
+.tarjeta:hover .tarjeta-nombre { opacity:.35; }
 
 .ficha-video { margin-top:clamp(.5rem,1.2vw,1rem); }
 .ficha-video .marco { width:100%; aspect-ratio:16/9; background:var(--z-150); overflow:hidden; }
@@ -394,6 +472,7 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
     <span>KEVIN GIL</span>
   </a>
   <nav class="menu" id="menu">
+    <a href="#inicio" data-reiniciar>Inicio</a>
     <a href="#proyectos">Proyectos</a>
     <a href="#sobre">Sobre mí</a>
     <a href="#contacto">Contacto</a>
@@ -437,7 +516,7 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   </div>
   <div class="vitrina" id="vitrina"></div>
   <div class="ver-todos">
-    <button class="boton boton-secundario" data-ver-todos>Ver todos los proyectos</button>
+    <button class="btn-todos" data-ver-todos><span>Ver todos los proyectos</span><span class="cuenta">11</span><span class="flecha"></span></button>
   </div>
 </section>
 
@@ -612,15 +691,14 @@ const HITOS = [
 const UTILES = [
   { nombre:'Revit',       logo:'assets/logos/revit.webp' },
   { nombre:'AutoCAD',     logo:'assets/logos/autocad.webp' },
+  { nombre:'Civil 3D',    logo:'assets/logos/civil3d.webp' },
+  { nombre:'SketchUp',    logo:'assets/logos/sketchup.webp' },
   { nombre:'D5 Render',   logo:'assets/logos/d5.webp' },
-  { nombre:'Civil 3D',    svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 28c6-10 10 4 15-4s10 2 15-6"/><path d="M5 33h30"/></svg>' },
-  { nombre:'SketchUp',    svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 6l13 7v14l-13 7-13-7V13z"/><path d="M20 20l13-7M20 20v14M20 20L7 13"/></svg>' },
-  { nombre:'Twinmotion',  svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 26c4-6 8-6 12 0s10 4 14-4"/><path d="M7 33h26"/><path d="M13 26V14M27 22V11"/></svg>' },
-  { nombre:'Claude',      svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 30l7-20 7 20"/><path d="M16 23h8"/></svg>' },
-  { nombre:'Claude Code', svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 13l-8 7 8 7M25 13l8 7-8 7"/></svg>' },
-  { nombre:'ChatGPT',     svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 7l11 6.5v13L20 33 9 26.5v-13z"/><circle cx="20" cy="20" r="4"/></svg>' },
-  { nombre:'Canva',       svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="20" cy="20" r="13"/><path d="M25 16c-3-3-9-1-9 4s6 7 9 4"/></svg>' },
-  { nombre:'Excel',       svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="8" y="8" width="24" height="24" rx="2"/><path d="M8 16h24M8 24h24M16 8v24M24 8v24"/></svg>' }
+  { nombre:'Twinmotion',  logo:'assets/logos/twinmotion.webp' },
+  { nombre:'Claude Code', logo:'assets/logos/claudecode.webp' },
+  { nombre:'ChatGPT',     logo:'assets/logos/chatgpt.webp' },
+  { nombre:'Canva',       logo:'assets/logos/canva.webp' },
+  { nombre:'Excel',       logo:'assets/logos/excel.webp' }
 ];
 
 let PALETAS = {};
@@ -672,13 +750,16 @@ const capaIndice = document.getElementById('indice-capa');
 const rejilla    = document.getElementById('rejilla-todos');
 
 rejilla.innerHTML = TODOS.map((p, i) => `
-  <article class="tarjeta" data-slug="${p.slug}" tabindex="0" role="button" style="transition-delay:${(Math.min(i,8)*.05).toFixed(2)}s">
+  <article class="tarjeta" data-slug="${p.slug}" tabindex="0" role="button" aria-label="Ver ${p.titulo}" style="transition-delay:${(Math.min(i,9)*.05).toFixed(2)}s">
     <div class="tarjeta-marco">
       <img src="${ruta(p.slug, p.portada)}" srcset="${juego(p.slug, p.portada)}"
-           sizes="(max-width:700px) 100vw, 33vw" alt="${p.titulo}" loading="lazy" decoding="async">
+           sizes="(max-width:860px) 100vw, 50vw" alt="${p.titulo}" loading="lazy" decoding="async">
+      <div class="tarjeta-pie">
+        <h4>${p.titulo}</h4>
+        <div class="tipo mono">${p.tipo}</div>
+      </div>
     </div>
-    <h4>${p.titulo}</h4>
-    <div class="tipo mono">${p.tipo}</div>
+    <div class="tarjeta-nombre">${p.titulo}</div>
   </article>`).join('');
 
 function abrirIndice() {
@@ -702,16 +783,12 @@ capaIndice.addEventListener('click', e => {
 /* =================================================================
    SOBRE MI
    ================================================================= */
-document.getElementById('hitos').innerHTML = HITOS.map(h => `
-  <div class="hito">
+document.getElementById('hitos').innerHTML = HITOS.map((h, i) => `
+  <div class="hito" style="transition-delay:${(i * .08).toFixed(2)}s">
+    <div class="escudo">${h.escudo ? `<img src="${h.escudo}" alt="">` : h.sigla}</div>
     <div class="anio mono">${h.anio}</div>
-    <div class="cuerpo">
-      <div class="escudo">${h.escudo ? `<img src="${h.escudo}" alt="">` : h.sigla}</div>
-      <div>
-        <h4>${h.titulo}${h.estado ? `<span class="marca-estado">${h.estado}</span>` : ''}</h4>
-        <p>${h.detalle}</p>
-      </div>
-    </div>
+    <h4>${h.titulo}${h.estado ? `<span class="marca-estado">${h.estado}</span>` : ''}</h4>
+    <p>${h.detalle}</p>
   </div>`).join('');
 
 document.getElementById('herramientas').innerHTML = UTILES.map((u, i) => `
@@ -829,12 +906,19 @@ function abrirFicha(slug, hoja) {
   ficha.scrollTop = 0;
   const hasta = contenido.querySelector('.ficha-principal').getBoundingClientRect();
 
+  // La ficha se vuelve opaca MIENTRAS el clon viaja, no al final. Si se
+  // espera al aterrizaje, durante todo el vuelo se ve la pagina anterior
+  // por detras del clon y el movimiento se lee sucio.
+  ficha.animate([{ opacity:0 }, { opacity:1 }],
+    { duration: 420, delay: 220, easing: 'ease-out', fill: 'forwards' });
+
   viajero.animate([
     { left:`${desde.left}px`, top:`${desde.top}px`, width:`${desde.width}px`, height:`${desde.height}px` },
     { left:`${hasta.left}px`, top:`${hasta.top}px`, width:`${hasta.width}px`, height:`${hasta.height}px` }
   ], { duration: 800, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' })
    .onfinish = () => {
       ficha.classList.add('abierta');
+      ficha.getAnimations().forEach(a => a.cancel());
       ficha.style.opacity = '';
       ficha.style.visibility = '';
       setTimeout(() => viajero.remove(), 120);
@@ -915,6 +999,41 @@ function saltarA(destino) {
   }, 390);
 }
 
+/* Volver al inicio vuelve a tocar la entrada completa: la mascara
+   tipografica, la lamina abriendose y el titulo emergiendo. Se rehacen
+   los nodos animados porque una animacion CSS ya consumida no se puede
+   rebobinar sin reemplazar el elemento. */
+function volverAlInicio() {
+  if (saltando) return;
+  saltando = true;
+
+  wipe.classList.remove('saliendo');
+  wipe.classList.add('entrando');
+
+  setTimeout(() => {
+    const previo = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+    scrollTo(0, 0);
+    document.documentElement.style.scrollBehavior = previo;
+    history.replaceState(null, '', location.pathname);
+
+    const mascara = document.querySelector('.mascara-marca');
+    const inicio  = document.getElementById('inicio');
+    if (mascara && inicio) {
+      const copiaMascara = mascara.cloneNode(true);
+      const copiaInicio  = inicio.cloneNode(true);
+      mascara.replaceWith(copiaMascara);
+      inicio.replaceWith(copiaInicio);
+      repartir(copiaMascara.querySelector('#linea1'), 'STICK', .35);
+      repartir(copiaMascara.querySelector('#linea2'), 'INDUSTRIES', .75);
+    }
+
+    wipe.classList.remove('entrando');
+    wipe.classList.add('saliendo');
+    setTimeout(() => { saltando = false; }, 390);
+  }, 390);
+}
+
 document.addEventListener('click', e => {
   if (e.target.closest('.ficha')) {
     const salto = e.target.closest('[data-proyecto]');
@@ -922,7 +1041,11 @@ document.addEventListener('click', e => {
     return;
   }
 
-  const enlace = e.target.closest('.menu a, .marca');
+  // Inicio no solo sube: vuelve a tocar la animación de entrada
+  const reinicio = e.target.closest('[data-reiniciar], .marca');
+  if (reinicio) { e.preventDefault(); volverAlInicio(); return; }
+
+  const enlace = e.target.closest('.menu a');
   if (enlace) {
     const destino = enlace.getAttribute('href');
     if (destino && destino.startsWith('#')) { e.preventDefault(); saltarA(destino); return; }
@@ -1023,7 +1146,7 @@ const observador = new IntersectionObserver(en => {
     observador.unobserve(e.target);
   });
 }, { threshold:.12, rootMargin:'0px 0px -60px 0px' });
-document.querySelectorAll('.revelar, .palabras, .herramientas').forEach(el => observador.observe(el));
+document.querySelectorAll('.revelar, .palabras, .herramientas, .hitos').forEach(el => observador.observe(el));
 
 /* Enlace directo a un proyecto */
 function desdeDireccion() {
