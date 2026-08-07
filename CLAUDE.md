@@ -1,137 +1,105 @@
-﻿# PORTAFOLIO — STICK INDUSTRIES
+﻿# PORTAFOLIO — Kevin Gil
 
-Sitio de portafolio para mostrar el trabajo de visualización arquitectónica a clientes.
+CV interactiva y portafolio de visualización arquitectónica.
 
-> VISUAL 3D STUDIO quedó en pausa. La marca del sitio es **STICK INDUSTRIES**.
-> Por decisión del Señor Stick, el **logo y el favicon siguen siendo los de V3S
-> hasta nuevo aviso**.
-
-## Objetivo
-
-Un enlace que se manda por WhatsApp y abre en dos segundos. Muestra poco y lo
-muestra grande: cuatro proyectos en la pantalla principal, seis imágenes dentro
-de cada uno. Todo lo demás vive en un índice de texto.
+> No busca vender: busca **mostrar el trabajo**. Es la carta de presentación
+> de Kevin Gil como ingeniero civil y visualizador.
 
 ## Estado actual
 
-**v2.0 — funcional, verificado en escritorio. Sin publicar.**
+**v7.2 — funcional, verificado en escritorio. Sin publicar.**
 
-Pendiente antes de publicar:
-1. Cargar el número de WhatsApp real (constante `CONTACTO` en `index.html`)
-2. Decidir sobre las marcas de terceros en los recorridos (ver *Decisiones abiertas*)
-3. Verificar la vista móvil en un teléfono real
-4. Publicar en GitHub Pages o dominio propio
+Pendientes antes de publicar:
+1. Los dos usuarios de **Instagram** (hoy `PENDIENTE` en la constante `CONTACTO`)
+2. Confirmar que el **315 630 7424** de la hoja de vida es el número para clientes
+3. El logo de **Claude** (falta; los otros diez están puestos)
+4. Verificar la vista **móvil** en un teléfono real
+5. Decidir **qué proyectos y qué renders** quedan (siguen siendo provisionales)
+6. Publicar en GitHub Pages o dominio propio
 
 ## Arquitectura
 
-Un solo `index.html` autonomo: HTML, CSS y JavaScript en el mismo archivo,
+Un solo `index.html` autónomo: HTML, CSS y JavaScript en el mismo archivo,
 sin dependencias ni framework.
 
-### Lenguaje visual (v4)
+```
+PORTAFOLIO/
+├── index.html                   el sitio completo
+├── CLAUDE.md                    este archivo
+├── propuestas/                  las tres portadas que se compararon
+├── assets/
+│   ├── marca/                   logo y favicon (V3S, por decisión explícita)
+│   ├── logos/                   logos de software y escudos de formación
+│   ├── renders/                 210 archivos: 105 imágenes en 1600 y 2560 px
+│   ├── video/                   6 recorridos + fotogramas de portada
+│   └── paletas.json             color dominante por proyecto
+└── herramientas/
+    ├── optimizar-imagenes.ps1   extrae y convierte los renders del archivo
+    ├── optimizar-videos.ps1     comprime los recorridos
+    └── extraer-paletas.ps1      saca el color dominante de cada portada
+```
 
-- **Paleta clara editorial.** Fondo hueso `#faf9f7`, texto negro `#0a0a0a`.
-  El render brilla porque el papel es blanco. Cambiado desde el oscuro
-  original por decision del Senor Stick.
-- **Navegacion en columna lateral fija** a la izquierda, 190 px. Sobre la
-  portada se vuelve transparente para no cortar la imagen.
-- **La obra se recorre en horizontal**, como pasar laminas: rueda del raton
-  traducida a desplazamiento lateral, arrastre con el puntero, flechas y
-  teclado, con riel de avance y contador.
-- **El texto de cada obra va DEBAJO de la lamina.** En paleta clara, tapar
-  el render con un velo oscuro para escribir encima seria trabajar contra
-  la propia paleta.
+### Recorrido
 
-### Recorrido del sitio
+Todo se recorre **desplazando**; el menú superior salta con corte plano (wipe).
 
-1. **Portada** — máscara tipográfica: el render se ve por dentro de las letras
-   de STICK INDUSTRIES, que entran desenfocadas y toman foco una a una. Luego el
-   encuadre se abre y la imagen toma la pantalla completa.
-2. **Obra** — cuatro proyectos en rejilla 2×2. Al pasar el cursor, la tarjeta
-   revela resumen, ficha de datos y la llamada a ver el proyecto.
-3. **Ficha de proyecto** — capa a pantalla completa con portada, datos, galería
-   editorial, recorrido en video y navegación al proyecto anterior o siguiente.
-4. **Archivo** — índice de texto de los siete proyectos restantes. La miniatura
-   flota siguiendo el cursor, con retraso.
-5. **Técnica**, **Software**, **Contacto**.
+1. **Inicio** — máscara tipográfica: el render se ve por dentro de las letras
+   de STICK INDUSTRIES. El botón *Inicio* del menú vuelve a tocarla entera.
+2. **Proyectos** — cuatro hojas verticales a pantalla completa. En reposo el
+   nombre va en vertical; al señalar, la hoja crece y las demás ceden.
+   Botón *Ver todos los proyectos* → índice con los once.
+3. **Sobre mí** — biografía, herramientas en tira desaturada y trayecto como
+   línea de tiempo con hilo continuo.
+4. **Contacto** — solo título y botones.
 
-### El catálogo vive en el JavaScript
+### Lenguaje visual
 
-Al final de `index.html`, `DESTACADOS` y `ARCHIVO` describen cada proyecto:
-`slug`, `titulo`, `tipo`, `portada`, `piezas` (los números de imagen ya curados,
-en orden), `anchas` (cuáles ocupan todo el ancho de la galería), `resumen`,
-`datos`, `texto` y `video`.
-
-Para añadir un proyecto: agregar sus rutas en `optimizar-imagenes.ps1`,
-ejecutarlo, y añadir una entrada al arreglo. El HTML no se toca.
-
-### Los scripts son la fuente de verdad
-
-`assets/` es material derivado: se regenera completo ejecutando los dos scripts.
-El archivo original nunca se modifica; solo se lee desde
-`Documents\KEVIN\VISUAL 3D STUDIO`.
+Sigue `STICK_UI_SYSTEM.md` con la **escala zinc invertida**. El documento
+rector declara *dark-first absoluto* y dice que no se contemplan variantes
+light: esta pieza es la excepción pedida expresamente, y conviene actualizar
+el rector. Se conservan sus demás reglas: mono para todo dato técnico, un solo
+CTA por bloque, bordes con opacidad, radios, microinteracciones.
 
 ## Decisiones tomadas
 
-- **Un solo archivo HTML**, no React. El sitio no tiene estado ni datos dinámicos.
-- **Portada tipográfica** (propuesta C) sobre las otras dos: STICK INDUSTRIES es
-  un nombre nuevo, y esta portada lo planta a pantalla completa en el primer
-  segundo asociándolo de inmediato al trabajo.
-- **Curaduría fuerte:** de 105 imágenes disponibles, la pantalla principal
-  muestra 4. Un portafolio se juzga por su peor imagen, no por la mejor.
-- **Una sola curva de animación** para todo el sitio: `cubic-bezier(.16,1,.3,1)`.
-  Arranca rápido y frena largo.
-- **Los videos no se precargan.** Solo el fotograma de portada; el video baja al
-  pulsar play. Sin esto la página costaría 65 MB al abrirse.
-- **Marca de agua propia: se elimina recortando 12% del encuadre**, no con el
-  filtro `delogo` de ffmpeg — `delogo` interpola desde los bordes y deja un
-  borrón visible cuando la marca cae sobre una línea recta (probado en
-  `cazadores-12`).
-- **En la portada, las letras no se animan con `transform`.** Al mover un
-  elemento recortado con `background-clip:text`, el recorte se rompe y el texto
-  sale negro. Se animan `opacity` y `filter`, y el fondo va con
-  `background-attachment:fixed` para que las letras compongan una sola imagen.
-
-## Material descartado y por qué
-
-- `VideoScreenShot` de las carpetas D5: capturas automáticas de viewport. Son la
-  mayoría de los 3000+ archivos del archivo original.
-- `CANTABRIA D5\IMAGENES` (renders `CNT_*`): salidas crudas de D5, sin decorar.
-  Limpias de marca de agua pero muy inferiores a las de `RENDERS IA`.
-- `LOTE 1 1.jpg` y `LAGO.png`: fotografías reales, no renders.
-- Los dos JPG con nombre de código en `CASA WILL`: volumetría gris sin acabado.
-- `coincafex-07`: es la lámina de propuesta, no un render de galería.
-- `04. MARIO`: no son renders sino la propuesta de la app PINDI.
+- **Un solo archivo HTML.** El sitio no tiene estado ni datos dinámicos.
+- **Paleta clara.** El render brilla porque el papel es blanco.
+- **Al abrir un proyecto la página se tiñe** con el color dominante de su
+  render, mezclado en proporción baja para no comprometer la lectura.
+- **Dos resoluciones por render** (1600 y 2560 px) servidas con `srcset`.
+- **Los logos de software van en gris al 55%** y solo toman color al señalarlos:
+  encerrados en tarjetas iguales, sus formas y paletas dispares se notaban.
+- **Marca de agua propia: se elimina recortando 12% del encuadre**, no con
+  `delogo` de ffmpeg, que deja borrón sobre líneas rectas (`cazadores-12`).
+- **En la portada las letras no se animan con `transform`**: rompe el recorte
+  de `background-clip:text`. Se animan `opacity` y `filter`.
+- **El rótulo vertical se desplaza en el contenedor, no en el texto**: dentro
+  de `writing-mode` vertical con `rotate(180deg)` los ejes quedan girados.
+- **La ficha se funde mientras el clon viaja**, no al aterrizar: si no, se ve
+  la página anterior por detrás durante todo el vuelo.
 
 ## Decisiones abiertas
 
-1. **Marcas de terceros en los recorridos.** Los videos de LOTE 23 CANTABRIA y
-   LOTE 1 CAZADORES llevan incrustado el logo de **BELVAL — Arq. Diego Beltrán
-   Mantilla**, la oficina donde el Señor Stick hace sus prácticas. No se puede
-   quitar sin rehacer el render. Hay que decidir si se publican así, se retiran,
-   o se acompañan de un crédito.
+1. **Marcas de BELVAL** incrustadas en los recorridos de LOTE 23 y CAZADORES
+   (la oficina donde hace prácticas). No se quitan sin rehacer el render.
+2. **Nombres de menores** en los rótulos del recorrido de LA PUNTA
+   ("CUARTO JUAN ANGEL", "CUARTO LUCIANA").
+3. **Identidad gráfica propia**: hoy se usa el logo de V3S por decisión
+   explícita del Señor Stick.
 
-2. **Nombres propios en el recorrido de LA PUNTA.** Los rótulos del video dicen
-   "CUARTO JUAN ANGEL" y "CUARTO LUCIANA". Publicarlo expone los nombres de los
-   hijos del cliente en una página pública.
+## Qué falta aportar para que sea más inmersivo
 
-3. **Identidad gráfica de STICK INDUSTRIES.** Hoy se usa el logo de V3S por
-   decisión explícita. Cuando haya identidad propia, reemplazar
-   `assets/marca/logo-blanco.webp` y `assets/marca/favicon.png`.
-
-## Problemas conocidos
-
-- La vista móvil no se ha verificado en un dispositivo real. El CSS tiene los
-  puntos de quiebre (menú a pantalla completa y rejilla de una columna por
-  debajo de 760 px) pero falta comprobarlo.
-- Los anclas del menú (`#archivo`, `#tecnica`) caen desfasados cuando las
-  imágenes aún no han cargado y la altura de la página todavía está creciendo.
-- STICK ASSETS y el bot de WhatsApp no tienen enlace público.
+En orden de impacto:
+1. **Fotos de obra construida en el mismo encuadre del render** — es el
+   argumento más fuerte de su perfil: no solo visualiza, construye.
+2. Capturas del modelo en Revit (alambres o clay) para mostrar el paso previo.
+3. Un retrato suyo.
+4. Fechas reales y cliente de cada proyecto.
+5. Videos originales sin comprimir, si se quieren a 1080p.
 
 ## Cómo verlo
 
-Doble clic en `index.html`, o servirlo:
-
 ```powershell
-cd C:\Users\kevin\Downloads\portafolio-v3s
+cd C:\Users\kevin\Downloads\PORTAFOLIO
 python -m http.server 8899
 ```
