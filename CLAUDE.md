@@ -1,4 +1,4 @@
-# PORTAFOLIO — STICK INDUSTRIES
+﻿# PORTAFOLIO — STICK INDUSTRIES
 
 Sitio de portafolio para mostrar el trabajo de visualización arquitectónica a clientes.
 
@@ -24,27 +24,22 @@ Pendiente antes de publicar:
 
 ## Arquitectura
 
-Un solo `index.html` autónomo: HTML, CSS y JavaScript en el mismo archivo, sin
-dependencias ni framework.
+Un solo `index.html` autonomo: HTML, CSS y JavaScript en el mismo archivo,
+sin dependencias ni framework.
 
-```
-portafolio-v3s/
-├── index.html                   el sitio completo
-├── CLAUDE.md                    este archivo
-├── propuestas/                  las tres portadas que se compararon
-│   ├── index.html               índice comparativo
-│   ├── a-cortinas.html
-│   ├── b-secuencia.html
-│   └── c-tipografia.html        ← la elegida, ya integrada en index.html
-├── assets/
-│   ├── marca/                   logo blanco y favicon (V3S)
-│   ├── renders/                 105 imágenes WebP (16,6 MB)
-│   ├── producto/                4 piezas de PINDI
-│   └── video/                   6 recorridos + fotogramas de portada (65,8 MB)
-└── herramientas/
-    ├── optimizar-imagenes.ps1   extrae y convierte los renders desde el archivo
-    └── optimizar-videos.ps1     comprime los recorridos para web
-```
+### Lenguaje visual (v4)
+
+- **Paleta clara editorial.** Fondo hueso `#faf9f7`, texto negro `#0a0a0a`.
+  El render brilla porque el papel es blanco. Cambiado desde el oscuro
+  original por decision del Senor Stick.
+- **Navegacion en columna lateral fija** a la izquierda, 190 px. Sobre la
+  portada se vuelve transparente para no cortar la imagen.
+- **La obra se recorre en horizontal**, como pasar laminas: rueda del raton
+  traducida a desplazamiento lateral, arrastre con el puntero, flechas y
+  teclado, con riel de avance y contador.
+- **El texto de cada obra va DEBAJO de la lamina.** En paleta clara, tapar
+  el render con un velo oscuro para escribir encima seria trabajar contra
+  la propia paleta.
 
 ### Recorrido del sitio
 
