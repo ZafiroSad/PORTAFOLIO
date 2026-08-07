@@ -3,50 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STICK INDUSTRIES — Kevin Gil</title>
-<meta name="description" content="Visualización arquitectónica 3D. Renders y recorridos. Bucaramanga, Colombia.">
+<title>Kevin Gil — Visualización arquitectónica</title>
+<meta name="description" content="Ingeniero civil y visualizador arquitectónico. Renders y recorridos 3D. Bucaramanga, Colombia.">
 <link rel="icon" href="assets/marca/favicon.png">
-<meta property="og:title" content="STICK INDUSTRIES — Kevin Gil">
-<meta property="og:description" content="Visualización arquitectónica 3D.">
+<meta property="og:title" content="Kevin Gil — Visualización arquitectónica">
+<meta property="og:description" content="Ingeniero civil y visualizador arquitectónico.">
 <meta property="og:image" content="assets/renders/casa-will-01.webp">
 <meta property="og:type" content="website">
 
 <style>
 /* =================================================================
-   STICK INDUSTRIES — CV interactiva
+   KEVIN GIL — CV interactiva
    Un solo archivo, sin librerias.
 
    Sigue STICK_UI_SYSTEM.md con la escala zinc INVERTIDA. El documento
-   rector declara dark-first absoluto y dice que no se contemplan
-   variantes light; esta pieza es la excepcion pedida expresamente.
+   rector declara dark-first absoluto; esta pieza es la excepcion pedida.
    Se conservan sus demas reglas: mono para todo dato tecnico, un solo
-   CTA por pantalla, bordes con opacidad, radios, microinteracciones,
-   tipografia del sistema, sin emojis.
+   CTA por bloque, bordes con opacidad, radios, microinteracciones.
+
+   Todo el sitio se recorre desplazando. No hay pestanas.
    ================================================================= */
 :root {
-  /* Zinc invertido: el 50 es el fondo y el 900 el texto */
   --z-50:  #fafafa;
   --z-100: #f4f4f5;
   --z-150: #eeeef0;
   --z-200: #e4e4e7;
-  --z-300: #d4d4d8;
   --z-400: #a1a1aa;
   --z-500: #71717a;
   --z-600: #52525b;
-  --z-700: #3f3f46;
-  --z-800: #27272a;
   --z-900: #18181b;
 
-  --fondo:  var(--z-50);
-  --tinta:  var(--z-900);
-  --tenue:  var(--z-600);
-  --debil:  var(--z-400);
+  --fondo: var(--z-50);
+  --tinta: var(--z-900);
+  --tenue: var(--z-600);
+  --debil: var(--z-400);
 
-  /* Tinte del proyecto abierto: lo escribe el JavaScript */
-  --th: 0; --ts: 0%;
+  --th: 0; --ts: 0%;            /* tinte del proyecto abierto */
 
   --margen: clamp(1.25rem, 4vw, 4rem);
-  --barra:  64px;
+  --barra:  60px;
 
   --salida: cubic-bezier(.16, 1, .3, 1);
   --suave:  cubic-bezier(.4, 0, .2, 1);
@@ -58,19 +53,19 @@
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
 body {
   background:var(--fondo); color:var(--tinta);
-  font-family:var(--sans); line-height:1.6;
+  font-family:var(--sans); line-height:1.65;
   -webkit-font-smoothing:antialiased;
-  overflow:hidden;              /* cada pestana gestiona su propio scroll */
+  overflow-x:hidden;
 }
+body.bloqueado { overflow:hidden; }
 img, video { display:block; max-width:100%; }
 a { color:inherit; text-decoration:none; }
 button { font:inherit; color:inherit; background:none; border:none; cursor:pointer; }
 ::selection { background:var(--tinta); color:var(--fondo); }
 :focus-visible { outline:1px solid var(--tinta); outline-offset:3px; }
-
-/* Todo dato tecnico va en mono: es el sello del sistema */
 .mono { font-family:var(--mono); }
 
 /* ============ Barra superior ================================== */
@@ -79,96 +74,27 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   height:var(--barra);
   display:flex; align-items:center; justify-content:space-between;
   padding:0 var(--margen);
-  background:rgba(250,250,250,.82);
+  background:rgba(250,250,250,.8);
   backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(39,39,42,.10);
-  transition:background .6s var(--suave), border-color .6s var(--suave);
+  border-bottom:1px solid rgba(39,39,42,.09);
 }
 .marca { display:flex; align-items:center; gap:.6rem; }
-.marca img { width:22px; height:22px; }
-.marca span { font-family:var(--mono); font-size:.66rem; font-weight:700; letter-spacing:.2em; }
+.marca img { width:20px; height:20px; }
+.marca span { font-family:var(--mono); font-size:.64rem; font-weight:700; letter-spacing:.2em; }
 
-.pestanas { display:flex; gap:.3rem; }
-.pestana {
-  position:relative;
-  font-family:var(--mono);
-  font-size:.66rem; letter-spacing:.18em; text-transform:uppercase;
-  color:var(--debil);
-  padding:.5rem .9rem; border-radius:12px;
+.menu { display:flex; gap:.2rem; }
+.menu a {
+  font-family:var(--mono); font-size:.63rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--debil); padding:.45rem .8rem; border-radius:10px;
   transition:color .35s var(--suave), background .35s var(--suave);
 }
-.pestana:hover { color:var(--tenue); background:rgba(39,39,42,.05); }
-.pestana.activa { color:var(--tinta); background:rgba(39,39,42,.07); }
-.pestana:active { transform:scale(.97); }
+.menu a:hover { color:var(--tenue); background:rgba(39,39,42,.05); }
+.menu a.activo { color:var(--tinta); background:rgba(39,39,42,.07); }
+@media (max-width:700px){ .menu a { padding:.4rem .5rem; letter-spacing:.1em; } }
 
-/* ============ Wipe de cambio de pestana ======================== */
-/* Un panel solido barre la pantalla, se cambia el contenido detras y el
-   panel sale por el otro lado. Corte plano: no hay fundido. */
-.wipe {
-  position:fixed; inset:0; z-index:300;
-  background:var(--tinta);
-  transform:scaleX(0); transform-origin:left;
-  pointer-events:none;
-}
-.wipe.entrando { transform:scaleX(1); transform-origin:left;  transition:transform .42s cubic-bezier(.7,0,.3,1); }
-.wipe.saliendo { transform:scaleX(0); transform-origin:right; transition:transform .42s cubic-bezier(.7,0,.3,1); }
+.avance { position:fixed; top:0; left:0; right:0; height:1px; z-index:121; background:var(--tinta); transform:scaleX(0); transform-origin:left; }
 
-/* ============ Vistas ========================================== */
-.vista {
-  position:fixed; inset:var(--barra) 0 0 0;
-  overflow-y:auto; overscroll-behavior:contain;
-  display:none;
-}
-.vista.activa { display:block; }
-
-/* ============ PORTADA ========================================= */
-#v-inicio { display:none; }
-#v-inicio.activa { display:flex; flex-direction:column; justify-content:center; }
-.inicio-cuerpo { padding:clamp(2rem,6vh,4rem) var(--margen); width:100%; }
-
-.lamina {
-  position:relative; width:100%; aspect-ratio:16/8;
-  overflow:hidden; background:var(--z-150); border-radius:16px;
-  clip-path:inset(42% 0 42% 0);
-  animation:abrirLamina 1.8s var(--salida) 2.5s forwards;
-}
-@keyframes abrirLamina { to { clip-path:inset(0 0 0 0); } }
-.lamina img {
-  width:100%; height:100%; object-fit:cover;
-  transform:scale(1.26);
-  animation:asentar 2.8s var(--salida) 2.5s forwards,
-            deriva 28s ease-in-out 5.4s infinite alternate;
-}
-@keyframes asentar { to { transform:scale(1.04); } }
-@keyframes deriva {
-  from { transform:scale(1.04) translate(0,0); }
-  to   { transform:scale(1.11) translate(-1.5%,-1%); }
-}
-
-.inicio-texto {
-  display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);
-  gap:clamp(1.5rem,4vw,4rem); align-items:end;
-  margin-top:clamp(1.6rem,4vh,2.6rem);
-}
-@media (max-width:860px){ .inicio-texto { grid-template-columns:1fr; gap:1.2rem } }
-
-.bloque { overflow:hidden; }
-.bloque > * { display:block; transform:translateY(112%); animation:emerger 1.3s var(--salida) forwards; }
-@keyframes emerger { to { transform:translateY(0); } }
-
-.inicio-texto h1 {
-  font-size:clamp(1.9rem,5vw,4rem); font-weight:600;
-  line-height:1.02; letter-spacing:-.035em;
-}
-.inicio-texto h1 .suave { font-weight:200; color:var(--tenue); }
-.t1 { animation-delay:3.5s } .t2 { animation-delay:3.64s }
-
-.inicio-aparte { opacity:0; animation:aparecer 1.2s ease 4.1s forwards; padding-bottom:.3rem; }
-.inicio-aparte p { color:var(--tenue); font-size:.92rem; max-width:34ch; }
-.inicio-aparte .dato { font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; color:var(--debil); margin-top:.8rem; }
-@keyframes aparecer { to { opacity:1; } }
-
-/* --- Mascara tipografica de entrada --------------------------- */
+/* ============ Entrada ========================================= */
 .mascara-marca {
   position:fixed; inset:0; z-index:400;
   display:flex; align-items:center; justify-content:center;
@@ -176,12 +102,7 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   animation:disolverMarca 1.4s var(--salida) 2.5s forwards;
 }
 @keyframes disolverMarca { to { opacity:0; visibility:hidden; } }
-
-.palabra {
-  font-size:clamp(3rem, 13vw, 12rem);
-  font-weight:800; letter-spacing:-.05em; line-height:.9;
-  text-align:center; text-transform:uppercase;
-}
+.palabra { font-size:clamp(3rem,13vw,12rem); font-weight:800; letter-spacing:-.05em; line-height:.9; text-align:center; text-transform:uppercase; }
 .linea2 { display:block; font-size:.42em; letter-spacing:.08em; font-weight:300; margin-top:.35em; }
 
 /* El recorte va en cada letra. background-attachment:fixed ancla el fondo
@@ -198,249 +119,249 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 }
 @keyframes enfocar { to { opacity:1; filter:blur(0); } }
 @media (hover:none) { .letra { background-attachment:scroll; background-size:700% auto; } }
-
 .regla-marca {
-  position:absolute; left:50%; bottom:34%;
-  width:min(78vw,900px); height:1px;
+  position:absolute; left:50%; bottom:34%; width:min(78vw,900px); height:1px;
   transform:translateX(-50%) scaleX(0);
   background:linear-gradient(to right, transparent, rgba(39,39,42,.35), transparent);
   animation:cruzar 1.6s var(--salida) 1.5s forwards;
 }
 @keyframes cruzar { to { transform:translateX(-50%) scaleX(1); } }
 
-/* ============ OBRA — vitrina de cuatro hojas =================== */
-.vitrina { display:flex; height:100%; min-height:0; }
+/* ============ INICIO ========================================== */
+.inicio { padding:calc(var(--barra) + clamp(2rem,6vh,4rem)) var(--margen) clamp(3rem,8vh,5rem); }
+.lamina { position:relative; width:100%; aspect-ratio:16/8; overflow:hidden; background:var(--z-150); border-radius:16px;
+  clip-path:inset(42% 0 42% 0); animation:abrirLamina 1.8s var(--salida) 2.5s forwards; }
+@keyframes abrirLamina { to { clip-path:inset(0 0 0 0); } }
+.lamina img { width:100%; height:100%; object-fit:cover; transform:scale(1.26);
+  animation:asentar 2.8s var(--salida) 2.5s forwards, deriva 28s ease-in-out 5.4s infinite alternate; }
+@keyframes asentar { to { transform:scale(1.04); } }
+@keyframes deriva { from { transform:scale(1.04) translate(0,0) } to { transform:scale(1.11) translate(-1.5%,-1%) } }
+
+.inicio-texto { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:clamp(1.5rem,4vw,4rem); align-items:end; margin-top:clamp(1.6rem,4vh,2.6rem); }
+@media (max-width:860px){ .inicio-texto { grid-template-columns:1fr; gap:1.2rem } }
+.bloque { overflow:hidden; }
+.bloque > * { display:block; transform:translateY(112%); animation:emerger 1.3s var(--salida) forwards; }
+@keyframes emerger { to { transform:translateY(0) } }
+.inicio-texto h1 { font-size:clamp(1.9rem,5vw,4rem); font-weight:600; line-height:1.02; letter-spacing:-.035em; }
+.inicio-texto h1 .suave { font-weight:200; color:var(--tenue); }
+.t1 { animation-delay:3.5s } .t2 { animation-delay:3.64s }
+.inicio-aparte { opacity:0; animation:aparecer 1.2s ease 4.1s forwards; padding-bottom:.3rem; }
+.inicio-aparte p { color:var(--tenue); font-size:.92rem; max-width:34ch; }
+.inicio-aparte .dato { font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; color:var(--debil); margin-top:.8rem; }
+@keyframes aparecer { to { opacity:1 } }
+
+/* ============ Secciones ======================================= */
+.seccion { padding:clamp(4rem,11vh,8rem) var(--margen); scroll-margin-top:var(--barra); }
+.cabeza { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(1.5rem,4vw,4rem); align-items:end;
+  margin-bottom:clamp(2.5rem,6vh,4rem); padding-bottom:1.6rem; border-bottom:1px solid rgba(39,39,42,.1); }
+@media (max-width:860px){ .cabeza { grid-template-columns:1fr; gap:1rem } }
+.etiqueta { font-family:var(--mono); font-size:.62rem; letter-spacing:.28em; text-transform:uppercase; color:var(--debil); margin-bottom:1rem; }
+.cabeza h2 { font-size:clamp(1.8rem,4.2vw,3.1rem); font-weight:600; letter-spacing:-.035em; line-height:1.07; }
+.cabeza h2 .suave { font-weight:200; color:var(--tenue); }
+.cabeza .apunte { color:var(--tenue); font-size:.95rem; max-width:44ch; }
+
+.palabras span { display:inline-block; overflow:hidden; vertical-align:top; }
+.palabras span i { display:inline-block; font-style:normal; transform:translateY(105%); transition:transform 1s var(--salida); }
+.palabras.visible span i { transform:translateY(0); }
+.revelar > * { opacity:0; transform:translateY(22px); }
+.revelar.visible > * { opacity:1; transform:none; transition:opacity .9s var(--suave), transform 1s var(--salida); }
+
+/* ============ PROYECTOS — vitrina ============================= */
+.vitrina { display:flex; height:clamp(520px, 78vh, 900px); border-radius:16px; overflow:hidden; }
 @media (max-width:860px){ .vitrina { flex-direction:column; height:auto; } }
 
-.hoja {
-  position:relative; flex:1 1 0; min-width:0;
-  overflow:hidden; cursor:pointer;
-  border-right:1px solid rgba(39,39,42,.10);
-  transition:flex-grow .9s var(--salida);
-}
+.hoja { position:relative; flex:1 1 0; min-width:0; overflow:hidden; cursor:pointer;
+  border-right:1px solid rgba(250,250,250,.14); transition:flex-grow .9s var(--salida); }
 .hoja:last-child { border-right:none; }
-/* Al senalar una hoja crece y las demas ceden: el reparto se hace solo */
 .vitrina:hover .hoja { flex-grow:.72; }
 .vitrina .hoja:hover { flex-grow:2.6; }
 @media (max-width:860px){
-  .hoja { flex:none; height:58vh; border-right:none; border-bottom:1px solid rgba(39,39,42,.10); }
+  .hoja { flex:none; height:56vh; border-right:none; border-bottom:1px solid rgba(250,250,250,.14); }
   .vitrina:hover .hoja, .vitrina .hoja:hover { flex-grow:1; }
 }
 
 .hoja-img { position:absolute; inset:0; }
-.hoja-img img {
-  width:100%; height:100%; object-fit:cover;
-  transform:scale(1.06);
-  transition:transform 1.4s var(--salida), filter .9s var(--suave);
-  filter:saturate(.82) brightness(.94);
-}
+.hoja-img img { width:100%; height:100%; object-fit:cover; transform:scale(1.06);
+  transition:transform 1.4s var(--salida), filter .9s var(--suave); filter:saturate(.85) brightness(.92); }
 .hoja:hover .hoja-img img { transform:scale(1); filter:saturate(1) brightness(1); }
+.hoja-velo { position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(9,9,11,.8) 0%, rgba(9,9,11,.25) 45%, rgba(9,9,11,.05) 100%); }
 
-.hoja-velo {
-  position:absolute; inset:0;
-  background:linear-gradient(to top, rgba(9,9,11,.82) 0%, rgba(9,9,11,.28) 45%, rgba(9,9,11,.06) 100%);
-  transition:opacity .8s var(--suave);
-}
-.hoja:hover .hoja-velo { opacity:.9; }
+.hoja-rotulo { position:absolute; left:0; bottom:0; z-index:2; padding:clamp(1.2rem,2vw,2rem); color:#fff; overflow:hidden; }
+/* El nombre entra y sale desde detras de su propia mascara. Antes se
+   desvanecia con opacidad, y al pasar de una hoja a otra los dos textos
+   se cruzaban a media transparencia: se veia sucio. */
+.hoja-vertical { writing-mode:vertical-rl; transform:rotate(180deg);
+  font-size:clamp(.95rem,1.4vw,1.25rem); font-weight:500; white-space:nowrap;
+  transition:transform .55s var(--salida); }
+.hoja:hover .hoja-vertical { transform:rotate(180deg) translateY(-110%); }
 
-/* En reposo el nombre va en vertical: cabe en una columna estrecha sin
-   partirse y da el aire de lomo de libro */
-.hoja-rotulo {
-  position:absolute; left:0; bottom:0; z-index:2;
-  padding:clamp(1.2rem,2vw,2rem);
-  color:#fff;
-}
-.hoja-vertical {
-  writing-mode:vertical-rl; transform:rotate(180deg);
-  font-size:clamp(.95rem,1.5vw,1.3rem); font-weight:500; letter-spacing:.02em;
-  white-space:nowrap;
-  transition:opacity .5s var(--suave);
-}
-.hoja:hover .hoja-vertical { opacity:0; }
+.hoja-abierta { position:absolute; left:0; right:0; bottom:0; z-index:3;
+  padding:clamp(1.4rem,2.2vw,2.4rem); color:#fff; pointer-events:none; }
+.hoja-abierta > * { overflow:hidden; }
+.hoja-abierta > * > * { display:block; transform:translateY(110%); transition:transform .7s var(--salida); }
+.hoja:hover .hoja-abierta > * > * { transform:translateY(0); }
+.hoja:hover .hoja-abierta > *:nth-child(2) > * { transition-delay:.06s }
+.hoja:hover .hoja-abierta > *:nth-child(3) > * { transition-delay:.12s }
+.hoja:hover .hoja-abierta > *:nth-child(4) > * { transition-delay:.18s }
+.hoja-abierta .num { font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; opacity:.8; }
+.hoja-abierta h3 { font-size:clamp(1.3rem,2.2vw,2rem); font-weight:500; letter-spacing:-.02em; margin:.35rem 0 .5rem; }
+.hoja-abierta p { font-size:.87rem; line-height:1.6; max-width:44ch; opacity:.88; }
+.hoja-abierta .entrar { display:inline-flex; align-items:center; gap:.5rem; margin-top:1.1rem;
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; text-transform:uppercase;
+  border:1px solid rgba(255,255,255,.45); border-radius:10px; padding:.55rem 1rem; }
 
-.hoja-abierta {
-  position:absolute; left:0; right:0; bottom:0; z-index:3;
-  padding:clamp(1.4rem,2.4vw,2.6rem);
-  color:#fff;
-  opacity:0; transform:translateY(14px);
-  transition:opacity .6s var(--suave) .12s, transform .8s var(--salida) .12s;
-  pointer-events:none;
-}
-.hoja:hover .hoja-abierta { opacity:1; transform:none; }
-.hoja-abierta .num { font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; opacity:.7; }
-.hoja-abierta h3 { font-size:clamp(1.3rem,2.4vw,2.1rem); font-weight:500; letter-spacing:-.02em; margin:.4rem 0 .6rem; }
-.hoja-abierta p { font-size:.88rem; line-height:1.6; max-width:46ch; opacity:.85; }
-.hoja-abierta .entrar {
-  display:inline-flex; align-items:center; gap:.6rem; margin-top:1.2rem;
-  font-family:var(--mono); font-size:.64rem; letter-spacing:.2em; text-transform:uppercase;
-  border:1px solid rgba(255,255,255,.45); border-radius:12px;
-  padding:.6rem 1.1rem;
-}
-
-/* ============ SOBRE MI ======================================== */
-.pagina { max-width:1100px; margin:0 auto; padding:clamp(3.5rem,9vh,7rem) var(--margen); }
-.pagina-cabeza { margin-bottom:clamp(2.5rem,6vh,4rem); padding-bottom:1.8rem; border-bottom:1px solid rgba(39,39,42,.12); }
-.etiqueta { font-family:var(--mono); font-size:.62rem; letter-spacing:.28em; text-transform:uppercase; color:var(--debil); margin-bottom:1rem; }
-.pagina-cabeza h2 { font-size:clamp(1.9rem,4.4vw,3.2rem); font-weight:600; letter-spacing:-.035em; line-height:1.06; }
-.pagina-cabeza h2 .suave { font-weight:200; color:var(--tenue); }
-
-.bio { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:clamp(2rem,5vw,4.5rem); align-items:start; }
-@media (max-width:860px){ .bio { grid-template-columns:1fr; } }
-.bio p { color:var(--tenue); font-size:1rem; margin-bottom:1.1rem; max-width:62ch; }
+/* ============ SOBRE MÍ ======================================== */
+.bio { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:clamp(2rem,5vw,4.5rem); align-items:start; }
+@media (max-width:900px){ .bio { grid-template-columns:1fr; } }
+.bio p { color:var(--tenue); font-size:1rem; margin-bottom:1.1rem; max-width:60ch; }
 .bio p strong { color:var(--tinta); font-weight:500; }
 
-.hitos { border-top:1px solid rgba(39,39,42,.12); }
-.hito {
-  display:grid; grid-template-columns:auto 1fr; gap:1.5rem;
-  padding:1.2rem 0; border-bottom:1px solid rgba(39,39,42,.12);
-}
-.hito .anio { font-family:var(--mono); font-size:.66rem; letter-spacing:.14em; color:var(--debil); padding-top:.25rem; }
-.hito h4 { font-size:.98rem; font-weight:500; margin-bottom:.2rem; }
-.hito p { font-size:.86rem; color:var(--tenue); margin:0; }
+.hitos { border-top:1px solid rgba(39,39,42,.1); }
+.hito { display:grid; grid-template-columns:auto 1fr; gap:1.4rem; padding:1.1rem 0; border-bottom:1px solid rgba(39,39,42,.1); }
+.hito .anio { font-family:var(--mono); font-size:.64rem; letter-spacing:.12em; color:var(--debil); padding-top:.3rem; white-space:nowrap; }
+.hito .escudo { width:38px; height:38px; border-radius:10px; border:1px solid rgba(39,39,42,.14);
+  display:flex; align-items:center; justify-content:center; overflow:hidden; flex:none;
+  font-family:var(--mono); font-size:.58rem; font-weight:700; letter-spacing:.02em; color:var(--tenue); }
+.hito .escudo img { width:100%; height:100%; object-fit:contain; padding:5px; }
+.hito .cuerpo { display:flex; gap:1rem; align-items:flex-start; }
+.hito h4 { font-size:.98rem; font-weight:500; margin-bottom:.15rem; }
+.hito p { font-size:.85rem; color:var(--tenue); margin:0; }
+.hito .marca-estado { font-family:var(--mono); font-size:.58rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--debil); border:1px solid rgba(39,39,42,.14); border-radius:8px; padding:.15rem .45rem; margin-left:.5rem; }
 
-.herramientas { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:1.4rem; }
-.herramientas span {
-  font-family:var(--mono); font-size:.62rem; letter-spacing:.12em; text-transform:uppercase;
-  color:var(--tenue); border:1px solid rgba(39,39,42,.16); border-radius:10px;
-  padding:.4rem .8rem;
+/* --- Herramientas ------------------------------------------- */
+.herramientas { display:grid; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); gap:.7rem; margin-top:1.6rem; }
+.util {
+  position:relative; aspect-ratio:1; border-radius:14px;
+  border:1px solid rgba(39,39,42,.12); background:#fff;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.5rem;
+  opacity:0; transform:translateY(18px) rotateX(-22deg);
+  transform-origin:center bottom;
+  transition:opacity .7s var(--suave), transform .9s var(--salida),
+             border-color .4s var(--suave), box-shadow .4s var(--suave);
 }
+.herramientas.visible .util { opacity:1; transform:none; }
+.util:hover { border-color:rgba(39,39,42,.34); box-shadow:0 10px 30px rgba(0,0,0,.07); }
+.util .simbolo {
+  width:38px; height:38px; display:flex; align-items:center; justify-content:center;
+  transition:transform .6s var(--salida);
+}
+.util:hover .simbolo { transform:scale(1.14) rotate(-4deg); }
+.util .nombre { font-family:var(--mono); font-size:.55rem; letter-spacing:.13em; text-transform:uppercase; color:var(--tenue); text-align:center; padding:0 .3rem; }
+.util svg { width:100%; height:100%; }
 
 /* ============ CONTACTO ======================================== */
-.acciones { display:flex; gap:.7rem; flex-wrap:wrap; margin-top:2rem; }
-.boton {
-  display:inline-flex; align-items:center; gap:.55rem;
-  padding:.9rem 1.8rem; border-radius:12px;
-  font-size:.84rem; font-weight:500;
-  transition:opacity .3s var(--suave), background .3s var(--suave), border-color .3s var(--suave), transform .2s var(--suave);
-}
+.acciones { display:flex; gap:.7rem; flex-wrap:wrap; margin-top:.5rem; }
+.boton { display:inline-flex; align-items:center; gap:.55rem; padding:.9rem 1.7rem; border-radius:12px;
+  font-size:.83rem; font-weight:500;
+  transition:opacity .3s var(--suave), background .3s var(--suave), border-color .3s var(--suave), transform .2s var(--suave); }
 .boton:active { transform:scale(.97); }
 .boton-primario { background:var(--tinta); color:var(--fondo); }
 .boton-primario:hover { opacity:.86; }
-.boton-secundario { border:1px solid rgba(39,39,42,.18); }
+.boton-secundario { border:1px solid rgba(39,39,42,.16); }
 .boton-secundario:hover { border-color:rgba(39,39,42,.4); }
+.boton svg { flex:none; }
+
+.pie { padding:1.6rem var(--margen); border-top:1px solid rgba(39,39,42,.1);
+  display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.1em; color:var(--debil); }
 
 /* ============ FICHA DE PROYECTO =============================== */
-/* Al abrirse, la pagina toma el color dominante del render: el tinte se
-   mezcla con el fondo en proporcion baja, lo justo para que cambie la
-   temperatura sin comprometer la lectura */
-.ficha {
-  position:fixed; inset:0; z-index:200;
+/* Sin margenes laterales: las imagenes van a sangre y solo el texto
+   respeta una columna legible. Es lo que quita la sensacion de encierro. */
+.ficha { position:fixed; inset:0; z-index:200;
   background:hsl(var(--th), calc(var(--ts) * .5), 97%);
   overflow-y:auto; overscroll-behavior:contain;
   opacity:0; visibility:hidden;
-  transition:opacity .5s var(--suave), visibility .5s, background .9s var(--suave);
-}
+  transition:opacity .5s var(--suave), visibility .5s, background .9s var(--suave); }
 .ficha.abierta { opacity:1; visibility:visible; }
 
-.ficha-barra {
-  position:sticky; top:0; z-index:10;
-  height:var(--barra);
-  display:flex; align-items:center; justify-content:space-between;
-  padding:0 var(--margen);
-  background:hsla(var(--th), calc(var(--ts) * .5), 97%, .85);
-  backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(39,39,42,.10);
-}
-.ficha-barra .nombre { font-family:var(--mono); font-size:.66rem; letter-spacing:.2em; text-transform:uppercase; }
-.ficha-cerrar {
-  display:flex; align-items:center; gap:.55rem;
-  font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; color:var(--tenue);
-  padding:.5rem .8rem; border-radius:12px;
-  transition:color .3s var(--suave), background .3s var(--suave);
-}
+.ficha-barra { position:sticky; top:0; z-index:10; height:var(--barra);
+  display:flex; align-items:center; justify-content:space-between; padding:0 var(--margen);
+  background:hsla(var(--th), calc(var(--ts) * .5), 97%, .82); backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(39,39,42,.09); }
+.ficha-barra .nombre { font-family:var(--mono); font-size:.64rem; letter-spacing:.2em; text-transform:uppercase; }
+.ficha-cerrar { display:flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.61rem;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--tenue); padding:.45rem .7rem; border-radius:10px;
+  transition:color .3s var(--suave), background .3s var(--suave); }
 .ficha-cerrar:hover { color:var(--tinta); background:rgba(39,39,42,.06); }
-.ficha-cerrar .aspa { position:relative; width:12px; height:12px; }
-.ficha-cerrar .aspa::before, .ficha-cerrar .aspa::after {
-  content:''; position:absolute; top:50%; left:0; width:100%; height:1px; background:currentColor;
-}
+.ficha-cerrar .aspa { position:relative; width:11px; height:11px; }
+.ficha-cerrar .aspa::before, .ficha-cerrar .aspa::after { content:''; position:absolute; top:50%; left:0; width:100%; height:1px; background:currentColor; }
 .ficha-cerrar .aspa::before { transform:rotate(45deg) } .ficha-cerrar .aspa::after { transform:rotate(-45deg) }
 
-.ficha-cuerpo { max-width:1400px; margin:0 auto; padding:clamp(2rem,5vh,3.5rem) var(--margen) clamp(4rem,10vh,7rem); }
-.ficha-principal { position:relative; width:100%; aspect-ratio:16/9; overflow:hidden; background:var(--z-150); border-radius:16px; }
-.ficha-principal img { width:100%; height:112%; object-fit:cover; will-change:transform; }
+.ficha-principal { position:relative; width:100%; height:clamp(420px,82vh,1000px); overflow:hidden; background:var(--z-150); }
+.ficha-principal img { width:100%; height:114%; object-fit:cover; will-change:transform; }
 
-.ficha-titular {
-  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);
-  gap:clamp(1.5rem,4vw,4rem); align-items:end;
-  margin-top:clamp(1.6rem,4vh,2.6rem); padding-bottom:2rem;
-  border-bottom:1px solid rgba(39,39,42,.12);
-}
+/* Solo el texto se encolumna; nunca las imagenes */
+.columna { max-width:1100px; margin:0 auto; padding:clamp(2.5rem,7vh,4.5rem) var(--margen); }
+.ficha-titular { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:clamp(1.5rem,4vw,4rem); align-items:end; }
 @media (max-width:860px){ .ficha-titular { grid-template-columns:1fr; gap:1rem } }
 .ficha-titular h2 { font-size:clamp(1.9rem,5vw,3.6rem); font-weight:600; letter-spacing:-.035em; line-height:1.04; }
-.ficha-titular .tipo { font-family:var(--mono); font-size:.62rem; letter-spacing:.24em; text-transform:uppercase; color:var(--debil); margin-bottom:.9rem; }
+.ficha-titular .tipo { font-family:var(--mono); font-size:.61rem; letter-spacing:.24em; text-transform:uppercase; color:var(--debil); margin-bottom:.8rem; }
 .ficha-titular .texto { color:var(--tenue); font-size:1rem; }
 
-.galeria { display:grid; gap:clamp(.8rem,1.6vw,1.2rem); grid-template-columns:repeat(2,1fr); margin-top:clamp(2.5rem,6vh,4rem); }
-.galeria figure {
-  overflow:hidden; background:var(--z-150); border-radius:16px;
-  aspect-ratio:3/2; cursor:pointer;
-  opacity:0; transform:translateY(24px);
-}
+/* Galeria a sangre: cada pieza ocupa el ancho de la ventana */
+.galeria { display:flex; flex-direction:column; gap:clamp(.5rem,1.2vw,1rem); }
+.galeria figure { position:relative; width:100%; overflow:hidden; background:var(--z-150); cursor:pointer;
+  height:clamp(360px,74vh,900px);
+  opacity:0; transform:translateY(26px); }
 .galeria figure.dentro { opacity:1; transform:none; transition:opacity 1s var(--suave), transform 1.1s var(--salida); }
-.galeria figure.ancha { grid-column:1 / -1; aspect-ratio:16/9; }
 .galeria img { width:100%; height:108%; object-fit:cover; transition:transform 1.3s var(--salida); will-change:transform; }
-.galeria figure:hover img { transform:scale(1.035); }
-@media (max-width:700px){ .galeria { grid-template-columns:1fr; } .galeria figure.ancha { aspect-ratio:3/2 } }
+.galeria figure:hover img { transform:scale(1.03); }
+@media (max-width:700px){ .galeria figure { height:52vh } }
 
-.ficha-video { margin-top:clamp(2.5rem,6vh,4rem); }
-.ficha-video h3 { font-family:var(--mono); font-size:.62rem; letter-spacing:.24em; text-transform:uppercase; color:var(--debil); margin-bottom:1rem; font-weight:400; }
-.ficha-video .marco { aspect-ratio:16/9; background:var(--z-150); overflow:hidden; border-radius:16px; }
+.ficha-video { margin-top:clamp(.5rem,1.2vw,1rem); }
+.ficha-video .marco { width:100%; aspect-ratio:16/9; background:var(--z-150); overflow:hidden; }
 .ficha-video video { width:100%; height:100%; object-fit:cover; }
 
-.ficha-navegar {
-  display:flex; justify-content:space-between; align-items:center; gap:1rem;
-  margin-top:clamp(3rem,7vh,5rem); padding-top:1.8rem; border-top:1px solid rgba(39,39,42,.12);
-}
-.ficha-navegar button {
-  font-family:var(--mono); font-size:.64rem; letter-spacing:.18em; text-transform:uppercase; color:var(--tenue);
-  padding:.5rem .8rem; border-radius:12px;
-  transition:color .3s var(--suave), background .3s var(--suave);
-}
+.ficha-navegar { display:flex; justify-content:space-between; align-items:center; gap:1rem;
+  max-width:1100px; margin:0 auto; padding:2rem var(--margen) clamp(4rem,9vh,6rem); }
+.ficha-navegar button { font-family:var(--mono); font-size:.62rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--tenue); padding:.5rem .8rem; border-radius:10px; transition:color .3s var(--suave), background .3s var(--suave); }
 .ficha-navegar button:hover { color:var(--tinta); background:rgba(39,39,42,.06); }
 
-.viajero { position:fixed; z-index:250; overflow:hidden; border-radius:16px; pointer-events:none; }
+.viajero { position:fixed; z-index:250; overflow:hidden; pointer-events:none; }
 .viajero img { width:100%; height:100%; object-fit:cover; }
 
-/* ============ Visor de imagen ================================= */
-.visor {
-  position:fixed; inset:0; z-index:280; background:rgba(250,250,250,.985);
+/* ============ Visor ========================================== */
+.visor { position:fixed; inset:0; z-index:280; background:rgba(250,250,250,.985);
   display:flex; align-items:center; justify-content:center; padding:clamp(1rem,4vh,3rem);
-  opacity:0; visibility:hidden; transition:opacity .45s var(--suave), visibility .45s;
-}
+  opacity:0; visibility:hidden; transition:opacity .45s var(--suave), visibility .45s; }
 .visor.abierto { opacity:1; visibility:visible; }
-.visor img { max-width:100%; max-height:100%; object-fit:contain; border-radius:8px; transform:scale(.97); transition:transform .5s var(--salida); }
+.visor img { max-width:100%; max-height:100%; object-fit:contain; transform:scale(.97); transition:transform .5s var(--salida); }
 .visor.abierto img { transform:scale(1); }
 .visor-cerrar, .visor-nav { position:absolute; color:var(--tenue); padding:1rem; font-size:1.6rem; line-height:1; transition:color .3s; }
 .visor-cerrar:hover, .visor-nav:hover { color:var(--tinta); }
 .visor-cerrar { top:.8rem; right:1rem; }
 .visor-nav.prev { left:.4rem; top:50%; transform:translateY(-50%); }
 .visor-nav.sig  { right:.4rem; top:50%; transform:translateY(-50%); }
-.visor-pie { position:absolute; bottom:1.1rem; left:50%; transform:translateX(-50%); font-family:var(--mono); font-size:.62rem; letter-spacing:.18em; color:var(--debil); text-transform:uppercase; }
+.visor-pie { position:absolute; bottom:1.1rem; left:50%; transform:translateX(-50%); font-family:var(--mono); font-size:.61rem; letter-spacing:.18em; color:var(--debil); text-transform:uppercase; }
 
 @media (prefers-reduced-motion:reduce){
   *, *::before, *::after { animation:none !important; transition:none !important; }
   .mascara-marca { display:none } .lamina { clip-path:none }
-  .bloque > *, .galeria figure { opacity:1 !important; transform:none !important; }
+  .bloque > *, .revelar > *, .galeria figure, .util { opacity:1 !important; transform:none !important; }
+  .palabras span i, .hoja-abierta > * > * { transform:none }
   .inicio-aparte { opacity:1 }
 }
 </style>
 </head>
 <body>
 
-<header class="barra" id="barra">
-  <a href="#" class="marca" data-ir="inicio">
+<div class="avance" id="avance"></div>
+
+<header class="barra">
+  <a href="#inicio" class="marca">
     <img src="assets/marca/favicon.png" alt="Logotipo">
-    <span>STICK INDUSTRIES</span>
+    <span>KEVIN GIL</span>
   </a>
-  <nav class="pestanas" id="pestanas">
-    <button class="pestana activa" data-ir="inicio">Inicio</button>
-    <button class="pestana" data-ir="obra">Obra</button>
-    <button class="pestana" data-ir="sobre">Sobre mí</button>
-    <button class="pestana" data-ir="contacto">Contacto</button>
+  <nav class="menu" id="menu">
+    <a href="#proyectos">Proyectos</a>
+    <a href="#sobre">Sobre mí</a>
+    <a href="#contacto">Contacto</a>
   </nav>
 </header>
-
-<div class="wipe" id="wipe"></div>
 
 <div class="mascara-marca">
   <div class="palabra"><span id="linea1"></span><span class="linea2" id="linea2"></span></div>
@@ -448,81 +369,82 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 </div>
 
 <!-- ===================== INICIO ===================== -->
-<section class="vista activa" id="v-inicio">
-  <div class="inicio-cuerpo">
-    <div class="lamina">
-      <img src="assets/renders/casa-will-01.webp"
-           srcset="assets/renders/casa-will-01.webp 1600w, assets/renders/casa-will-01@2x.webp 2560w"
-           sizes="100vw" alt="Vivienda campestre al atardecer" fetchpriority="high">
-    </div>
-    <div class="inicio-texto">
-      <h1>
-        <span class="bloque"><span class="t1 suave">Antes de construirlo,</span></span>
-        <span class="bloque"><span class="t2">véalo terminado.</span></span>
-      </h1>
-      <div class="inicio-aparte">
-        <p>Visualización arquitectónica 3D. Modelado, iluminación y recorridos.</p>
-        <div class="dato mono">Kevin Gil · Bucaramanga, Colombia</div>
-      </div>
+<section class="inicio" id="inicio">
+  <div class="lamina">
+    <img src="assets/renders/casa-will-01.webp"
+         srcset="assets/renders/casa-will-01.webp 1600w, assets/renders/casa-will-01@2x.webp 2560w"
+         sizes="100vw" alt="Vivienda campestre al atardecer" fetchpriority="high">
+  </div>
+  <div class="inicio-texto">
+    <h1>
+      <span class="bloque"><span class="t1 suave">Antes de construirlo,</span></span>
+      <span class="bloque"><span class="t2">véalo terminado.</span></span>
+    </h1>
+    <div class="inicio-aparte">
+      <p>Ingeniero civil y visualizador arquitectónico. Modelado, iluminación y recorridos 3D.</p>
+      <div class="dato mono">Kevin Gil · Bucaramanga, Colombia</div>
     </div>
   </div>
 </section>
 
-<!-- ===================== OBRA ===================== -->
-<section class="vista" id="v-obra">
+<!-- ===================== PROYECTOS ===================== -->
+<section class="seccion" id="proyectos">
+  <div class="cabeza">
+    <div>
+      <div class="etiqueta revelar"><span>Selección</span></div>
+      <h2 class="palabras" data-texto="Proyectos."></h2>
+    </div>
+    <div class="revelar">
+      <p class="apunte">Señale cualquiera para ver de qué se trata. Haga clic para entrar.</p>
+    </div>
+  </div>
   <div class="vitrina" id="vitrina"></div>
 </section>
 
 <!-- ===================== SOBRE MÍ ===================== -->
-<section class="vista" id="v-sobre">
-  <div class="pagina">
-    <div class="pagina-cabeza">
-      <div class="etiqueta">Quién</div>
-      <h2><span class="suave">Ingeniero civil</span><br>y visualizador.</h2>
+<section class="seccion" id="sobre">
+  <div class="cabeza">
+    <div>
+      <div class="etiqueta revelar"><span>Quién</span></div>
+      <h2 class="palabras" data-texto="Ingeniero civil y visualizador."></h2>
+    </div>
+  </div>
+
+  <div class="bio">
+    <div>
+      <p>Me llamo <strong>Kevin Stick Gil Arévalo</strong>. Estudio ingeniería civil en la
+         <strong>Universidad Pontificia Bolivariana, seccional Bucaramanga</strong>, con nueve
+         semestres culminados y un promedio ponderado de 4.2 sobre 5.</p>
+      <p>En 2026 fundé <strong>VISUAL 3D STUDIO</strong>, un estudio centrado en la representación
+         precisa del diseño: modelos digitales coherentes con criterios constructivos y planos
+         técnicos que facilitan la coordinación en obra.</p>
+      <p>Esa mezcla es el punto. No llego al render desde la imagen, llego desde el modelo:
+         cuando levanto un proyecto en Revit, los espesores, las luces y los apoyos son los que
+         se van a construir. Y como subo a obra varias veces por semana, veo cada semana la
+         distancia entre lo que se dibuja y lo que se levanta.</p>
+
+      <div class="herramientas" id="herramientas"></div>
     </div>
 
-    <div class="bio">
-      <div>
-        <p>Me llamo <strong>Kevin Gil</strong>. Estudio ingeniería civil en la
-           <strong>Universidad Pontificia Bolivariana, seccional Bucaramanga</strong>,
-           y hago visualización arquitectónica en paralelo desde hace un par de años.</p>
-        <p>Esa mezcla es el punto: no llego al render desde la imagen, llego desde el
-           modelo. Cuando levanto un proyecto en Revit, los espesores, las luces y los
-           apoyos son los que se van a construir. La imagen sale de ahí, no al revés.</p>
-        <p>Actualmente hago mis prácticas como residente de obra, subiendo a campo
-           varios días por semana. Eso me obliga a ver todas las semanas la distancia
-           entre lo que se dibuja y lo que se levanta.</p>
-
-        <div class="herramientas">
-          <span>Revit</span><span>D5 Render</span><span>AutoCAD</span>
-          <span>Photoshop</span><span>Premiere</span><span>Excel</span>
-        </div>
-      </div>
-
-      <div class="hitos" id="hitos"></div>
-    </div>
+    <div class="hitos" id="hitos"></div>
   </div>
 </section>
 
 <!-- ===================== CONTACTO ===================== -->
-<section class="vista" id="v-contacto">
-  <div class="pagina">
-    <div class="pagina-cabeza">
-      <div class="etiqueta">Contacto</div>
-      <h2>Hablemos de <span class="suave">su proyecto.</span></h2>
-    </div>
-    <p style="color:var(--tenue); max-width:46ch;">
-      Envíe los planos o un boceto y le indico alcance y tiempo. Respuesta el mismo día.
-    </p>
-    <div class="acciones">
-      <a class="boton boton-primario" id="btn-whatsapp" href="#" target="_blank" rel="noopener">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 01-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.2 8.2 0 015.83 2.42 8.18 8.18 0 012.41 5.82c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.43.06-.65.31-.22.25-.85.83-.85 2.03s.87 2.35.99 2.51c.12.17 1.71 2.61 4.15 3.66.58.25 1.03.4 1.39.51.58.19 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29z"/></svg>
-        Escribir por WhatsApp
-      </a>
-      <a class="boton boton-secundario" id="btn-correo" href="#">Enviar correo</a>
+<section class="seccion" id="contacto">
+  <div class="cabeza">
+    <div>
+      <div class="etiqueta revelar"><span>Contacto</span></div>
+      <h2 class="palabras" data-texto="Hablemos."></h2>
     </div>
   </div>
+  <div class="acciones revelar" id="acciones"></div>
 </section>
+
+<div class="pie">
+  <span>KEVIN GIL · BUCARAMANGA, COLOMBIA</span>
+  <span>VISUAL 3D STUDIO</span>
+</div>
 
 <!-- ===================== FICHA ===================== -->
 <div class="ficha" id="ficha" role="dialog" aria-modal="true" aria-label="Proyecto">
@@ -543,66 +465,118 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 
 <script>
 /* =================================================================
-   CONTACTO — editar aquí
+   CONTACTO — datos tomados de la hoja de vida
    ================================================================= */
 const CONTACTO = {
-  whatsapp: '573000000000',
-  mensaje:  'Hola Kevin, vi tu portafolio y quiero hablar de un proyecto.',
-  correo:   'kevingilarevalo10@gmail.com'
+  whatsapp:  '573156307424',
+  mensaje:   'Hola Kevin, vi tu portafolio y quiero hablar de un proyecto.',
+  correo:    'kevingilarevalo10@gmail.com',
+  instagram: 'PENDIENTE',        // <-- usuario de Instagram personal
+  igEstudio: 'PENDIENTE'         // <-- usuario de Instagram de VISUAL 3D STUDIO
 };
 
 /* =================================================================
-   CATALOGO
-   Los proyectos y sus renders son provisionales: se deciden al final.
-   Cada proyecto solo lleva nombre, tipo, descripcion y sus piezas.
+   CATALOGO  (los proyectos y sus renders se deciden al final)
    ================================================================= */
 const PROYECTOS = [
   { slug:'casa-will', titulo:'Casa Will', tipo:'Vivienda campestre',
-    portada:1, piezas:[1,2,3], anchas:[1],
+    portada:1, piezas:[1,2,3],
     texto:'Una casa de una sola planta que se abre por completo al jardín. El encargo pedía mostrar cómo el alero protege la fachada acristalada sin cerrar la vista, así que los tres encuadres trabajan la misma hora del día y la misma altura de cámara.' },
 
   { slug:'coincafex', titulo:'Coincafex', tipo:'Sede corporativa',
-    portada:3, piezas:[3,5,8,10,2,6], anchas:[3],
+    portada:3, piezas:[3,5,8,10,2,6],
     texto:'La intervención envuelve una bodega existente con una piel metálica microperforada que unifica el volumen y oculta la cubierta. Adentro, las oficinas se resolvieron con luz cálida rasante y madera, para que el interior no leyera como industrial.',
     video:'coincafex' },
 
   { slug:'punta', titulo:'La Punta', tipo:'Vivienda de lujo',
-    portada:7, piezas:[7,2,5,17,21,22], anchas:[7],
+    portada:7, piezas:[7,2,5,17,21,22],
     texto:'El proyecto más extenso del archivo: se modelaron y ambientaron todos los espacios, desde el teatro en casa hasta cada alcoba. Aquí se muestra una selección.',
     video:'punta' },
 
   { slug:'cantabria-1', titulo:'Lote 1 · Cantabria', tipo:'Vivienda unifamiliar',
-    portada:6, piezas:[6,14,3,4,9,8], anchas:[6],
+    portada:6, piezas:[6,14,3,4,9,8],
     texto:'La casa se organiza alrededor de una sala a doble altura que conecta visualmente los dos niveles. El acristalamiento continuo obligó a cuidar los reflejos: en visualización, un vidrio mal resuelto delata el render antes que cualquier otro material.',
     video:'cantabria-1' }
 ];
 
+/* Formacion y trayectoria, tomadas de la hoja de vida.
+   escudo: ruta al logo si existe; si no, se muestran las iniciales. */
 const HITOS = [
-  { anio:'2026', titulo:'Prácticas como residente de obra', detalle:'Seguimiento de ejecución en vivienda unifamiliar, tres días por semana en campo.' },
-  { anio:'2023', titulo:'Primeros encargos de visualización', detalle:'Renders de vivienda y comercio para arquitectos y constructoras de la región.' },
-  { anio:'—',    titulo:'Ingeniería civil, UPB Bucaramanga', detalle:'Formación en estructuras, materiales y construcción bajo NSR-10.' }
+  { anio:'2026 —', escudo:'assets/marca/favicon.png', sigla:'V3S',
+    titulo:'VISUAL 3D STUDIO', estado:'Fundador',
+    detalle:'Estudio de representación del diseño: modelos digitales coherentes con criterios constructivos y planos técnicos para coordinar la obra.' },
+
+  { anio:'2026 —', escudo:null, sigla:'UPB',
+    titulo:'Especialización en Vías Terrestres', estado:'Cursando',
+    detalle:'Universidad Pontificia Bolivariana, seccional Bucaramanga.' },
+
+  { anio:'2022 —', escudo:null, sigla:'UPB',
+    titulo:'Ingeniería Civil', estado:'9 semestres',
+    detalle:'Universidad Pontificia Bolivariana, seccional Bucaramanga. Promedio ponderado 4.2 / 5.' },
+
+  { anio:'2025', escudo:null, sigla:'UIS',
+    titulo:'Modelado BIM y gestión de la construcción', estado:null,
+    detalle:'Curso con Autodesk Revit. Asociación Centro de Estudios de Ingeniería Civil, UIS.' },
+
+  { anio:'2025', escudo:null, sigla:'SSI',
+    titulo:'Congreso XOpen Internacional', estado:null,
+    detalle:'Sociedad Santandereana de Ingeniería. Participación y competencia de puentes.' },
+
+  { anio:'2023', escudo:null, sigla:'OBRA',
+    titulo:'Ayudante de obra', estado:null,
+    detalle:'Proyectos de construcción y obra civil.' },
+
+  { anio:'2021', escudo:null, sigla:'CBSJA',
+    titulo:'Bachiller Académico Bilingüe', estado:null,
+    detalle:'Colegio Bilingüe San Juan de Ávila. Inglés B2 certificado por IELTS.' },
+
+  { anio:'Próximo', escudo:null, sigla:'···',
+    titulo:'Especialización en Estructuras', estado:'Proyectada',
+    detalle:'Siguiente paso en la formación.' }
+];
+
+/* Herramientas. Cada una lleva su simbolo dibujado en SVG: no se usan
+   logos de marca, que exigirian permiso y ademas obligarian a descargar
+   archivos externos. Son marcas graficas propias que evocan cada oficio. */
+const UTILES = [
+  { nombre:'Revit',       svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 30V14l14-8 14 8v16"/><path d="M6 30h28M14 30V20h12v10"/></svg>' },
+  { nombre:'AutoCAD',     svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 32L20 8l12 24"/><path d="M13 23h14"/><circle cx="20" cy="8" r="2"/></svg>' },
+  { nombre:'Civil 3D',    svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 28c6-10 10 4 15-4s10 2 15-6"/><path d="M5 33h30"/></svg>' },
+  { nombre:'SketchUp',    svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 6l13 7v14l-13 7-13-7V13z"/><path d="M20 20l13-7M20 20v14M20 20L7 13"/></svg>' },
+  { nombre:'D5 Render',   svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="20" cy="20" r="7"/><path d="M20 4v5M20 31v5M4 20h5M31 20h5M9 9l3.5 3.5M27.5 27.5L31 31M31 9l-3.5 3.5M12.5 27.5L9 31"/></svg>' },
+  { nombre:'Twinmotion',  svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 26c4-6 8-6 12 0s10 4 14-4"/><path d="M7 33h26"/><path d="M13 26V14M27 22V11"/></svg>' },
+  { nombre:'Claude',      svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 30l7-20 7 20"/><path d="M16 23h8"/></svg>' },
+  { nombre:'Claude Code', svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 13l-8 7 8 7M25 13l8 7-8 7"/></svg>' },
+  { nombre:'ChatGPT',     svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 7l11 6.5v13L20 33 9 26.5v-13z"/><circle cx="20" cy="20" r="4"/></svg>' },
+  { nombre:'Canva',       svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="20" cy="20" r="13"/><path d="M25 16c-3-3-9-1-9 4s6 7 9 4"/></svg>' },
+  { nombre:'Excel',       svg:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="8" y="8" width="24" height="24" rx="2"/><path d="M8 16h24M8 24h24M16 8v24M24 8v24"/></svg>' }
 ];
 
 let PALETAS = {};
 fetch('assets/paletas.json').then(r => r.json()).then(p => { PALETAS = p; }).catch(() => {});
 
-const ruta   = (slug, i) => `assets/renders/${slug}-${String(i).padStart(2,'0')}.webp`;
-const ruta2x = (slug, i) => `assets/renders/${slug}-${String(i).padStart(2,'0')}@2x.webp`;
-const juego  = (slug, i) => `${ruta(slug,i)} 1600w, ${ruta2x(slug,i)} 2560w`;
+const ruta   = (s, i) => `assets/renders/${s}-${String(i).padStart(2,'0')}.webp`;
+const ruta2x = (s, i) => `assets/renders/${s}-${String(i).padStart(2,'0')}@2x.webp`;
+const juego  = (s, i) => `${ruta(s,i)} 1600w, ${ruta2x(s,i)} 2560w`;
 
 /* =================================================================
-   PORTADA — reparto de letras
+   ENTRADA
    ================================================================= */
-function repartir(elemento, texto, retraso) {
-  elemento.innerHTML = [...texto].map((c, i) =>
+function repartir(el, texto, retraso) {
+  el.innerHTML = [...texto].map((c, i) =>
     `<span class="letra" style="animation-delay:${(retraso + i * .045).toFixed(3)}s">${c === ' ' ? '&nbsp;' : c}</span>`
   ).join('');
 }
 repartir(document.getElementById('linea1'), 'STICK', .35);
 repartir(document.getElementById('linea2'), 'INDUSTRIES', .75);
 
+document.querySelectorAll('.palabras').forEach(t => {
+  t.innerHTML = t.dataset.texto.split(' ').map((p, i) =>
+    `<span><i style="transition-delay:${(i * .07).toFixed(3)}s">${p}</i></span>`).join(' ');
+});
+
 /* =================================================================
-   VITRINA — cuatro hojas verticales
+   VITRINA
    ================================================================= */
 document.getElementById('vitrina').innerHTML = PROYECTOS.map((p, i) => `
   <article class="hoja" data-slug="${p.slug}" tabindex="0" role="button" aria-label="Ver ${p.titulo}">
@@ -613,65 +587,45 @@ document.getElementById('vitrina').innerHTML = PROYECTOS.map((p, i) => `
     <div class="hoja-velo"></div>
     <div class="hoja-rotulo"><div class="hoja-vertical">${p.titulo}</div></div>
     <div class="hoja-abierta">
-      <div class="num mono">${String(i + 1).padStart(2,'0')} · ${p.tipo}</div>
-      <h3>${p.titulo}</h3>
-      <p>${p.texto}</p>
-      <span class="entrar">Ver proyecto</span>
+      <div><span class="num mono">${String(i + 1).padStart(2,'0')} · ${p.tipo}</span></div>
+      <div><h3>${p.titulo}</h3></div>
+      <div><p>${p.texto}</p></div>
+      <div><span class="entrar">Ver proyecto</span></div>
     </div>
   </article>`).join('');
 
+/* =================================================================
+   SOBRE MI
+   ================================================================= */
 document.getElementById('hitos').innerHTML = HITOS.map(h => `
   <div class="hito">
     <div class="anio mono">${h.anio}</div>
-    <div><h4>${h.titulo}</h4><p>${h.detalle}</p></div>
+    <div class="cuerpo">
+      <div class="escudo">${h.escudo ? `<img src="${h.escudo}" alt="">` : h.sigla}</div>
+      <div>
+        <h4>${h.titulo}${h.estado ? `<span class="marca-estado">${h.estado}</span>` : ''}</h4>
+        <p>${h.detalle}</p>
+      </div>
+    </div>
+  </div>`).join('');
+
+document.getElementById('herramientas').innerHTML = UTILES.map((u, i) => `
+  <div class="util" style="transition-delay:${(i * .05).toFixed(2)}s">
+    <div class="simbolo">${u.svg}</div>
+    <div class="nombre">${u.nombre}</div>
   </div>`).join('');
 
 /* =================================================================
-   PESTANAS con corte plano
-   El panel barre la pantalla, se cambia la vista detras y el panel sale
-   por el otro lado. Nada se funde: es un corte.
+   CONTACTO
    ================================================================= */
-const wipe = document.getElementById('wipe');
-let vistaActual = 'inicio';
-let enTransito = false;
+const IG_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>';
+const WA_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 01-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.2 8.2 0 015.83 2.42 8.18 8.18 0 012.41 5.82c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.43.06-.65.31-.22.25-.85.83-.85 2.03s.87 2.35.99 2.51c.12.17 1.71 2.61 4.15 3.66.58.25 1.03.4 1.39.51.58.19 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29z"/></svg>';
 
-function irA(destino) {
-  if (destino === vistaActual || enTransito) return;
-  enTransito = true;
-
-  wipe.classList.remove('saliendo');
-  wipe.classList.add('entrando');
-
-  // Cuando el panel cubre del todo, se cambia la vista sin que se vea
-  setTimeout(() => {
-    document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
-    document.getElementById('v-' + destino).classList.add('activa');
-    document.getElementById('v-' + destino).scrollTop = 0;
-
-    document.querySelectorAll('.pestana').forEach(t =>
-      t.classList.toggle('activa', t.dataset.ir === destino));
-
-    vistaActual = destino;
-    history.replaceState(null, '', destino === 'inicio' ? location.pathname : '#' + destino);
-
-    wipe.classList.remove('entrando');
-    wipe.classList.add('saliendo');
-    setTimeout(() => { enTransito = false; }, 430);
-  }, 430);
-}
-
-document.addEventListener('click', e => {
-  const ir = e.target.closest('[data-ir]');
-  if (ir) { e.preventDefault(); irA(ir.dataset.ir); return; }
-
-  if (e.target.closest('.ficha')) {
-    const salto = e.target.closest('[data-proyecto]');
-    if (salto) mudarProyecto(salto.dataset.proyecto);
-    return;
-  }
-  const hoja = e.target.closest('.hoja');
-  if (hoja) abrirFicha(hoja.dataset.slug, hoja);
-});
+document.getElementById('acciones').innerHTML = `
+  <a class="boton boton-primario" href="https://wa.me/${CONTACTO.whatsapp}?text=${encodeURIComponent(CONTACTO.mensaje)}" target="_blank" rel="noopener">${WA_SVG} WhatsApp</a>
+  <a class="boton boton-secundario" href="mailto:${CONTACTO.correo}">Correo</a>
+  <a class="boton boton-secundario" href="https://instagram.com/${CONTACTO.instagram}" target="_blank" rel="noopener">${IG_SVG} Instagram</a>
+  <a class="boton boton-secundario" href="https://instagram.com/${CONTACTO.igEstudio}" target="_blank" rel="noopener">${IG_SVG} Visual 3D Studio</a>`;
 
 /* =================================================================
    FICHA DE PROYECTO
@@ -683,31 +637,25 @@ let proyectoActual = null, hojaOrigen = null;
 
 function aplicarTinte(slug) {
   const p = PALETAS[slug];
-  const raiz = document.documentElement;
-  raiz.style.setProperty('--th', p ? p.h : 0);
-  raiz.style.setProperty('--ts', p ? p.s + '%' : '0%');
+  document.documentElement.style.setProperty('--th', p ? p.h : 0);
+  document.documentElement.style.setProperty('--ts', p ? p.s + '%' : '0%');
 }
 
 function pintarFicha(p) {
   const i      = PROYECTOS.findIndex(x => x.slug === p.slug);
   const previo = PROYECTOS[(i - 1 + PROYECTOS.length) % PROYECTOS.length];
   const sigue  = PROYECTOS[(i + 1) % PROYECTOS.length];
-
-  // A dos columnas: si las piezas no anchas son impares, la ultima quedaria
-  // sola dejando hueco. Se asciende a ancha y el bloque cierra parejo.
-  const anchas  = [...p.anchas];
-  const sueltas = p.piezas.filter(n => !anchas.includes(n));
-  if (sueltas.length % 2 === 1) anchas.push(sueltas[sueltas.length - 1]);
+  const resto  = p.piezas.filter(n => n !== p.portada);
 
   fichaNombre.textContent = p.titulo;
   aplicarTinte(p.slug);
 
   contenido.innerHTML = `
-    <div class="ficha-cuerpo">
-      <div class="ficha-principal">
-        <img src="${ruta(p.slug, p.portada)}" srcset="${juego(p.slug, p.portada)}"
-             sizes="100vw" alt="${p.titulo}" data-parallax="0.1">
-      </div>
+    <div class="ficha-principal">
+      <img src="${ruta(p.slug, p.portada)}" srcset="${juego(p.slug, p.portada)}"
+           sizes="100vw" alt="${p.titulo}" data-parallax="0.09">
+    </div>
+    <div class="columna">
       <div class="ficha-titular">
         <div>
           <div class="tipo mono">${p.tipo}</div>
@@ -715,48 +663,41 @@ function pintarFicha(p) {
         </div>
         <p class="texto">${p.texto}</p>
       </div>
-      <div class="galeria" id="galeria">
-        ${p.piezas.filter(n => n !== p.portada).map((n, k) => `
-          <figure class="${anchas.includes(n) ? 'ancha' : ''}" data-k="${k}">
-            <img src="${ruta(p.slug, n)}" srcset="${juego(p.slug, n)}"
-                 sizes="(max-width:700px) 100vw, 50vw"
-                 alt="${p.titulo} — imagen ${k+1}" loading="lazy" decoding="async">
-          </figure>`).join('')}
-      </div>
+    </div>
+    <div class="galeria" id="galeria">
+      ${resto.map((n, k) => `
+        <figure data-k="${k}">
+          <img src="${ruta(p.slug, n)}" srcset="${juego(p.slug, n)}" sizes="100vw"
+               alt="${p.titulo} — imagen ${k+1}" loading="lazy" decoding="async" data-parallax="0.05">
+        </figure>`).join('')}
       ${p.video ? `
         <div class="ficha-video">
-          <h3>Recorrido</h3>
           <div class="marco">
             <video controls preload="none" playsinline poster="assets/video/${p.video}-poster.webp">
               <source src="assets/video/${p.video}.mp4" type="video/mp4">
             </video>
           </div>
         </div>` : ''}
-      <div class="ficha-navegar">
-        <button data-proyecto="${previo.slug}">← ${previo.titulo}</button>
-        <button data-proyecto="${sigue.slug}">${sigue.titulo} →</button>
-      </div>
+    </div>
+    <div class="ficha-navegar">
+      <button data-proyecto="${previo.slug}">← ${previo.titulo}</button>
+      <button data-proyecto="${sigue.slug}">${sigue.titulo} →</button>
     </div>`;
 
-  const orden = p.piezas.filter(n => n !== p.portada).map(n => ruta2x(p.slug, n));
-  contenido.querySelector('#galeria').dataset.orden = JSON.stringify(orden);
+  contenido.querySelector('#galeria').dataset.orden = JSON.stringify(resto.map(n => ruta2x(p.slug, n)));
 
-  const obs = new IntersectionObserver(entradas => {
-    entradas.forEach(e => {
+  const obs = new IntersectionObserver(en => {
+    en.forEach(e => {
       if (!e.isIntersecting) return;
-      const k = Number(e.target.dataset.k) || 0;
-      e.target.style.transitionDelay = `${Math.min(k, 3) * .09}s`;
       e.target.classList.add('dentro');
       obs.unobserve(e.target);
     });
-  }, { root: ficha, threshold: .12 });
+  }, { root: ficha, threshold: .1 });
   contenido.querySelectorAll('.galeria figure').forEach(f => obs.observe(f));
 
   proyectoActual = p;
 }
 
-/* La hoja se clona y el clon viaja y crece hasta el sitio que ocupara la
-   imagen principal de la ficha: el ojo sigue un solo objeto */
 function abrirFicha(slug, hoja) {
   const p = PROYECTOS.find(x => x.slug === slug);
   if (!p) return;
@@ -766,6 +707,7 @@ function abrirFicha(slug, hoja) {
   hojaOrigen = hoja || null;
 
   pintarFicha(p);
+  document.body.classList.add('bloqueado');
   history.replaceState(null, '', '#' + slug);
 
   if (!origen || quieto) { ficha.classList.add('abierta'); ficha.scrollTop = 0; return; }
@@ -795,6 +737,7 @@ function abrirFicha(slug, hoja) {
 }
 
 function cerrarFicha() {
+  document.body.classList.remove('bloqueado');
   history.replaceState(null, '', location.pathname);
   contenido.querySelectorAll('video').forEach(v => v.pause());
 
@@ -830,23 +773,35 @@ function mudarProyecto(slug) {
   const p = PROYECTOS.find(x => x.slug === slug);
   if (!p) return;
   hojaOrigen = null;
+  contenido.style.transition = 'opacity .3s';
   contenido.style.opacity = '0';
   setTimeout(() => {
     pintarFicha(p);
     ficha.scrollTop = 0;
     history.replaceState(null, '', '#' + slug);
-    requestAnimationFrame(() => { contenido.style.transition = 'opacity .4s'; contenido.style.opacity = '1'; });
-  }, 320);
+    requestAnimationFrame(() => { contenido.style.opacity = '1'; });
+  }, 310);
 }
 
+document.addEventListener('click', e => {
+  if (e.target.closest('.ficha')) {
+    const salto = e.target.closest('[data-proyecto]');
+    if (salto) mudarProyecto(salto.dataset.proyecto);
+    return;
+  }
+  const hoja = e.target.closest('.hoja');
+  if (hoja) abrirFicha(hoja.dataset.slug, hoja);
+});
+
 document.addEventListener('keydown', e => {
-  if (e.key !== 'Enter' && e.key !== ' ') return;
-  const foco = document.activeElement;
-  if (foco && foco.classList.contains('hoja')) { e.preventDefault(); abrirFicha(foco.dataset.slug, foco); }
+  if (e.key === 'Enter' || e.key === ' ') {
+    const foco = document.activeElement;
+    if (foco && foco.classList.contains('hoja')) { e.preventDefault(); abrirFicha(foco.dataset.slug, foco); }
+  }
 });
 
 /* =================================================================
-   VISOR — abre la version de mayor resolucion
+   VISOR
    ================================================================= */
 const visor    = document.getElementById('visor');
 const visorImg = document.getElementById('visor-img');
@@ -891,40 +846,50 @@ visor.addEventListener('touchend', e => {
 }, { passive:true });
 
 /* =================================================================
-   PARALLAX dentro de la ficha
+   DESPLAZAMIENTO
    ================================================================= */
-ficha.addEventListener('scroll', () => {
-  contenido.querySelectorAll('[data-parallax]').forEach(el => {
+const avance    = document.getElementById('avance');
+const secciones = [...document.querySelectorAll('#proyectos, #sobre, #contacto')];
+const enlaces   = [...document.querySelectorAll('.menu a')];
+
+function moverParallax(raiz, alto) {
+  raiz.querySelectorAll('[data-parallax]').forEach(el => {
     const caja   = el.getBoundingClientRect();
+    if (caja.bottom < -200 || caja.top > alto + 200) return;
     const grado  = Number(el.dataset.parallax) || .1;
-    const centro = caja.top + caja.height / 2 - innerHeight / 2;
+    const centro = caja.top + caja.height / 2 - alto / 2;
     el.style.transform = `translateY(${(-centro * grado).toFixed(1)}px)`;
   });
+}
+
+addEventListener('scroll', () => {
+  const y = scrollY;
+  const alto = document.documentElement.scrollHeight - innerHeight;
+  avance.style.transform = `scaleX(${alto > 0 ? y / alto : 0})`;
+
+  let activa = '';
+  secciones.forEach(s => { if (s.getBoundingClientRect().top <= innerHeight * .4) activa = s.id; });
+  enlaces.forEach(a => a.classList.toggle('activo', a.getAttribute('href') === '#' + activa));
 }, { passive:true });
 
-/* =================================================================
-   CONTACTO Y DIRECCION
-   ================================================================= */
-document.getElementById('btn-whatsapp').href =
-  `https://wa.me/${CONTACTO.whatsapp}?text=${encodeURIComponent(CONTACTO.mensaje)}`;
-document.getElementById('btn-correo').href =
-  `mailto:${CONTACTO.correo}?subject=${encodeURIComponent('Proyecto — Stick Industries')}`;
+ficha.addEventListener('scroll', () => moverParallax(contenido, innerHeight), { passive:true });
 
-// Un enlace directo abre la pestana o el proyecto correspondiente
+const observador = new IntersectionObserver(en => {
+  en.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('visible');
+    observador.unobserve(e.target);
+  });
+}, { threshold:.12, rootMargin:'0px 0px -60px 0px' });
+document.querySelectorAll('.revelar, .palabras, .herramientas').forEach(el => observador.observe(el));
+
+/* Enlace directo a un proyecto */
 function desdeDireccion() {
   const clave = location.hash.slice(1);
-  if (!clave) return;
-  if (PROYECTOS.some(p => p.slug === clave)) {
-    document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
-    document.getElementById('v-obra').classList.add('activa');
-    document.querySelectorAll('.pestana').forEach(t => t.classList.toggle('activa', t.dataset.ir === 'obra'));
-    vistaActual = 'obra';
-    abrirFicha(clave, null);
-  } else if (['inicio','obra','sobre','contacto'].includes(clave)) {
-    irA(clave);
-  }
+  if (clave && PROYECTOS.some(p => p.slug === clave)) abrirFicha(clave, null);
 }
 addEventListener('load', desdeDireccion);
+addEventListener('hashchange', desdeDireccion);
 </script>
 
 </body>
