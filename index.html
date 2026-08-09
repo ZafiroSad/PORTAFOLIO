@@ -1,47 +1,56 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kevin Gil — Visualización arquitectónica</title>
+<title>PORTAFOLIO - KEVIN GIL</title>
 <meta name="description" content="Ingeniero civil y visualizador arquitectónico. Renders y recorridos 3D. Bucaramanga, Colombia.">
 <link rel="icon" href="assets/marca/favicon.png">
-<meta property="og:title" content="Kevin Gil — Visualización arquitectónica">
+<meta property="og:title" content="PORTAFOLIO - KEVIN GIL">
 <meta property="og:description" content="Ingeniero civil y visualizador arquitectónico.">
-<meta property="og:image" content="assets/renders/casa-will-01.webp">
+<meta property="og:image" content="assets/renders/cazadores-09.webp">
 <meta property="og:type" content="website">
 
 <style>
 /* =================================================================
-   KEVIN GIL — CV interactiva
-   Un solo archivo, sin librerias.
+   STICK INDUSTRIES — portafolio de Kevin Gil
+   Un solo archivo, sin librerias ni dependencias externas.
 
-   Sigue STICK_UI_SYSTEM.md con la escala zinc INVERTIDA. El documento
-   rector declara dark-first absoluto; esta pieza es la excepcion pedida.
-   Se conservan sus demas reglas: mono para todo dato tecnico, un solo
-   CTA por bloque, bordes con opacidad, radios, microinteracciones.
+   ESCALA OSCURA. El render es la unica fuente de luz de la pagina:
+   todo lo demas —fondo, texto, bordes— se mantiene por debajo de el
+   en luminosidad para que la imagen sea siempre lo mas brillante en
+   pantalla. Es la convencion de los estudios de visualizacion y la
+   razon por la que un mismo render se ve mejor sobre negro.
 
-   Todo el sitio se recorre desplazando. No hay pestanas.
+   Se conservan las reglas del STICK_UI_SYSTEM: mono para todo dato
+   tecnico, un solo CTA por bloque, bordes con opacidad y radios.
    ================================================================= */
 :root {
-  --z-50:  #fafafa;
-  --z-100: #f4f4f5;
-  --z-150: #eeeef0;
-  --z-200: #e4e4e7;
-  --z-400: #a1a1aa;
-  --z-500: #71717a;
-  --z-600: #52525b;
-  --z-900: #18181b;
+  --n-950:#09090b;   /* fondo */
+  --n-900:#0e0e10;   /* panel */
+  --n-850:#161618;   /* hueco de imagen */
+  --n-800:#232326;
+  --n-600:#52525b;
+  --n-500:#71717a;   /* debil */
+  --n-400:#a1a1aa;   /* tenue */
+  --n-200:#e4e4e7;
+  --n-50: #fafafa;   /* tinta */
 
-  --fondo: var(--z-50);
-  --tinta: var(--z-900);
-  --tenue: var(--z-600);
-  --debil: var(--z-400);
+  --fondo:var(--n-950);
+  --panel:var(--n-900);
+  --tinta:var(--n-50);
+  --tenue:var(--n-400);
+  --debil:var(--n-500);
+  --linea:rgba(250,250,250,.11);
+  --linea-fuerte:rgba(250,250,250,.28);
+  --vidrio:rgba(9,9,11,.72);
 
-  --th: 0; --ts: 0%;            /* tinte del proyecto abierto */
+  /* Tinte del proyecto abierto: el color dominante de su render tiñe
+     el fondo de la ficha muy por debajo del umbral de lectura. */
+  --th:0; --ts:0%;
 
-  --margen: clamp(1.25rem, 4vw, 4rem);
-  --barra:  60px;
+  --margen: clamp(1.25rem, 4vw, 4.5rem);
+  --barra: 62px;
 
   --salida: cubic-bezier(.16, 1, .3, 1);
   --suave:  cubic-bezier(.4, 0, .2, 1);
@@ -53,7 +62,11 @@
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
+/* El desplazamiento suave se anima por JS, no con scroll-behavior: el
+   scroll suave nativo no llega a ejecutarse en esta pagina y los saltos
+   del menu se quedaban quietos. Animarlo a mano ademas permite elegir
+   la curva del movimiento. */
+html { scroll-behavior:auto; }
 body {
   background:var(--fondo); color:var(--tinta);
   font-family:var(--sans); line-height:1.65;
@@ -74,144 +87,197 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   height:var(--barra);
   display:flex; align-items:center; justify-content:space-between;
   padding:0 var(--margen);
-  background:rgba(250,250,250,.8);
-  backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(39,39,42,.09);
+  background:var(--vidrio);
+  backdrop-filter:blur(22px) saturate(140%); -webkit-backdrop-filter:blur(22px) saturate(140%);
+  border-bottom:1px solid var(--linea);
 }
-.marca { display:flex; align-items:center; gap:.6rem; }
-.marca img { width:20px; height:20px; }
-.marca span { font-family:var(--mono); font-size:.64rem; font-weight:700; letter-spacing:.2em; }
+.marca { display:flex; align-items:center; gap:.55rem; }
+.marca span {
+  font-family:var(--mono); font-size:.66rem; font-weight:700; letter-spacing:.24em;
+}
+.marca .punto {
+  width:5px; height:5px; border-radius:50%; background:var(--tinta);
+  animation:latir 3.4s ease-in-out infinite;
+}
+@keyframes latir { 0%,100% { opacity:1 } 50% { opacity:.25 } }
 
-.menu { display:flex; gap:.2rem; }
+.menu { display:flex; gap:.15rem; }
 .menu a {
+  position:relative;
   font-family:var(--mono); font-size:.63rem; letter-spacing:.18em; text-transform:uppercase;
-  color:var(--debil); padding:.45rem .8rem; border-radius:10px;
+  color:var(--debil); padding:.5rem .85rem; border-radius:10px;
   transition:color .35s var(--suave), background .35s var(--suave);
 }
-.menu a:hover { color:var(--tenue); background:rgba(39,39,42,.05); }
-.menu a.activo { color:var(--tinta); background:rgba(39,39,42,.07); }
-@media (max-width:700px){ .menu a { padding:.4rem .5rem; letter-spacing:.1em; } }
+.menu a:hover { color:var(--tenue); background:rgba(250,250,250,.05); }
+.menu a.activo { color:var(--tinta); background:rgba(250,250,250,.08); }
+@media (max-width:700px){ .menu a { padding:.4rem .5rem; letter-spacing:.08em; } }
 
-.avance { position:fixed; top:0; left:0; right:0; height:1px; z-index:121; background:var(--tinta); transform:scaleX(0); transform-origin:left; }
-
-/* Corte plano al saltar desde el menu: un panel barre la pantalla, el
-   salto ocurre detras y el panel sale por el otro lado */
-.wipe { position:fixed; inset:0; z-index:300; background:var(--tinta);
-  transform:scaleX(0); transform-origin:left; pointer-events:none; }
-.wipe.entrando { transform:scaleX(1); transform-origin:left;  transition:transform .38s cubic-bezier(.7,0,.3,1); }
-.wipe.saliendo { transform:scaleX(0); transform-origin:right; transition:transform .38s cubic-bezier(.7,0,.3,1); }
+/* Barra de avance con el nombre de la seccion en curso */
+.avance { position:fixed; top:0; left:0; right:0; height:1.5px; z-index:121;
+  background:linear-gradient(to right, var(--n-400), var(--n-50));
+  transform:scaleX(0); transform-origin:left; }
 
 /* ============ Entrada ========================================= */
 .mascara-marca {
   position:fixed; inset:0; z-index:400;
   display:flex; align-items:center; justify-content:center;
   background:var(--fondo);
-  animation:disolverMarca 1.4s var(--salida) 2.5s forwards;
+  animation:disolverMarca 1.3s var(--salida) 2.4s forwards;
 }
 @keyframes disolverMarca { to { opacity:0; visibility:hidden; } }
 .palabra { font-size:clamp(3rem,13vw,12rem); font-weight:800; letter-spacing:-.05em; line-height:.9; text-align:center; text-transform:uppercase; }
 .linea2 { display:block; font-size:.42em; letter-spacing:.08em; font-weight:300; margin-top:.35em; }
 
-/* El recorte va en cada letra. background-attachment:fixed ancla el fondo
-   a la ventana, no a la letra, y asi las letras componen entre todas una
+/* El recorte va en cada letra. background-attachment:fixed ancla el
+   fondo a la ventana y no a la letra, asi todas componen entre si una
    sola imagen continua. Solo se animan opacity y filter: al animar
-   transform, el recorte se rompe y el texto sale negro. */
+   transform el recorte se rompe y el texto sale en color plano. */
 .letra {
   display:inline-block;
-  background-image:url('assets/renders/casa-will-01.webp');
+  background-image:var(--render-marca, url('assets/renders/cazadores-09.webp'));
   background-attachment:fixed; background-size:cover; background-position:center 45%;
   -webkit-background-clip:text; background-clip:text; color:transparent;
-  opacity:0; filter:blur(14px);
-  animation:enfocar 1.2s var(--salida) forwards;
+  opacity:0; filter:blur(16px);
+  animation:enfocar 1.15s var(--salida) forwards;
 }
 @keyframes enfocar { to { opacity:1; filter:blur(0); } }
 @media (hover:none) { .letra { background-attachment:scroll; background-size:700% auto; } }
 .regla-marca {
   position:absolute; left:50%; bottom:34%; width:min(78vw,900px); height:1px;
   transform:translateX(-50%) scaleX(0);
-  background:linear-gradient(to right, transparent, rgba(39,39,42,.35), transparent);
-  animation:cruzar 1.6s var(--salida) 1.5s forwards;
+  background:linear-gradient(to right, transparent, var(--linea-fuerte), transparent);
+  animation:cruzar 1.5s var(--salida) 1.4s forwards;
 }
 @keyframes cruzar { to { transform:translateX(-50%) scaleX(1); } }
 
-/* ============ INICIO ========================================== */
-.inicio { padding:calc(var(--barra) + clamp(2rem,6vh,4rem)) var(--margen) clamp(3rem,8vh,5rem); }
-.lamina { position:relative; width:100%; aspect-ratio:16/8; overflow:hidden; background:var(--z-150); border-radius:16px;
-  clip-path:inset(42% 0 42% 0); animation:abrirLamina 1.8s var(--salida) 2.5s forwards; }
-@keyframes abrirLamina { to { clip-path:inset(0 0 0 0); } }
-.lamina img { width:100%; height:100%; object-fit:cover; transform:scale(1.26);
-  animation:asentar 2.8s var(--salida) 2.5s forwards, deriva 28s ease-in-out 5.4s infinite alternate; }
-@keyframes asentar { to { transform:scale(1.04); } }
-@keyframes deriva { from { transform:scale(1.04) translate(0,0) } to { transform:scale(1.11) translate(-1.5%,-1%) } }
-
-.inicio-texto { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:clamp(1.5rem,4vw,4rem); align-items:end; margin-top:clamp(1.6rem,4vh,2.6rem); }
-@media (max-width:860px){ .inicio-texto { grid-template-columns:1fr; gap:1.2rem } }
-.bloque { overflow:hidden; }
-.bloque > * { display:block; transform:translateY(112%); animation:emerger 1.3s var(--salida) forwards; }
-@keyframes emerger { to { transform:translateY(0) } }
-.inicio-texto h1 { font-size:clamp(1.9rem,5vw,4rem); font-weight:600; line-height:1.02; letter-spacing:-.035em; }
-.inicio-texto h1 .suave { font-weight:200; color:var(--tenue); }
-.t1 { animation-delay:3.5s } .t2 { animation-delay:3.64s }
-.inicio-aparte { opacity:0; animation:aparecer 1.2s ease 4.1s forwards; padding-bottom:.3rem; }
-.inicio-aparte p { color:var(--tenue); font-size:.92rem; max-width:34ch; }
-.inicio-aparte .dato { font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; color:var(--debil); margin-top:.8rem; }
-@keyframes aparecer { to { opacity:1 } }
-
 /* ============ Secciones ======================================= */
-/* Cada seccion ocupa al menos la pantalla completa por debajo de la
-   barra: al saltar desde el menu, la seccion queda encuadrada de arriba
-   a abajo en vez de aparecer a media altura */
+/* Cada seccion arranca justo bajo la barra y ocupa la pantalla
+   completa: al saltar desde el menu queda encuadrada de borde a
+   borde, nunca a media altura ni con el titulo cortado. */
 .seccion {
-  padding:clamp(3rem,7vh,5rem) var(--margen);
-  scroll-margin-top:var(--barra);
-  min-height:calc(100svh - var(--barra));
-  display:flex; flex-direction:column; justify-content:center;
+  position:relative;
+  min-height:100svh;
+  padding-top:var(--barra);
+  display:flex; flex-direction:column;
 }
+.seccion-cuerpo {
+  flex:1; display:flex; flex-direction:column;
+  /* "safe" centra mientras el contenido quepa y lo alinea arriba
+     cuando no cabe. Con center a secas, un contenido mas alto que su
+     hueco se desborda por ARRIBA y la barra fija le come el titulo. */
+  justify-content:safe center;
+  padding:clamp(1rem,2.6vh,2rem) 0;
+}
+.acolchado { padding-left:var(--margen); padding-right:var(--margen); }
+
 .cabeza { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(1.5rem,4vw,4rem); align-items:end;
-  margin-bottom:clamp(2.5rem,6vh,4rem); padding-bottom:1.6rem; border-bottom:1px solid rgba(39,39,42,.1); }
-@media (max-width:860px){ .cabeza { grid-template-columns:1fr; gap:1rem } }
-.etiqueta { font-family:var(--mono); font-size:.62rem; letter-spacing:.28em; text-transform:uppercase; color:var(--debil); margin-bottom:1rem; }
+  margin-bottom:clamp(1.2rem,3vh,2.2rem); padding-bottom:1.2rem; border-bottom:1px solid var(--linea); }
+@media (max-width:860px){ .cabeza { grid-template-columns:1fr; gap:.8rem } }
+.etiqueta { font-family:var(--mono); font-size:.62rem; letter-spacing:.28em; text-transform:uppercase; color:var(--debil); margin-bottom:.9rem; }
 .cabeza h2 { font-size:clamp(1.8rem,4.2vw,3.1rem); font-weight:600; letter-spacing:-.035em; line-height:1.07; }
 .cabeza h2 .suave { font-weight:200; color:var(--tenue); }
-.cabeza .apunte { color:var(--tenue); font-size:.95rem; max-width:44ch; }
 
+/* --- Revelados al entrar en pantalla ------------------------- */
+/* Las palabras suben desde detras de su propia caja */
 .palabras span { display:inline-block; overflow:hidden; vertical-align:top; }
 .palabras span i { display:inline-block; font-style:normal; transform:translateY(105%); transition:transform 1s var(--salida); }
 .palabras.visible span i { transform:translateY(0); }
+
 .revelar > * { opacity:0; transform:translateY(22px); }
 .revelar.visible > * { opacity:1; transform:none; transition:opacity .9s var(--suave), transform 1s var(--salida); }
 
-/* ============ PROYECTOS — vitrina ============================= */
-.vitrina { display:flex; height:clamp(520px, 78vh, 900px); border-radius:16px; overflow:hidden; }
-@media (max-width:860px){ .vitrina { flex-direction:column; height:auto; } }
+/* Las imagenes no aparecen por opacidad: se descubren con una
+   mascara que se abre desde el centro. Pesa mucho mas. */
+.cortina { clip-path:inset(46% 0 46% 0); transition:clip-path 1.4s var(--salida); }
+.cortina.visible { clip-path:inset(0 0 0 0); }
 
+/* ============ INICIO ========================================== */
+.inicio { position:relative; min-height:100svh; display:flex; flex-direction:column; justify-content:flex-end;
+  padding:var(--barra) 0 0; overflow:hidden; }
+.lamina { position:absolute; inset:0; overflow:hidden; background:var(--n-850); }
+.lamina img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  transform:scale(1.3); opacity:0;
+  animation:asentar 2.6s var(--salida) 2.3s forwards; will-change:transform; }
+@keyframes asentar { to { transform:scale(1.06); opacity:1 } }
+/* Sobre el render, un degradado que apaga la parte baja para que el
+   texto se lea sin recuadros ni cajas de color */
+.lamina::after { content:''; position:absolute; inset:0;
+  background:linear-gradient(to top, var(--fondo) 2%, rgba(9,9,11,.72) 32%, rgba(9,9,11,.18) 62%, rgba(9,9,11,.45) 100%); }
+
+.inicio-texto { position:relative; z-index:2;
+  display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:clamp(1.5rem,4vw,4rem); align-items:end;
+  padding:0 var(--margen) clamp(3rem,9vh,6rem); }
+@media (max-width:860px){ .inicio-texto { grid-template-columns:1fr; gap:1.2rem } }
+.bloque { overflow:hidden; }
+.bloque > * { display:block; transform:translateY(112%); animation:emerger 1.25s var(--salida) forwards; }
+@keyframes emerger { to { transform:translateY(0) } }
+.inicio-texto h1 { font-size:clamp(2rem,5.4vw,4.4rem); font-weight:600; line-height:1.02; letter-spacing:-.04em; }
+.inicio-texto h1 .suave { font-weight:200; color:var(--tenue); }
+.t1 { animation-delay:3.3s } .t2 { animation-delay:3.44s }
+.inicio-aparte { opacity:0; animation:aparecer 1.2s ease 3.9s forwards; padding-bottom:.4rem; }
+.inicio-aparte p { color:var(--tenue); font-size:.95rem; max-width:34ch; }
+.inicio-aparte .dato { font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; color:var(--debil); margin-top:.9rem; }
+@keyframes aparecer { to { opacity:1 } }
+
+/* Indicador de desplazamiento */
+.baja { position:absolute; left:50%; bottom:1.4rem; z-index:3; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:.5rem;
+  font-family:var(--mono); font-size:.55rem; letter-spacing:.22em; text-transform:uppercase; color:var(--debil);
+  opacity:0; animation:aparecer 1s ease 4.4s forwards; }
+.baja .hilo { width:1px; height:34px; background:linear-gradient(to bottom, var(--linea-fuerte), transparent); }
+.baja .hilo::after { content:''; display:block; width:1px; height:12px; background:var(--tinta);
+  animation:gotear 2.2s var(--suave) infinite; }
+@keyframes gotear { 0% { transform:translateY(-12px); opacity:0 } 40% { opacity:1 } 100% { transform:translateY(34px); opacity:0 } }
+
+/* ============ PROYECTOS — vitrina a sangre ==================== */
+/* Las cuatro hojas ocupan el ancho completo de la ventana, sin
+   margenes ni esquinas redondeadas: el render llega hasta el borde. */
+.vitrina { display:flex; width:100%; flex:1; min-height:clamp(420px,58vh,760px); overflow:hidden;
+  border-top:1px solid var(--linea); border-bottom:1px solid var(--linea); }
+@media (max-width:860px){ .vitrina { flex-direction:column; min-height:0; } }
+
+/* Las cuatro hojas se descubren en cascada con una persiana que se
+   abre de abajo arriba. Es lo que hace que la seccion "entre" en vez
+   de aparecer ya montada. */
 .hoja { position:relative; flex:1 1 0; min-width:0; overflow:hidden; cursor:pointer;
-  border-right:1px solid rgba(250,250,250,.14); transition:flex-grow .9s var(--salida); }
+  border-right:1px solid rgba(9,9,11,.55); transition:flex-grow .9s var(--salida);
+  clip-path:inset(0 0 100% 0); }
+.vitrina.visible .hoja { clip-path:inset(0 0 0 0); transition:flex-grow .9s var(--salida), clip-path 1.15s var(--salida); }
+.vitrina.visible .hoja:nth-child(2) { transition-delay:0s, .09s }
+.vitrina.visible .hoja:nth-child(3) { transition-delay:0s, .18s }
+.vitrina.visible .hoja:nth-child(4) { transition-delay:0s, .27s }
 .hoja:last-child { border-right:none; }
-.vitrina:hover .hoja { flex-grow:.72; }
-.vitrina .hoja:hover { flex-grow:2.6; }
+.vitrina:hover .hoja { flex-grow:.74; }
+.vitrina .hoja:hover { flex-grow:2.4; }
 @media (max-width:860px){
-  .hoja { flex:none; height:56vh; border-right:none; border-bottom:1px solid rgba(250,250,250,.14); }
+  .hoja { flex:none; height:52vh; border-right:none; border-bottom:1px solid rgba(9,9,11,.55); }
   .vitrina:hover .hoja, .vitrina .hoja:hover { flex-grow:1; }
+  /* En tactil no hay cursor que señalar: la ficha de cada hoja va
+     siempre desplegada y el rotulo vertical sobra. */
+  .hoja-img img { filter:saturate(1) brightness(.88); transform:scale(1); }
+  .hoja-rotulo { display:none; }
+  .hoja-abierta > * > * { transform:translateY(0); }
+  .hoja-abierta p { display:none; }
 }
 
 .hoja-img { position:absolute; inset:0; }
-.hoja-img img { width:100%; height:100%; object-fit:cover; transform:scale(1.06);
-  transition:transform 1.4s var(--salida), filter .9s var(--suave); filter:saturate(.85) brightness(.92); }
+.hoja-img img { width:100%; height:100%; object-fit:cover; transform:scale(1.07);
+  transition:transform 1.4s var(--salida), filter .9s var(--suave);
+  filter:saturate(.72) brightness(.62); }
 .hoja:hover .hoja-img img { transform:scale(1); filter:saturate(1) brightness(1); }
 .hoja-velo { position:absolute; inset:0;
-  background:linear-gradient(to top, rgba(9,9,11,.8) 0%, rgba(9,9,11,.25) 45%, rgba(9,9,11,.05) 100%); }
+  background:linear-gradient(to top, rgba(9,9,11,.92) 0%, rgba(9,9,11,.35) 42%, rgba(9,9,11,.08) 100%); }
 
 /* El nombre en vertical sale por la izquierda cuando la hoja se abre.
    El desplazamiento va en el CONTENEDOR, no en el texto: dentro de un
-   elemento con writing-mode vertical y rotate(180deg), los ejes de
-   translate quedan girados y el texto no salia de su caja. */
+   elemento con writing-mode vertical y rotate(180deg) los ejes de
+   translate quedan girados y el texto no sale de su caja. */
 .hoja-rotulo { position:absolute; left:0; bottom:0; z-index:2;
   padding:clamp(1.2rem,2vw,2rem); color:#fff;
   transition:transform .55s var(--salida), opacity .35s var(--suave); }
 .hoja:hover .hoja-rotulo { transform:translateX(-115%); opacity:0; }
 .hoja-vertical { writing-mode:vertical-rl; transform:rotate(180deg);
-  font-size:clamp(.95rem,1.4vw,1.25rem); font-weight:500; white-space:nowrap; }
+  font-size:clamp(.95rem,1.4vw,1.2rem); font-weight:500; white-space:nowrap; letter-spacing:.01em; }
 
 .hoja-abierta { position:absolute; left:0; right:0; bottom:0; z-index:3;
   padding:clamp(1.4rem,2.2vw,2.4rem); color:#fff; pointer-events:none; }
@@ -221,104 +287,146 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 .hoja:hover .hoja-abierta > *:nth-child(2) > * { transition-delay:.06s }
 .hoja:hover .hoja-abierta > *:nth-child(3) > * { transition-delay:.12s }
 .hoja:hover .hoja-abierta > *:nth-child(4) > * { transition-delay:.18s }
-.hoja-abierta .num { font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; opacity:.8; }
+.hoja-abierta .num { font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; opacity:.82; }
 .hoja-abierta h3 { font-size:clamp(1.3rem,2.2vw,2rem); font-weight:500; letter-spacing:-.02em; margin:.35rem 0 .5rem; }
-.hoja-abierta p { font-size:.87rem; line-height:1.6; max-width:44ch; opacity:.88; }
+.hoja-abierta p { font-size:.86rem; line-height:1.6; max-width:44ch; opacity:.86; }
 .hoja-abierta .entrar { display:inline-flex; align-items:center; gap:.5rem; margin-top:1.1rem;
   font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; text-transform:uppercase;
-  border:1px solid rgba(255,255,255,.45); border-radius:10px; padding:.55rem 1rem; }
+  border:1px solid rgba(255,255,255,.5); border-radius:10px; padding:.55rem 1rem; }
+
+/* ============ Boton de indice ================================= */
+.ver-todos { display:flex; justify-content:center; padding:clamp(1.4rem,3.5vh,2.4rem) var(--margen) 0; }
+.btn-todos {
+  position:relative; overflow:hidden;
+  display:inline-flex; align-items:center; gap:1.2rem;
+  padding:1rem 2.2rem; border-radius:14px;
+  background:var(--tinta); color:var(--fondo);
+  font-size:.88rem; font-weight:500;
+  transition:transform .25s var(--suave), box-shadow .5s var(--suave);
+}
+.btn-todos:hover { transform:translateY(-2px); box-shadow:0 16px 40px rgba(0,0,0,.5); }
+.btn-todos:active { transform:scale(.98); }
+.btn-todos .cuenta { font-family:var(--mono); font-size:.65rem; letter-spacing:.16em; opacity:.55; }
+.btn-todos .flecha { width:22px; height:1px; background:currentColor; transition:width .5s var(--salida); }
+.btn-todos:hover .flecha { width:40px; }
+.btn-todos::before { content:''; position:absolute; inset:0; background:rgba(9,9,11,.14);
+  transform:translateX(-101%); transition:transform .6s var(--salida); }
+.btn-todos:hover::before { transform:translateX(101%); }
+.btn-todos > * { position:relative; z-index:1; }
 
 /* ============ SOBRE MÍ ======================================== */
-.bio { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:clamp(2rem,5vw,4.5rem); align-items:start; }
-@media (max-width:900px){ .bio { grid-template-columns:1fr; } }
-.bio p { color:var(--tenue); font-size:1rem; margin-bottom:1.1rem; max-width:60ch; }
+.bio { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:clamp(2rem,5vw,5rem); align-items:stretch; }
+/* La rueda se centra contra la columna de texto: alineada arriba
+   dejaba un vacio largo debajo. */
+.bio-trayecto { display:flex; flex-direction:column; justify-content:center; }
+@media (max-width:960px){ .bio { grid-template-columns:1fr; gap:2.5rem } }
+.bio p { color:var(--tenue); font-size:.95rem; margin-bottom:.8rem; max-width:58ch; }
 .bio p strong { color:var(--tinta); font-weight:500; }
+.bio .destacado { font-size:1.08rem; color:var(--n-200); }
 
-/* --- Trayecto: linea de tiempo con hilo continuo -------------- */
-.hitos { position:relative; padding-left:2.6rem; }
-/* El hilo se dibuja de arriba abajo cuando la seccion entra en pantalla */
-.hitos::before {
-  content:''; position:absolute; left:13px; top:.6rem; bottom:.6rem; width:1px;
-  background:rgba(39,39,42,.16);
-  transform:scaleY(0); transform-origin:top;
-  transition:transform 1.6s var(--salida);
+/* --- Cifras ---------------------------------------------------- */
+.cifras { display:flex; flex-wrap:wrap; gap:clamp(1.4rem,3.5vw,2.8rem); margin:1.3rem 0 1.5rem;
+  padding:1rem 0; border-top:1px solid var(--linea); border-bottom:1px solid var(--linea); }
+.cifra b { display:block; font-size:clamp(1.4rem,2.6vw,1.9rem); font-weight:600; letter-spacing:-.03em; line-height:1; }
+.cifra span { font-family:var(--mono); font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--debil); }
+
+/* --- Rueda del trayecto --------------------------------------- */
+/* Los hitos se desplazan dentro de su propia caja. El que queda en el
+   centro es el grande; los de arriba y abajo se van reduciendo segun
+   su distancia al centro, como una rueda que gira. La escala y la
+   opacidad las calcula el JS en cada cuadro. */
+.rueda-marco { position:relative; }
+.rueda-marco::before, .rueda-marco::after {
+  content:''; position:absolute; left:0; right:0; height:34%; z-index:3; pointer-events:none;
 }
-.hitos.visible::before { transform:scaleY(1); }
+.rueda-marco::before { top:0;    background:linear-gradient(to bottom, var(--fondo) 8%, transparent); }
+.rueda-marco::after  { bottom:0; background:linear-gradient(to top,    var(--fondo) 8%, transparent); }
 
-.hito { position:relative; padding:0 0 clamp(1.6rem,3vh,2.4rem) 0;
-  opacity:0; transform:translateX(14px);
-  transition:opacity .8s var(--suave), transform .9s var(--salida); }
-.hitos.visible .hito { opacity:1; transform:none; }
-.hito:last-child { padding-bottom:0; }
+.rueda {
+  height:clamp(260px, 39vh, 420px);
+  /* overscroll auto a proposito: al llegar al extremo de la rueda el
+     desplazamiento continua en la pagina en vez de quedarse atrapado */
+  overflow-y:auto; overscroll-behavior:auto;
+  scroll-snap-type:y proximity;
+  padding:22vh 0;                      /* para que el primero y el ultimo puedan centrarse */
+  scrollbar-width:none;
+}
+.rueda::-webkit-scrollbar { display:none; }
 
-/* El escudo se posa sobre el hilo */
+.hito {
+  scroll-snap-align:center;
+  display:grid; grid-template-columns:44px 1fr; gap:1rem; align-items:start;
+  padding:.7rem 0;
+  transform:scale(var(--k,.8)); opacity:var(--o,.3);
+  transform-origin:left center;
+  transition:transform .28s var(--suave), opacity .28s var(--suave);
+}
 .hito .escudo {
-  position:absolute; left:-2.6rem; top:0;
-  width:28px; height:28px; border-radius:8px;
-  background:var(--fondo); border:1px solid rgba(39,39,42,.14);
-  display:flex; align-items:center; justify-content:center; overflow:hidden;
-  font-family:var(--mono); font-size:.46rem; font-weight:700; color:var(--debil);
-  transition:border-color .4s var(--suave), transform .6s var(--salida);
+  width:44px; height:44px; border-radius:12px; overflow:hidden;
+  background:var(--panel); border:1px solid var(--linea);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-size:.52rem; font-weight:700; color:var(--debil);
 }
-.hito:hover .escudo { border-color:rgba(39,39,42,.42); transform:scale(1.12); }
-.hito .escudo img { width:100%; height:100%; object-fit:contain; padding:3px; }
+.hito .escudo img { width:100%; height:100%; object-fit:contain; padding:6px; }
+.hito .anio { font-family:var(--mono); font-size:.6rem; letter-spacing:.2em; color:var(--debil); }
+.hito h4 { font-size:1.05rem; font-weight:500; margin:.2rem 0 .25rem; letter-spacing:-.01em; }
+.hito p { font-size:.85rem; color:var(--tenue); margin:0; max-width:46ch; }
+.hito .marca-estado { font-family:var(--mono); font-size:.54rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--n-200); background:rgba(250,250,250,.09); border-radius:6px; padding:.2rem .5rem; margin-left:.6rem;
+  vertical-align:middle; white-space:nowrap; }
+/* El que esta en el centro se marca con un filo a la izquierda */
+.hito.foco .escudo { border-color:var(--linea-fuerte); }
 
-.hito .anio { font-family:var(--mono); font-size:.6rem; letter-spacing:.18em; color:var(--debil); }
-.hito h4 { font-size:1.02rem; font-weight:500; margin:.3rem 0 .2rem; }
-.hito p { font-size:.86rem; color:var(--tenue); margin:0; max-width:52ch; }
-.hito .marca-estado { font-family:var(--mono); font-size:.55rem; letter-spacing:.16em; text-transform:uppercase;
-  color:var(--tenue); background:rgba(39,39,42,.06); border-radius:6px; padding:.18rem .5rem; margin-left:.6rem;
-  vertical-align:middle; }
-
-/* --- Herramientas: tira continua, sin cajas ------------------- */
-/* Los logos vienen de marcas distintas y con formas muy diferentes.
-   Encerrarlos en tarjetas iguales hacia evidente ese desorden; sueltos
-   sobre el papel, alineados por una linea base comun, se leen como un
-   inventario y no como una parrilla de botones. */
-.herramientas { display:flex; flex-wrap:wrap; gap:clamp(1.6rem,3vw,2.8rem) clamp(1.8rem,3.5vw,3.2rem); margin-top:2rem; align-items:flex-end; }
+/* --- Herramientas --------------------------------------------- */
+/* Van siempre a color sobre una placa oscura propia. El gris que se
+   revelaba al pasar el cursor escondia justamente lo que hay que
+   mostrar: con que programas trabaja. */
+.herramientas { display:grid; grid-template-columns:repeat(auto-fill, minmax(92px,1fr));
+  gap:.5rem; margin-top:.9rem; }
 .util {
-  display:flex; flex-direction:column; align-items:center; gap:.7rem;
-  opacity:0; transform:translateY(20px);
-  transition:opacity .8s var(--suave), transform .9s var(--salida);
+  display:flex; flex-direction:column; align-items:center; gap:.5rem;
+  padding:.8rem .4rem .65rem; border-radius:12px;
+  background:var(--panel); border:1px solid var(--linea);
+  opacity:0; transform:translateY(18px);
+  transition:opacity .7s var(--suave), transform .8s var(--salida),
+             border-color .4s var(--suave), background .4s var(--suave);
 }
 .herramientas.visible .util { opacity:1; transform:none; }
-.util .simbolo {
-  width:clamp(34px,3.4vw,46px); height:clamp(34px,3.4vw,46px);
-  display:flex; align-items:center; justify-content:center;
-  filter:grayscale(1) opacity(.55);
-  transition:filter .5s var(--suave), transform .7s var(--salida);
-}
-/* En reposo van en gris: el conjunto se ve ordenado pese a venir de
-   paletas ajenas. El color aparece solo en el que se senala. */
-.util:hover .simbolo { filter:grayscale(0) opacity(1); transform:translateY(-6px) scale(1.1); }
-.util .nombre {
-  font-family:var(--mono); font-size:.56rem; letter-spacing:.16em; text-transform:uppercase;
-  color:var(--debil); transition:color .4s var(--suave);
-}
-.util:hover .nombre { color:var(--tinta); }
-.util img, .util svg { width:100%; height:100%; object-fit:contain; }
+.util:hover { border-color:var(--linea-fuerte); background:var(--n-850); }
+.util .simbolo { width:30px; height:30px; display:flex; align-items:center; justify-content:center;
+  transition:transform .6s var(--salida); }
+.util:hover .simbolo { transform:translateY(-3px) scale(1.08); }
+.util img { width:100%; height:100%; object-fit:contain; }
+.util .nombre { font-family:var(--mono); font-size:.55rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--tenue); text-align:center; }
 
 /* ============ CONTACTO ======================================== */
-.acciones { display:flex; gap:.7rem; flex-wrap:wrap; margin-top:.5rem; }
-.boton { display:inline-flex; align-items:center; gap:.55rem; padding:.9rem 1.7rem; border-radius:12px;
+.contacto-cuerpo { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(2rem,5vw,5rem); align-items:end; }
+@media (max-width:860px){ .contacto-cuerpo { grid-template-columns:1fr; gap:2rem } }
+.contacto-cuerpo .apunte { color:var(--tenue); font-size:1rem; max-width:42ch; margin-bottom:1.6rem; }
+.acciones { display:flex; gap:.7rem; flex-wrap:wrap; }
+.boton { display:inline-flex; align-items:center; gap:.55rem; padding:.9rem 1.6rem; border-radius:12px;
   font-size:.83rem; font-weight:500;
   transition:opacity .3s var(--suave), background .3s var(--suave), border-color .3s var(--suave), transform .2s var(--suave); }
 .boton:active { transform:scale(.97); }
 .boton-primario { background:var(--tinta); color:var(--fondo); }
 .boton-primario:hover { opacity:.86; }
-.boton-secundario { border:1px solid rgba(39,39,42,.16); }
-.boton-secundario:hover { border-color:rgba(39,39,42,.4); }
+.boton-secundario { border:1px solid var(--linea); color:var(--n-200); }
+.boton-secundario:hover { border-color:var(--linea-fuerte); background:rgba(250,250,250,.04); }
 .boton svg { flex:none; }
+.dato-directo { font-family:var(--mono); font-size:.66rem; letter-spacing:.14em; color:var(--debil); margin-top:1.4rem; }
+.dato-directo b { color:var(--tenue); font-weight:500; }
 
-.pie { padding:1.6rem var(--margen); border-top:1px solid rgba(39,39,42,.1);
+.pie { padding:1.5rem var(--margen); border-top:1px solid var(--linea);
   display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap;
-  font-family:var(--mono); font-size:.62rem; letter-spacing:.1em; color:var(--debil); }
+  font-family:var(--mono); font-size:.6rem; letter-spacing:.1em; color:var(--debil); }
 
 /* ============ FICHA DE PROYECTO =============================== */
-/* Sin margenes laterales: las imagenes van a sangre y solo el texto
-   respeta una columna legible. Es lo que quita la sensacion de encierro. */
-.ficha { position:fixed; inset:0; z-index:200;
-  background:hsl(var(--th), calc(var(--ts) * .5), 97%);
+/* Por encima del indice: si queda por debajo, al abrir un proyecto
+   desde el indice la ficha se monta tapada y solo aparece cuando se
+   cierra el indice, que es justo lo que se veia como fallo. */
+.ficha { position:fixed; inset:0; z-index:260;
+  background:hsl(var(--th), calc(var(--ts) * .35), 5%);
   overflow-y:auto; overscroll-behavior:contain;
   opacity:0; visibility:hidden;
   transition:opacity .5s var(--suave), visibility .5s, background .9s var(--suave); }
@@ -326,120 +434,132 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 
 .ficha-barra { position:sticky; top:0; z-index:10; height:var(--barra);
   display:flex; align-items:center; justify-content:space-between; padding:0 var(--margen);
-  background:hsla(var(--th), calc(var(--ts) * .5), 97%, .82); backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(39,39,42,.09); }
-.ficha-barra .nombre { font-family:var(--mono); font-size:.64rem; letter-spacing:.2em; text-transform:uppercase; }
-.ficha-cerrar { display:flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.61rem;
+  background:hsla(var(--th), calc(var(--ts) * .35), 5%, .8); backdrop-filter:blur(22px);
+  border-bottom:1px solid var(--linea); }
+.ficha-barra .nombre { font-family:var(--mono); font-size:.63rem; letter-spacing:.2em; text-transform:uppercase; }
+.ficha-cerrar { display:flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.6rem;
   letter-spacing:.2em; text-transform:uppercase; color:var(--tenue); padding:.45rem .7rem; border-radius:10px;
   transition:color .3s var(--suave), background .3s var(--suave); }
-.ficha-cerrar:hover { color:var(--tinta); background:rgba(39,39,42,.06); }
+.ficha-cerrar:hover { color:var(--tinta); background:rgba(250,250,250,.07); }
 .ficha-cerrar .aspa { position:relative; width:11px; height:11px; }
 .ficha-cerrar .aspa::before, .ficha-cerrar .aspa::after { content:''; position:absolute; top:50%; left:0; width:100%; height:1px; background:currentColor; }
 .ficha-cerrar .aspa::before { transform:rotate(45deg) } .ficha-cerrar .aspa::after { transform:rotate(-45deg) }
 
-.ficha-principal { position:relative; width:100%; height:clamp(420px,82vh,1000px); overflow:hidden; background:var(--z-150); }
-.ficha-principal img { width:100%; height:114%; object-fit:cover; will-change:transform; }
+/* Portada de la ficha: el nombre del proyecto va SOBRE el render, en
+   blanco, no debajo en una columna de texto. */
+.ficha-principal { position:relative; width:100%; height:clamp(440px,86vh,1040px); overflow:hidden; background:var(--n-850); }
+.ficha-principal img { width:100%; height:116%; object-fit:cover; will-change:transform; }
+.ficha-principal::after { content:''; position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(9,9,11,.92) 0%, rgba(9,9,11,.3) 40%, rgba(9,9,11,.05) 70%, rgba(9,9,11,.4) 100%); }
+.ficha-portada-texto { position:absolute; left:0; right:0; bottom:0; z-index:2;
+  padding:clamp(1.8rem,4vw,3.6rem) var(--margen); color:#fff; }
+.ficha-portada-texto .tipo { font-family:var(--mono); font-size:.62rem; letter-spacing:.26em; text-transform:uppercase;
+  opacity:.72; margin-bottom:.7rem; }
+.ficha-portada-texto h2 { font-size:clamp(2rem,6vw,4.6rem); font-weight:600; letter-spacing:-.04em; line-height:1;
+  overflow:hidden; }
+.ficha-portada-texto h2 span { display:block; transform:translateY(110%); animation:emerger 1.1s var(--salida) .18s forwards; }
 
 /* Solo el texto se encolumna; nunca las imagenes */
-.columna { max-width:1100px; margin:0 auto; padding:clamp(2.5rem,7vh,4.5rem) var(--margen); }
-.ficha-titular { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:clamp(1.5rem,4vw,4rem); align-items:end; }
-@media (max-width:860px){ .ficha-titular { grid-template-columns:1fr; gap:1rem } }
-.ficha-titular h2 { font-size:clamp(1.9rem,5vw,3.6rem); font-weight:600; letter-spacing:-.035em; line-height:1.04; }
-.ficha-titular .tipo { font-family:var(--mono); font-size:.61rem; letter-spacing:.24em; text-transform:uppercase; color:var(--debil); margin-bottom:.8rem; }
-.ficha-titular .texto { color:var(--tenue); font-size:1rem; }
+.columna { max-width:1080px; margin:0 auto; padding:clamp(2.6rem,7vh,4.5rem) var(--margen); }
+.ficha-texto { display:grid; grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr); gap:clamp(1.5rem,4vw,4rem); align-items:start; }
+@media (max-width:860px){ .ficha-texto { grid-template-columns:1fr; gap:1.2rem } }
+.ficha-texto .rotulo { font-family:var(--mono); font-size:.6rem; letter-spacing:.24em; text-transform:uppercase; color:var(--debil); }
+.ficha-texto p { color:var(--tenue); font-size:1rem; }
+.ficha-datos { display:flex; flex-wrap:wrap; gap:1.6rem 2.6rem; margin-top:1.8rem;
+  padding-top:1.3rem; border-top:1px solid var(--linea); }
+.ficha-datos div span { display:block; font-family:var(--mono); font-size:.55rem; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--debil); margin-bottom:.25rem; }
+.ficha-datos div b { font-weight:500; font-size:.9rem; }
 
-/* El render principal va a sangre; el resto se arma como collage: una
-   retícula de doce columnas donde las piezas alternan ancho y alto. Asi
-   la lectura tiene ritmo en vez de ser una columna de imagenes iguales. */
-.galeria { display:grid; grid-template-columns:repeat(12,1fr); gap:clamp(.5rem,1vw,.9rem); padding:0 clamp(.5rem,1vw,.9rem); }
-.galeria figure { position:relative; overflow:hidden; background:var(--z-150); cursor:pointer;
-  grid-column:span 6; height:clamp(300px,46vh,560px);
-  opacity:0; transform:translateY(26px) scale(.985); }
-.galeria figure.dentro { opacity:1; transform:none; transition:opacity 1s var(--suave), transform 1.1s var(--salida); }
-/* Patron: ancha · media+media · alta+ancha, y se repite */
-.galeria figure:nth-child(6n+1) { grid-column:span 12; height:clamp(380px,68vh,820px); }
-.galeria figure:nth-child(6n+2),
-.galeria figure:nth-child(6n+3) { grid-column:span 6; }
-.galeria figure:nth-child(6n+4) { grid-column:span 5; height:clamp(340px,56vh,660px); }
-.galeria figure:nth-child(6n+5) { grid-column:span 7; height:clamp(340px,56vh,660px); }
-.galeria figure:nth-child(6n)   { grid-column:span 12; height:clamp(360px,62vh,760px); }
-.galeria img { width:100%; height:108%; object-fit:cover; transition:transform 1.3s var(--salida); will-change:transform; }
-.galeria figure:hover img { transform:scale(1.035); }
+/* Galeria ordenada: parejas de piezas iguales con una pieza ancha
+   cada tres. Tiene ritmo pero se lee como una retícula, no como un
+   monton de imagenes de tamanos arbitrarios. */
+.galeria { display:grid; grid-template-columns:repeat(6,1fr); gap:clamp(.5rem,1vw,.9rem); padding:0 clamp(.5rem,1vw,.9rem); }
+.galeria figure { position:relative; overflow:hidden; background:var(--n-850); cursor:pointer;
+  grid-column:span 3; height:clamp(280px,44vh,540px);
+  clip-path:inset(12% 0 12% 0); opacity:0;
+  transition:clip-path 1.1s var(--salida), opacity .8s var(--suave); }
+.galeria figure.dentro { clip-path:inset(0 0 0 0); opacity:1; }
+.galeria figure:nth-child(3n+3) { grid-column:span 6; height:clamp(360px,68vh,860px); }
+.galeria img { width:100%; height:110%; object-fit:cover; transition:transform 1.3s var(--salida); will-change:transform; }
+.galeria figure:hover img { transform:scale(1.04); }
+.galeria figcaption { position:absolute; left:0; bottom:0; padding:1rem 1.2rem; z-index:2;
+  font-family:var(--mono); font-size:.56rem; letter-spacing:.2em; text-transform:uppercase; color:#fff;
+  opacity:0; transform:translateY(8px); transition:opacity .4s var(--suave), transform .5s var(--salida);
+  text-shadow:0 2px 12px rgba(0,0,0,.8); }
+.galeria figure:hover figcaption { opacity:.9; transform:none; }
 @media (max-width:860px){
-  .galeria figure, .galeria figure:nth-child(n) { grid-column:span 12; height:46vh; }
+  .galeria figure, .galeria figure:nth-child(n) { grid-column:span 6; height:42vh; }
 }
+
+/* Material adicional: renders del mismo proyecto que no entran en la
+   seleccion pero acompanan al que quiera ver mas */
+.extra-cabeza { max-width:1080px; margin:0 auto; padding:clamp(2.6rem,6vh,4rem) var(--margen) 1.2rem; }
+.extra-cabeza .rotulo { font-family:var(--mono); font-size:.6rem; letter-spacing:.24em; text-transform:uppercase; color:var(--debil); }
+.extra-cabeza p { color:var(--tenue); font-size:.9rem; margin-top:.5rem; }
+.tira-extra { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:clamp(.5rem,1vw,.9rem);
+  padding:0 clamp(.5rem,1vw,.9rem); }
+.tira-extra figure { position:relative; overflow:hidden; background:var(--n-850); cursor:pointer;
+  aspect-ratio:16/10; opacity:.72; transition:opacity .5s var(--suave); }
+.tira-extra figure:hover { opacity:1; }
+.tira-extra img { width:100%; height:100%; object-fit:cover; transition:transform 1.1s var(--salida); }
+.tira-extra figure:hover img { transform:scale(1.05); }
+
+/* Recorrido: va al final de la ficha y se muestra completo, sin
+   recortar. Los seis archivos son 1280x720, asi que el marco 16:9 los
+   encaja exactos. */
+.ficha-recorrido { max-width:1400px; margin:0 auto; padding:clamp(2.6rem,6vh,4.5rem) var(--margen) 0; }
+.ficha-recorrido .rotulo { font-family:var(--mono); font-size:.6rem; letter-spacing:.24em; text-transform:uppercase;
+  color:var(--debil); margin-bottom:1rem; display:flex; align-items:center; gap:.8rem; }
+.ficha-recorrido .rotulo::after { content:''; flex:1; height:1px; background:var(--linea); }
+.ficha-recorrido .marco { width:100%; aspect-ratio:16/9; background:#000; overflow:hidden; border-radius:6px; }
+.ficha-recorrido video { width:100%; height:100%; object-fit:contain; background:#000; }
+
+.ficha-navegar { display:flex; justify-content:space-between; align-items:center; gap:1rem;
+  max-width:1080px; margin:0 auto; padding:2.5rem var(--margen) clamp(4rem,9vh,6rem); }
+.ficha-navegar button { font-family:var(--mono); font-size:.61rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--tenue); padding:.5rem .8rem; border-radius:10px; transition:color .3s var(--suave), background .3s var(--suave); }
+.ficha-navegar button:hover { color:var(--tinta); background:rgba(250,250,250,.07); }
+
+.viajero { position:fixed; z-index:280; overflow:hidden; pointer-events:none; }
+.viajero img { width:100%; height:100%; object-fit:cover; }
 
 /* ============ Índice de todos los proyectos =================== */
-.ver-todos { display:flex; justify-content:center; margin-top:clamp(1.8rem,4vh,3rem); }
-/* Boton ancho, con la cuenta de proyectos y una franja que lo cruza al
-   pasar el cursor: pesa lo suficiente para no perderse bajo la vitrina */
-.btn-todos {
-  position:relative; overflow:hidden;
-  display:inline-flex; align-items:center; gap:1.2rem;
-  padding:1.1rem 2.4rem; border-radius:14px;
-  background:var(--tinta); color:var(--fondo);
-  font-size:.9rem; font-weight:500;
-  transition:transform .25s var(--suave), box-shadow .5s var(--suave);
-}
-.btn-todos:hover { transform:translateY(-2px); box-shadow:0 14px 34px rgba(0,0,0,.16); }
-.btn-todos:active { transform:scale(.98); }
-.btn-todos .cuenta { font-family:var(--mono); font-size:.65rem; letter-spacing:.16em; opacity:.6; }
-.btn-todos .flecha { width:22px; height:1px; background:currentColor; transition:width .5s var(--salida); }
-.btn-todos:hover .flecha { width:40px; }
-.btn-todos::before {
-  content:''; position:absolute; inset:0; background:rgba(255,255,255,.16);
-  transform:translateX(-101%); transition:transform .6s var(--salida);
-}
-.btn-todos:hover::before { transform:translateX(101%); }
-.btn-todos > * { position:relative; z-index:1; }
 .indice-capa { position:fixed; inset:0; z-index:210; background:var(--fondo);
   overflow-y:auto; overscroll-behavior:contain;
   opacity:0; visibility:hidden; transition:opacity .45s var(--suave), visibility .45s; }
 .indice-capa.abierta { opacity:1; visibility:visible; }
-/* Retícula de doce columnas: las piezas alternan tamaño para que el
-   indice tenga el mismo pulso que la galeria y no sea un catalogo plano */
-.rejilla-todos { display:grid; grid-template-columns:repeat(12,1fr);
-  gap:clamp(.7rem,1.4vw,1.2rem); padding:clamp(1.5rem,4vh,3rem) var(--margen) clamp(4rem,9vh,6rem); }
-.tarjeta { position:relative; cursor:pointer; grid-column:span 4; opacity:0; transform:translateY(26px); }
-.rejilla-todos.visible .tarjeta { opacity:1; transform:none; transition:opacity .8s var(--suave), transform .9s var(--salida); }
-.tarjeta:nth-child(7n+1) { grid-column:span 7; }
-.tarjeta:nth-child(7n+2) { grid-column:span 5; }
-.tarjeta:nth-child(7n+3),
-.tarjeta:nth-child(7n+4),
-.tarjeta:nth-child(7n+5) { grid-column:span 4; }
-.tarjeta:nth-child(7n+6) { grid-column:span 5; }
-.tarjeta:nth-child(7n)   { grid-column:span 7; }
-@media (max-width:860px){ .tarjeta, .tarjeta:nth-child(n) { grid-column:span 12; } }
 
-.tarjeta-marco { position:relative; aspect-ratio:16/10; overflow:hidden; border-radius:14px; background:var(--z-150); }
-.tarjeta-marco img { width:100%; height:106%; object-fit:cover; transition:transform 1.3s var(--salida), filter .6s var(--suave); filter:brightness(.97); }
-.tarjeta:hover .tarjeta-marco img { transform:scale(1.05); filter:brightness(.72); }
-/* El rotulo sube desde el borde inferior de la lamina */
-.tarjeta-pie { position:absolute; left:0; right:0; bottom:0; z-index:2; padding:1.2rem 1.3rem; color:#fff; overflow:hidden; }
-.tarjeta-pie > * { display:block; transform:translateY(115%); transition:transform .65s var(--salida); }
-.tarjeta:hover .tarjeta-pie > * { transform:translateY(0); }
-.tarjeta:hover .tarjeta-pie > *:nth-child(2) { transition-delay:.05s }
-.tarjeta-pie h4 { font-size:1.05rem; font-weight:500; }
-.tarjeta-pie .tipo { font-family:var(--mono); font-size:.58rem; letter-spacing:.18em; text-transform:uppercase; opacity:.85; margin-top:.15rem; }
-/* Fuera de foco, el nombre va debajo en negro sobre el papel */
-.tarjeta-nombre { margin-top:.7rem; font-size:.92rem; font-weight:500; transition:opacity .4s var(--suave); }
-.tarjeta:hover .tarjeta-nombre { opacity:.35; }
+.filtros { display:flex; flex-wrap:wrap; gap:.45rem; padding:clamp(1.4rem,4vh,2.4rem) var(--margen) 1.2rem; }
+.filtro { font-family:var(--mono); font-size:.6rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--debil); padding:.5rem .95rem; border-radius:999px; border:1px solid var(--linea);
+  transition:color .3s var(--suave), border-color .3s var(--suave), background .3s var(--suave); }
+.filtro:hover { color:var(--tenue); border-color:var(--linea-fuerte); }
+.filtro.activo { color:var(--fondo); background:var(--tinta); border-color:var(--tinta); }
+.filtro .n { opacity:.5; margin-left:.45rem; }
 
-.ficha-video { margin-top:clamp(.5rem,1.2vw,1rem); }
-.ficha-video .marco { width:100%; aspect-ratio:16/9; background:var(--z-150); overflow:hidden; }
-.ficha-video video { width:100%; height:100%; object-fit:cover; }
+.rejilla-todos { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:clamp(.8rem,1.6vw,1.4rem); padding:.6rem var(--margen) clamp(4rem,9vh,6rem); }
+.tarjeta { position:relative; cursor:pointer; opacity:0; transform:translateY(22px);
+  transition:opacity .7s var(--suave), transform .8s var(--salida); }
+.rejilla-todos.visible .tarjeta { opacity:1; transform:none; }
+.tarjeta.oculta { display:none; }
 
-.ficha-navegar { display:flex; justify-content:space-between; align-items:center; gap:1rem;
-  max-width:1100px; margin:0 auto; padding:2rem var(--margen) clamp(4rem,9vh,6rem); }
-.ficha-navegar button { font-family:var(--mono); font-size:.62rem; letter-spacing:.18em; text-transform:uppercase;
-  color:var(--tenue); padding:.5rem .8rem; border-radius:10px; transition:color .3s var(--suave), background .3s var(--suave); }
-.ficha-navegar button:hover { color:var(--tinta); background:rgba(39,39,42,.06); }
-
-.viajero { position:fixed; z-index:250; overflow:hidden; pointer-events:none; }
-.viajero img { width:100%; height:100%; object-fit:cover; }
+.tarjeta-marco { position:relative; aspect-ratio:16/10; overflow:hidden; border-radius:12px; background:var(--n-850); }
+.tarjeta-marco img { width:100%; height:106%; object-fit:cover;
+  transition:transform 1.2s var(--salida), filter .6s var(--suave); filter:brightness(.78) saturate(.9); }
+.tarjeta:hover .tarjeta-marco img { transform:scale(1.05); filter:brightness(1) saturate(1); }
+.tarjeta-pie { position:absolute; left:0; right:0; bottom:0; z-index:2; padding:1rem 1.2rem; color:#fff; overflow:hidden;
+  background:linear-gradient(to top, rgba(9,9,11,.85), transparent); }
+.tarjeta-pie h4 { font-size:1rem; font-weight:500; }
+.tarjeta-pie .tipo { font-family:var(--mono); font-size:.55rem; letter-spacing:.18em; text-transform:uppercase; opacity:.78; margin-top:.15rem; }
+.tarjeta .sello { position:absolute; top:.8rem; right:.8rem; z-index:2;
+  font-family:var(--mono); font-size:.5rem; letter-spacing:.16em; text-transform:uppercase;
+  background:rgba(9,9,11,.7); backdrop-filter:blur(8px); border:1px solid var(--linea);
+  color:#fff; padding:.25rem .55rem; border-radius:999px; }
 
 /* ============ Visor ========================================== */
-.visor { position:fixed; inset:0; z-index:280; background:rgba(250,250,250,.985);
+.visor { position:fixed; inset:0; z-index:300; background:rgba(9,9,11,.97);
   display:flex; align-items:center; justify-content:center; padding:clamp(1rem,4vh,3rem);
   opacity:0; visibility:hidden; transition:opacity .45s var(--suave), visibility .45s; }
 .visor.abierto { opacity:1; visibility:visible; }
@@ -450,26 +570,30 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 .visor-cerrar { top:.8rem; right:1rem; }
 .visor-nav.prev { left:.4rem; top:50%; transform:translateY(-50%); }
 .visor-nav.sig  { right:.4rem; top:50%; transform:translateY(-50%); }
-.visor-pie { position:absolute; bottom:1.1rem; left:50%; transform:translateX(-50%); font-family:var(--mono); font-size:.61rem; letter-spacing:.18em; color:var(--debil); text-transform:uppercase; }
+.visor-pie { position:absolute; bottom:1.1rem; left:50%; transform:translateX(-50%); font-family:var(--mono);
+  font-size:.6rem; letter-spacing:.18em; color:var(--debil); text-transform:uppercase; }
 
 @media (prefers-reduced-motion:reduce){
   *, *::before, *::after { animation:none !important; transition:none !important; }
-  .mascara-marca { display:none } .lamina { clip-path:none }
-  .bloque > *, .revelar > *, .galeria figure, .util { opacity:1 !important; transform:none !important; }
+  .mascara-marca { display:none }
+  .lamina img { opacity:1; transform:none }
+  .bloque > *, .revelar > *, .util { opacity:1 !important; transform:none !important; }
   .palabras span i, .hoja-abierta > * > * { transform:none }
-  .inicio-aparte { opacity:1 }
+  .inicio-aparte, .baja { opacity:1 }
+  .cortina, .galeria figure, .hoja { clip-path:none !important; opacity:1 !important; }
+  .ficha-portada-texto h2 span { transform:none }
+  .hito { transform:none !important; opacity:1 !important; }
 }
 </style>
 </head>
 <body>
 
 <div class="avance" id="avance"></div>
-<div class="wipe" id="wipe"></div>
 
 <header class="barra">
-  <a href="#inicio" class="marca">
-    <img src="assets/marca/favicon.png" alt="Logotipo">
-    <span>KEVIN GIL</span>
+  <a href="#inicio" class="marca" data-reiniciar>
+    <span class="punto"></span>
+    <span>STICK INDUSTRIES</span>
   </a>
   <nav class="menu" id="menu">
     <a href="#inicio" data-reiniciar>Inicio</a>
@@ -487,9 +611,9 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 <!-- ===================== INICIO ===================== -->
 <section class="inicio" id="inicio">
   <div class="lamina">
-    <img src="assets/renders/casa-will-01.webp"
-         srcset="assets/renders/casa-will-01.webp 1600w, assets/renders/casa-will-01@2x.webp 2560w"
-         sizes="100vw" alt="Vivienda campestre al atardecer" fetchpriority="high">
+    <img id="render-inicio" src="assets/renders/cazadores-09.webp"
+         srcset="assets/renders/cazadores-09.webp 1600w, assets/renders/cazadores-09@2x.webp 2560w"
+         sizes="100vw" alt="Render de fachada" fetchpriority="high">
   </div>
   <div class="inicio-texto">
     <h1>
@@ -501,22 +625,22 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
       <div class="dato mono">Kevin Gil · Bucaramanga, Colombia</div>
     </div>
   </div>
+  <div class="baja"><span>Desplace</span><span class="hilo"></span></div>
 </section>
 
 <!-- ===================== PROYECTOS ===================== -->
 <section class="seccion" id="proyectos">
-  <div class="cabeza">
-    <div>
-      <div class="etiqueta revelar"><span>Selección</span></div>
-      <h2 class="palabras" data-texto="Proyectos."></h2>
+  <div class="seccion-cuerpo">
+    <div class="cabeza acolchado">
+      <div>
+        <div class="etiqueta revelar"><span>Selección</span></div>
+        <h2 class="palabras" data-texto="Proyectos."></h2>
+      </div>
     </div>
-    <div class="revelar">
-      <p class="apunte">Señale cualquiera para ver de qué se trata. Haga clic para entrar.</p>
+    <div class="vitrina" id="vitrina"></div>
+    <div class="ver-todos">
+      <button class="btn-todos" data-ver-todos><span>Ver todos los proyectos</span><span class="cuenta" id="cuenta-todos"></span><span class="flecha"></span></button>
     </div>
-  </div>
-  <div class="vitrina" id="vitrina"></div>
-  <div class="ver-todos">
-    <button class="btn-todos" data-ver-todos><span>Ver todos los proyectos</span><span class="cuenta">11</span><span class="flecha"></span></button>
   </div>
 </section>
 
@@ -525,52 +649,76 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
     <span class="nombre mono">Todos los proyectos</span>
     <button class="ficha-cerrar" id="indice-cerrar"><span class="aspa"></span> Cerrar</button>
   </div>
+  <div class="filtros" id="filtros"></div>
   <div class="rejilla-todos" id="rejilla-todos"></div>
 </div>
 
 <!-- ===================== SOBRE MÍ ===================== -->
 <section class="seccion" id="sobre">
-  <div class="cabeza">
-    <div>
-      <div class="etiqueta revelar"><span>Quién</span></div>
-      <h2 class="palabras" data-texto="Ingeniero civil y visualizador."></h2>
-    </div>
-  </div>
-
-  <div class="bio">
-    <div>
-      <p>Me llamo <strong>Kevin Stick Gil Arévalo</strong>. Estudio ingeniería civil en la
-         <strong>Universidad Pontificia Bolivariana, seccional Bucaramanga</strong>, con nueve
-         semestres culminados y un promedio ponderado de 4.2 sobre 5.</p>
-      <p>En 2026 fundé <strong>VISUAL 3D STUDIO</strong>, un estudio centrado en la representación
-         precisa del diseño: modelos digitales coherentes con criterios constructivos y planos
-         técnicos que facilitan la coordinación en obra.</p>
-      <p>Esa mezcla es el punto. No llego al render desde la imagen, llego desde el modelo:
-         cuando levanto un proyecto en Revit, los espesores, las luces y los apoyos son los que
-         se van a construir. Y como subo a obra varias veces por semana, veo cada semana la
-         distancia entre lo que se dibuja y lo que se levanta.</p>
-
-      <div class="herramientas" id="herramientas"></div>
+  <div class="seccion-cuerpo acolchado">
+    <div class="cabeza">
+      <div>
+        <div class="etiqueta revelar"><span>Quién</span></div>
+        <h2 class="palabras" data-texto="Ingeniero civil y visualizador."></h2>
+      </div>
     </div>
 
-    <div class="hitos" id="hitos"></div>
+    <div class="bio">
+      <div>
+        <p class="destacado">No llego al render desde la imagen: llego desde el modelo. Cuando levanto
+           un proyecto en Revit, los espesores, las luces y los apoyos son los que se van a construir.</p>
+        <p><strong>Kevin Stick Gil Arévalo.</strong> Estudiante de ingeniería civil en la Universidad
+           Pontificia Bolivariana, seccional Bucaramanga, con nueve semestres culminados. En 2026 fundé
+           <strong>VISUAL 3D STUDIO</strong>, un estudio de representación del diseño: modelos digitales
+           coherentes con criterios constructivos y planos técnicos que sirven para coordinar la obra.</p>
+        <p>Subo a obra varias veces por semana. Esa distancia entre lo que se dibuja y lo que se levanta
+           es la que corrijo antes de que llegue al concreto, y es lo que separa una imagen bonita de una
+           imagen que se puede construir.</p>
+
+        <div class="cifras revelar">
+          <div class="cifra"><b>10</b><span>Proyectos</span></div>
+          <div class="cifra"><b>4.2</b><span>Promedio / 5</span></div>
+          <div class="cifra"><b>B2</b><span>Inglés IELTS</span></div>
+          <div class="cifra"><b>2026</b><span>V3S fundado</span></div>
+        </div>
+
+        <div class="etiqueta">Herramientas</div>
+        <div class="herramientas" id="herramientas"></div>
+      </div>
+
+      <div class="bio-trayecto">
+        <div class="etiqueta">Trayecto</div>
+        <div class="rueda-marco">
+          <div class="rueda" id="rueda"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- ===================== CONTACTO ===================== -->
 <section class="seccion" id="contacto">
-  <div class="cabeza">
-    <div>
-      <div class="etiqueta revelar"><span>Contacto</span></div>
-      <h2 class="palabras" data-texto="Hablemos."></h2>
+  <div class="seccion-cuerpo acolchado">
+    <div class="cabeza">
+      <div>
+        <div class="etiqueta revelar"><span>Contacto</span></div>
+        <h2 class="palabras" data-texto="Hablemos."></h2>
+      </div>
+    </div>
+    <div class="contacto-cuerpo">
+      <div class="revelar">
+        <p class="apunte">Cuénteme qué va a construir y le digo cómo se vería. Respondo por WhatsApp
+           el mismo día.</p>
+        <div class="acciones" id="acciones"></div>
+        <div class="dato-directo" id="dato-directo"></div>
+      </div>
     </div>
   </div>
-  <div class="acciones revelar" id="acciones"></div>
 </section>
 
 <div class="pie">
   <span>KEVIN GIL · BUCARAMANGA, COLOMBIA</span>
-  <span>VISUAL 3D STUDIO</span>
+  <span>STICK INDUSTRIES</span>
 </div>
 
 <!-- ===================== FICHA ===================== -->
@@ -592,102 +740,136 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 
 <script>
 /* =================================================================
-   CONTACTO — datos tomados de la hoja de vida
+   CONTACTO
    ================================================================= */
 const CONTACTO = {
   whatsapp:  '573156307424',
+  telefono:  '315 630 7424',
   mensaje:   'Hola Kevin, vi tu portafolio y quiero hablar de un proyecto.',
   correo:    'kevingilarevalo10@gmail.com',
-  instagram: 'PENDIENTE',        // <-- usuario de Instagram personal
-  igEstudio: 'PENDIENTE'         // <-- usuario de Instagram de VISUAL 3D STUDIO
+  instagram: 'kevingilarevalo',
+  igEstudio: 'visual_3dstudio'
 };
 
 /* =================================================================
-   CATALOGO  (los proyectos y sus renders se deciden al final)
+   CATALOGO
+   Espeja la carpeta  02. WORK\03. PROYECTOS PERSONALES\PROYECTOS
+   PORTAFOLIO : los cuatro de PRINCIPALES abren la vitrina y los de
+   SECUNDARIOS completan el indice.
+
+   slug    identificador del proyecto (define el enlace directo)
+   arch    prefijo de los archivos de render en assets/renders
+   portada numero del render de FACHADA — es siempre la imagen de
+           entrada del proyecto
+   piezas  seleccion curada, en orden de lectura
+   extra   renders del mismo proyecto fuera de la seleccion
    ================================================================= */
-const PROYECTOS = [
-  { slug:'casa-will', titulo:'Casa Will', tipo:'Vivienda campestre',
-    portada:1, piezas:[1,2,3],
+const PRINCIPALES = [
+  { slug:'cazadores', arch:'cazadores', titulo:'Lote 1 · Cazadores Resort', tipo:'Vivienda unifamiliar',
+    grupo:'vivienda', lugar:'Condominio Cazadores Resort', anio:'2026', estado:'En curso',
+    portada:9, piezas:[9,7,8,10,13,11,12,6,5,4,3,1,2,14], extra:[], video:'cazadores',
+    texto:'Vivienda de dos plantas sobre ladera, resuelta con piedra, madera y grandes paños de vidrio. El encargo pedía verificar cómo se comporta la fachada contra la pendiente del lote, así que la serie recorre el volumen completo antes de entrar a los espacios interiores.' },
+
+  { slug:'cantabria-1', arch:'cantabria-1', titulo:'Lote 1 · Villas de Cantabria', tipo:'Vivienda unifamiliar',
+    grupo:'vivienda', lugar:'Villas de Cantabria', anio:'2026', estado:'En curso',
+    portada:7, piezas:[7,12,14,13,3,10], extra:[1,2,4,5,6,8,9,11], video:'cantabria-1',
+    texto:'La casa se organiza alrededor de una sala a doble altura que conecta visualmente los dos niveles. El acristalamiento continuo obligó a cuidar los reflejos: en visualización, un vidrio mal resuelto delata el render antes que cualquier otro material.' },
+
+  { slug:'cantabria-23', arch:'cantabria-23', titulo:'Lote 23 · Villas de Cantabria', tipo:'Vivienda unifamiliar',
+    grupo:'vivienda', lugar:'Villas de Cantabria', anio:'2026', estado:'En curso',
+    portada:9, piezas:[9,13,3,10,11], extra:[1,2,4,5,6,7,8,12], video:'cantabria-23',
+    texto:'Fachada de líneas rectas con patio interior y piscina. La cocina abierta y la escalera funcionan como pieza central del primer nivel, y el recorrido se armó para leer esa continuidad de un espacio al siguiente.' },
+
+  { slug:'punta', arch:'punta', titulo:'Punta Ruitoque', tipo:'Vivienda de lujo',
+    grupo:'vivienda', lugar:'Ruitoque', anio:'2025', estado:'Terminado',
+    portada:7, piezas:[7,18,12,13], extra:[1,2,3,4,5,6,8,9,10,11,14,15,16,17,19,20,21,22], video:'punta',
+    texto:'El proyecto más extenso del archivo: se modelaron y ambientaron todos los espacios de la casa, desde el teatro hasta cada alcoba. La selección muestra la fachada y tres habitaciones; el resto del material queda más abajo.' }
+];
+
+const SECUNDARIOS = [
+  { slug:'coincafex', arch:'coincafex', titulo:'Coincafex', tipo:'Sede corporativa',
+    grupo:'corporativo', lugar:'Zona industrial', anio:'2025', estado:'Terminado',
+    portada:3, piezas:[3,8,10,5,6,2,4], extra:[1,9], video:'coincafex',
+    texto:'La intervención envuelve una bodega existente con una piel metálica microperforada que unifica el volumen y oculta la cubierta. Adentro, las oficinas se resolvieron con luz cálida rasante y madera para que el interior no leyera como industrial.' },
+
+  { slug:'casa-campo', arch:'casa-will', titulo:'Casa Campo', tipo:'Vivienda campestre',
+    grupo:'vivienda', lugar:'Santander', anio:'2025', estado:'Terminado',
+    portada:1, piezas:[1,2,3], extra:[],
     texto:'Una casa de una sola planta que se abre por completo al jardín. El encargo pedía mostrar cómo el alero protege la fachada acristalada sin cerrar la vista, así que los tres encuadres trabajan la misma hora del día y la misma altura de cámara.' },
 
-  { slug:'coincafex', titulo:'Coincafex', tipo:'Sede corporativa',
-    portada:3, piezas:[3,5,8,10,2,6],
-    texto:'La intervención envuelve una bodega existente con una piel metálica microperforada que unifica el volumen y oculta la cubierta. Adentro, las oficinas se resolvieron con luz cálida rasante y madera, para que el interior no leyera como industrial.',
-    video:'coincafex' },
+  { slug:'ruitoque-34', arch:'ruitoque', titulo:'Casa 34 · Ruitoque', tipo:'Vivienda urbana',
+    grupo:'vivienda', lugar:'Ruitoque', anio:'2025', estado:'Terminado',
+    portada:1, piezas:[1,2], extra:[], video:'ruitoque',
+    texto:'La misma fachada resuelta de día y de noche, para mostrar cómo cambia el proyecto cuando entra la iluminación exterior.' },
 
-  { slug:'punta', titulo:'La Punta', tipo:'Vivienda de lujo',
-    portada:7, piezas:[7,2,5,17,21,22],
-    texto:'El proyecto más extenso del archivo: se modelaron y ambientaron todos los espacios, desde el teatro en casa hasta cada alcoba. Aquí se muestra una selección.',
-    video:'punta' },
+  { slug:'closets-lebrija', arch:'lebrija', titulo:'Closets Lebrija', tipo:'Carpintería a medida',
+    grupo:'carpinteria', lugar:'Lebrija', anio:'2025', estado:'Terminado',
+    portada:2, piezas:[2,4,8], extra:[6,7,9,10,11,12],
+    texto:'Vestieres y closets representados con el material y la herrajería reales. La imagen sirve para aprobar en obra: si el render miente en un espesor o en una luz, el mueble llega distinto.' },
 
-  { slug:'cantabria-1', titulo:'Lote 1 · Cantabria', tipo:'Vivienda unifamiliar',
-    portada:6, piezas:[6,14,3,4,9,8],
-    texto:'La casa se organiza alrededor de una sala a doble altura que conecta visualmente los dos niveles. El acristalamiento continuo obligó a cuidar los reflejos: en visualización, un vidrio mal resuelto delata el render antes que cualquier otro material.',
-    video:'cantabria-1' }
+  { slug:'cocina-lebrija', arch:'lebrija', titulo:'Cocina Lebrija', tipo:'Carpintería a medida',
+    grupo:'carpinteria', lugar:'Lebrija', anio:'2025', estado:'Terminado',
+    portada:16, piezas:[16,1,3], extra:[5,13,14,15,17],
+    texto:'Cocina con isla en superficie de mármol y muebles en dos tonos. Se representaron los electrodomésticos y la iluminación bajo mueble tal como se instalaron.' },
+
+  { slug:'mediterranea', arch:'mediterranea', titulo:'Cocina Mediterráneo', tipo:'Carpintería a medida',
+    grupo:'carpinteria', lugar:'Bucaramanga', anio:'2026', estado:'Terminado',
+    portada:1, piezas:[1,2,3], extra:[],
+    texto:'Cocina oscura con listones verticales en madera y encimera clara. El estudio buscaba controlar el contraste: mucho mueble negro exige que la luz de trabajo quede exactamente donde se va a instalar.' }
 ];
 
-/* El resto del archivo. Los cuatro de arriba tambien aparecen aqui:
-   el indice es el catalogo completo, no un cajon de sobras. */
-const OTROS = [
-  { slug:'cazadores', titulo:'Lote 1 · Cazadores', tipo:'Vivienda unifamiliar', portada:9, piezas:[9,7,2,12,5,14],
-    texto:'Vivienda de dos plantas con fachada en piedra y grandes paños de vidrio. Interiores en tonos claros y madera.', video:'cazadores' },
-  { slug:'cantabria-23', titulo:'Lote 23 · Cantabria', tipo:'Vivienda unifamiliar', portada:7, piezas:[7,9,5,12,6,1],
-    texto:'Vivienda con fachada de líneas rectas y patio interior. Cocina abierta y escalera como pieza central.', video:'cantabria-23' },
-  { slug:'ruitoque', titulo:'Casa 34 · Ruitoque', tipo:'Vivienda urbana', portada:1, piezas:[1,2],
-    texto:'La misma fachada resuelta de día y de noche, para mostrar cómo cambia el proyecto con la iluminación exterior.', video:'ruitoque' },
-  { slug:'lebrija', titulo:'Lebrija', tipo:'Mobiliario a medida', portada:1, piezas:[1,5,9,12,15,17],
-    texto:'Closets y cocinas representados con el material y la herrajería reales, para aprobar en obra sin sorpresas.' },
-  { slug:'cocina-comedor', titulo:'Cocina comedor', tipo:'Interiorismo', portada:1, piezas:[1,2,3],
-    texto:'Estudio de tres variantes de iluminación y acabado sobre el mismo espacio.' },
-  { slug:'snacks', titulo:'Snacks', tipo:'Local comercial', portada:1, piezas:[1,2,3],
-    texto:'Imagen de marca aplicada a local comercial: fachada, góndolas y punto de pago.' },
-  { slug:'estudio-solar', titulo:'Estudio de asoleamiento', tipo:'Análisis técnico', portada:1, piezas:[1,2,3],
-    texto:'Análisis de iluminación natural sobre un espacio de doble altura: trayectoria solar, zonas de luz directa y penumbra bajo el entrepiso.' }
+const TODOS = [...PRINCIPALES, ...SECUNDARIOS];
+
+const GRUPOS = [
+  { clave:'todos',       nombre:'Todos' },
+  { clave:'vivienda',    nombre:'Vivienda' },
+  { clave:'corporativo', nombre:'Sede corporativa' },
+  { clave:'carpinteria', nombre:'Carpintería' }
 ];
 
-const TODOS = [...PROYECTOS, ...OTROS];
+/* Renders de fachada que se turnan en la portada: cada vez que se
+   vuelve a Inicio entra el siguiente. */
+const FACHADAS = [
+  'cazadores-09', 'cantabria-1-07', 'punta-07',
+  'cantabria-23-09', 'coincafex-03', 'casa-will-01'
+];
+let fachadaActual = 0;
 
-/* Formacion y trayectoria, tomadas de la hoja de vida.
-   escudo: ruta al logo si existe; si no, se muestran las iniciales. */
+/* Formacion y trayectoria, en orden cronologico */
 const HITOS = [
-  { anio:'2026 —', escudo:'assets/marca/favicon.png', sigla:'V3S',
-    titulo:'VISUAL 3D STUDIO', estado:'Fundador',
-    detalle:'Estudio de representación del diseño: modelos digitales coherentes con criterios constructivos y planos técnicos para coordinar la obra.' },
+  { anio:'2021', escudo:'assets/logos/sja.webp', sigla:'CBSJA',
+    titulo:'Bachiller Académico Bilingüe', estado:null,
+    detalle:'Colegio Bilingüe San Juan de Ávila. Inglés B2 certificado por IELTS.' },
 
-  { anio:'2026 —', escudo:'assets/logos/upb.webp', sigla:'UPB',
-    titulo:'Especialización en Vías Terrestres', estado:'Cursando',
-    detalle:'Universidad Pontificia Bolivariana, seccional Bucaramanga.' },
-
-  { anio:'2022 —', escudo:'assets/logos/upb.webp', sigla:'UPB',
+  { anio:'2022', escudo:'assets/logos/upb.webp', sigla:'UPB',
     titulo:'Ingeniería Civil', estado:'9 semestres',
     detalle:'Universidad Pontificia Bolivariana, seccional Bucaramanga. Promedio ponderado 4.2 / 5.' },
 
-  { anio:'2025', escudo:'assets/logos/uis.webp', sigla:'UIS',
-    titulo:'Modelado BIM y gestión de la construcción', estado:null,
-    detalle:'Curso con Autodesk Revit. Asociación Centro de Estudios de Ingeniería Civil, UIS.' },
+  { anio:'2023', escudo:null, sigla:'OBRA',
+    titulo:'Ayudante de obra', estado:null,
+    detalle:'Proyectos de construcción y obra civil. El primer contacto con lo que se levanta.' },
 
   { anio:'2025', escudo:null, sigla:'SSI',
     titulo:'Congreso XOpen Internacional', estado:null,
     detalle:'Sociedad Santandereana de Ingeniería. Participación y competencia de puentes.' },
 
-  { anio:'2023', escudo:null, sigla:'OBRA',
-    titulo:'Ayudante de obra', estado:null,
-    detalle:'Proyectos de construcción y obra civil.' },
+  { anio:'2025', escudo:'assets/logos/uis.webp', sigla:'UIS',
+    titulo:'Modelado BIM y gestión de la construcción', estado:null,
+    detalle:'Curso con Autodesk Revit. Asociación Centro de Estudios de Ingeniería Civil, UIS.' },
 
-  { anio:'2021', escudo:'assets/logos/sja.webp', sigla:'CBSJA',
-    titulo:'Bachiller Académico Bilingüe', estado:null,
-    detalle:'Colegio Bilingüe San Juan de Ávila. Inglés B2 certificado por IELTS.' },
+  { anio:'2026', escudo:'assets/marca/favicon.png', sigla:'V3S',
+    titulo:'VISUAL 3D STUDIO', estado:'Fundador',
+    detalle:'Estudio de representación del diseño: modelos digitales coherentes con criterios constructivos y planos técnicos para coordinar la obra.' },
+
+  { anio:'2026', escudo:'assets/logos/upb.webp', sigla:'UPB',
+    titulo:'Especialización en Vías Terrestres', estado:'Cursando',
+    detalle:'Universidad Pontificia Bolivariana, seccional Bucaramanga.' },
 
   { anio:'Próximo', escudo:null, sigla:'···',
     titulo:'Especialización en Estructuras', estado:'Proyectada',
     detalle:'Siguiente paso en la formación.' }
 ];
 
-/* Herramientas. Cada una lleva su simbolo dibujado en SVG: no se usan
-   logos de marca, que exigirian permiso y ademas obligarian a descargar
-   archivos externos. Son marcas graficas propias que evocan cada oficio. */
-/* Herramientas. Las que tienen logo real usan el archivo; las demas
-   llevan un simbolo propio dibujado en SVG mientras llega el logo. */
 const UTILES = [
   { nombre:'Revit',       logo:'assets/logos/revit.webp' },
   { nombre:'AutoCAD',     logo:'assets/logos/autocad.webp' },
@@ -704,9 +886,9 @@ const UTILES = [
 let PALETAS = {};
 fetch('assets/paletas.json').then(r => r.json()).then(p => { PALETAS = p; }).catch(() => {});
 
-const ruta   = (s, i) => `assets/renders/${s}-${String(i).padStart(2,'0')}.webp`;
-const ruta2x = (s, i) => `assets/renders/${s}-${String(i).padStart(2,'0')}@2x.webp`;
-const juego  = (s, i) => `${ruta(s,i)} 1600w, ${ruta2x(s,i)} 2560w`;
+const ruta   = (a, i) => `assets/renders/${a}-${String(i).padStart(2,'0')}.webp`;
+const ruta2x = (a, i) => `assets/renders/${a}-${String(i).padStart(2,'0')}@2x.webp`;
+const juego  = (a, i) => `${ruta(a,i)} 1600w, ${ruta2x(a,i)} 2560w`;
 
 /* =================================================================
    ENTRADA
@@ -716,8 +898,11 @@ function repartir(el, texto, retraso) {
     `<span class="letra" style="animation-delay:${(retraso + i * .045).toFixed(3)}s">${c === ' ' ? '&nbsp;' : c}</span>`
   ).join('');
 }
-repartir(document.getElementById('linea1'), 'STICK', .35);
-repartir(document.getElementById('linea2'), 'INDUSTRIES', .75);
+function marcarEntrada(raiz) {
+  repartir(raiz.querySelector('#linea1'), 'STICK', .3);
+  repartir(raiz.querySelector('#linea2'), 'INDUSTRIES', .7);
+}
+marcarEntrada(document);
 
 document.querySelectorAll('.palabras').forEach(t => {
   t.innerHTML = t.dataset.texto.split(' ').map((p, i) =>
@@ -727,10 +912,10 @@ document.querySelectorAll('.palabras').forEach(t => {
 /* =================================================================
    VITRINA
    ================================================================= */
-document.getElementById('vitrina').innerHTML = PROYECTOS.map((p, i) => `
+document.getElementById('vitrina').innerHTML = PRINCIPALES.map((p, i) => `
   <article class="hoja" data-slug="${p.slug}" tabindex="0" role="button" aria-label="Ver ${p.titulo}">
     <div class="hoja-img">
-      <img src="${ruta(p.slug, p.portada)}" srcset="${juego(p.slug, p.portada)}"
+      <img src="${ruta(p.arch, p.portada)}" srcset="${juego(p.arch, p.portada)}"
            sizes="(max-width:860px) 100vw, 60vw" alt="${p.titulo}" decoding="async">
     </div>
     <div class="hoja-velo"></div>
@@ -743,24 +928,43 @@ document.getElementById('vitrina').innerHTML = PROYECTOS.map((p, i) => `
     </div>
   </article>`).join('');
 
+document.getElementById('cuenta-todos').textContent = String(TODOS.length).padStart(2,'0');
+
 /* =================================================================
-   INDICE DE TODOS LOS PROYECTOS
+   INDICE + FILTROS POR GRUPO
    ================================================================= */
 const capaIndice = document.getElementById('indice-capa');
 const rejilla    = document.getElementById('rejilla-todos');
 
 rejilla.innerHTML = TODOS.map((p, i) => `
-  <article class="tarjeta" data-slug="${p.slug}" tabindex="0" role="button" aria-label="Ver ${p.titulo}" style="transition-delay:${(Math.min(i,9)*.05).toFixed(2)}s">
+  <article class="tarjeta" data-slug="${p.slug}" data-grupo="${p.grupo}" tabindex="0" role="button"
+           aria-label="Ver ${p.titulo}" style="transition-delay:${(Math.min(i,9)*.05).toFixed(2)}s">
     <div class="tarjeta-marco">
-      <img src="${ruta(p.slug, p.portada)}" srcset="${juego(p.slug, p.portada)}"
-           sizes="(max-width:860px) 100vw, 50vw" alt="${p.titulo}" loading="lazy" decoding="async">
+      <img src="${ruta(p.arch, p.portada)}" srcset="${juego(p.arch, p.portada)}"
+           sizes="(max-width:860px) 100vw, 34vw" alt="${p.titulo}" loading="lazy" decoding="async">
+      <span class="sello">${p.anio}</span>
       <div class="tarjeta-pie">
         <h4>${p.titulo}</h4>
         <div class="tipo mono">${p.tipo}</div>
       </div>
     </div>
-    <div class="tarjeta-nombre">${p.titulo}</div>
   </article>`).join('');
+
+document.getElementById('filtros').innerHTML = GRUPOS.map(g => {
+  const n = g.clave === 'todos' ? TODOS.length : TODOS.filter(p => p.grupo === g.clave).length;
+  return `<button class="filtro${g.clave === 'todos' ? ' activo' : ''}" data-grupo="${g.clave}">
+            ${g.nombre}<span class="n mono">${String(n).padStart(2,'0')}</span></button>`;
+}).join('');
+
+document.getElementById('filtros').addEventListener('click', e => {
+  const b = e.target.closest('.filtro');
+  if (!b) return;
+  const g = b.dataset.grupo;
+  document.querySelectorAll('.filtro').forEach(f => f.classList.toggle('activo', f === b));
+  rejilla.querySelectorAll('.tarjeta').forEach(t => {
+    t.classList.toggle('oculta', g !== 'todos' && t.dataset.grupo !== g);
+  });
+});
 
 function abrirIndice() {
   capaIndice.classList.add('abierta');
@@ -769,11 +973,10 @@ function abrirIndice() {
 }
 function cerrarIndice() {
   capaIndice.classList.remove('abierta');
-  document.body.classList.remove('bloqueado');
+  if (!ficha.classList.contains('abierta')) document.body.classList.remove('bloqueado');
 }
 document.getElementById('indice-cerrar').addEventListener('click', cerrarIndice);
 
-// Desde el indice se entra al proyecto; la tarjeta es el punto de partida
 capaIndice.addEventListener('click', e => {
   const tarjeta = e.target.closest('.tarjeta');
   if (!tarjeta) return;
@@ -781,19 +984,52 @@ capaIndice.addEventListener('click', e => {
 });
 
 /* =================================================================
-   SOBRE MI
+   SOBRE MI — rueda del trayecto
    ================================================================= */
-document.getElementById('hitos').innerHTML = HITOS.map((h, i) => `
-  <div class="hito" style="transition-delay:${(i * .08).toFixed(2)}s">
+const rueda = document.getElementById('rueda');
+rueda.innerHTML = HITOS.map(h => `
+  <div class="hito">
     <div class="escudo">${h.escudo ? `<img src="${h.escudo}" alt="">` : h.sigla}</div>
-    <div class="anio mono">${h.anio}</div>
-    <h4>${h.titulo}${h.estado ? `<span class="marca-estado">${h.estado}</span>` : ''}</h4>
-    <p>${h.detalle}</p>
+    <div>
+      <div class="anio mono">${h.anio}</div>
+      <h4>${h.titulo}${h.estado ? `<span class="marca-estado">${h.estado}</span>` : ''}</h4>
+      <p>${h.detalle}</p>
+    </div>
   </div>`).join('');
 
+/* El tamano de cada hito depende de su distancia al centro de la
+   rueda: el del medio va entero, y los de arriba y abajo se reducen
+   de forma continua conforme se alejan. */
+function girarRueda() {
+  const caja   = rueda.getBoundingClientRect();
+  const centro = caja.top + caja.height / 2;
+  const radio  = caja.height / 2;
+  let masCerca = null, minD = Infinity;
+
+  rueda.querySelectorAll('.hito').forEach(h => {
+    const c = h.getBoundingClientRect();
+    const d = Math.abs((c.top + c.height / 2) - centro) / radio;   // 0 en el centro
+    const k = Math.min(d, 1.5);
+    h.style.setProperty('--k', (1 - k * 0.30).toFixed(3));
+    h.style.setProperty('--o', Math.max(.18, 1 - k * 0.85).toFixed(3));
+    if (d < minD) { minD = d; masCerca = h; }
+    h.classList.remove('foco');
+  });
+  if (masCerca) masCerca.classList.add('foco');
+}
+let ruedaPendiente = false;
+function pedirGiro() {
+  if (ruedaPendiente) return;
+  ruedaPendiente = true;
+  requestAnimationFrame(() => { girarRueda(); ruedaPendiente = false; });
+}
+rueda.addEventListener('scroll', pedirGiro, { passive:true });
+addEventListener('resize', pedirGiro);
+girarRueda();
+
 document.getElementById('herramientas').innerHTML = UTILES.map((u, i) => `
-  <div class="util" style="transition-delay:${(i * .05).toFixed(2)}s">
-    <div class="simbolo">${u.logo ? `<img src="${u.logo}" alt="${u.nombre}">` : u.svg}</div>
+  <div class="util" style="transition-delay:${(i * .04).toFixed(2)}s">
+    <div class="simbolo"><img src="${u.logo}" alt="${u.nombre}" loading="lazy"></div>
     <div class="nombre">${u.nombre}</div>
   </div>`).join('');
 
@@ -802,12 +1038,22 @@ document.getElementById('herramientas').innerHTML = UTILES.map((u, i) => `
    ================================================================= */
 const IG_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>';
 const WA_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 01-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.2 8.2 0 015.83 2.42 8.18 8.18 0 012.41 5.82c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.43.06-.65.31-.22.25-.85.83-.85 2.03s.87 2.35.99 2.51c.12.17 1.71 2.61 4.15 3.66.58.25 1.03.4 1.39.51.58.19 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29z"/></svg>';
+const MAIL_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="M3 7l9 6 9-6"/></svg>';
+
+/* El correo abre la ventana de redaccion de Gmail en el navegador, no
+   el cliente de correo del sistema: en un equipo sin cliente
+   configurado, un enlace mailto no hace nada visible. */
+const GMAIL = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(CONTACTO.correo)}` +
+              `&su=${encodeURIComponent('Proyecto de visualización')}`;
 
 document.getElementById('acciones').innerHTML = `
   <a class="boton boton-primario" href="https://wa.me/${CONTACTO.whatsapp}?text=${encodeURIComponent(CONTACTO.mensaje)}" target="_blank" rel="noopener">${WA_SVG} WhatsApp</a>
-  <a class="boton boton-secundario" href="mailto:${CONTACTO.correo}">Correo</a>
-  <a class="boton boton-secundario" href="https://instagram.com/${CONTACTO.instagram}" target="_blank" rel="noopener">${IG_SVG} Instagram</a>
-  <a class="boton boton-secundario" href="https://instagram.com/${CONTACTO.igEstudio}" target="_blank" rel="noopener">${IG_SVG} Visual 3D Studio</a>`;
+  <a class="boton boton-secundario" href="${GMAIL}" target="_blank" rel="noopener">${MAIL_SVG} Correo</a>
+  <a class="boton boton-secundario" href="https://www.instagram.com/${CONTACTO.instagram}" target="_blank" rel="noopener">${IG_SVG} Instagram</a>
+  <a class="boton boton-secundario" href="https://www.instagram.com/${CONTACTO.igEstudio}" target="_blank" rel="noopener">${IG_SVG} Visual 3D Studio</a>`;
+
+document.getElementById('dato-directo').innerHTML =
+  `<b>${CONTACTO.telefono}</b> · ${CONTACTO.correo}`;
 
 /* =================================================================
    FICHA DE PROYECTO
@@ -828,45 +1074,76 @@ function pintarFicha(p) {
   const previo = TODOS[(i - 1 + TODOS.length) % TODOS.length];
   const sigue  = TODOS[(i + 1) % TODOS.length];
   const resto  = p.piezas.filter(n => n !== p.portada);
+  const extra  = p.extra || [];
 
   fichaNombre.textContent = p.titulo;
   aplicarTinte(p.slug);
 
   contenido.innerHTML = `
     <div class="ficha-principal">
-      <img src="${ruta(p.slug, p.portada)}" srcset="${juego(p.slug, p.portada)}"
+      <img src="${ruta(p.arch, p.portada)}" srcset="${juego(p.arch, p.portada)}"
            sizes="100vw" alt="${p.titulo}" data-parallax="0.09">
-    </div>
-    <div class="columna">
-      <div class="ficha-titular">
-        <div>
-          <div class="tipo mono">${p.tipo}</div>
-          <h2>${p.titulo}</h2>
-        </div>
-        <p class="texto">${p.texto}</p>
+      <div class="ficha-portada-texto">
+        <div class="tipo mono">${p.tipo}</div>
+        <h2><span>${p.titulo}</span></h2>
       </div>
     </div>
+
+    <div class="columna">
+      <div class="ficha-texto">
+        <div class="rotulo">El proyecto</div>
+        <div>
+          <p>${p.texto}</p>
+          <div class="ficha-datos">
+            <div><span>Lugar</span><b>${p.lugar}</b></div>
+            <div><span>Año</span><b>${p.anio}</b></div>
+            <div><span>Estado</span><b>${p.estado}</b></div>
+            <div><span>Imágenes</span><b>${p.piezas.length + extra.length}</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="galeria" id="galeria">
       ${resto.map((n, k) => `
         <figure data-k="${k}">
-          <img src="${ruta(p.slug, n)}" srcset="${juego(p.slug, n)}" sizes="100vw"
+          <img src="${ruta(p.arch, n)}" srcset="${juego(p.arch, n)}" sizes="100vw"
                alt="${p.titulo} — imagen ${k+1}" loading="lazy" decoding="async" data-parallax="0.05">
+          <figcaption>${String(k + 2).padStart(2,'0')} / ${String(p.piezas.length).padStart(2,'0')}</figcaption>
         </figure>`).join('')}
-      ${p.video ? `
-        <div class="ficha-video">
-          <div class="marco">
-            <video controls preload="none" playsinline poster="assets/video/${p.video}-poster.webp">
-              <source src="assets/video/${p.video}.mp4" type="video/mp4">
-            </video>
-          </div>
-        </div>` : ''}
     </div>
+
+    ${extra.length ? `
+      <div class="extra-cabeza">
+        <div class="rotulo">Material adicional</div>
+        <p>Otros ${extra.length} renders del mismo proyecto, fuera de la selección.</p>
+      </div>
+      <div class="tira-extra" id="tira-extra">
+        ${extra.map((n, k) => `
+          <figure data-k="${k}">
+            <img src="${ruta(p.arch, n)}" srcset="${juego(p.arch, n)}" sizes="30vw"
+                 alt="${p.titulo} — adicional ${k+1}" loading="lazy" decoding="async">
+          </figure>`).join('')}
+      </div>` : ''}
+
+    ${p.video ? `
+      <div class="ficha-recorrido">
+        <div class="rotulo">Recorrido</div>
+        <div class="marco">
+          <video controls preload="none" playsinline poster="assets/video/${p.video}-poster.webp">
+            <source src="assets/video/${p.video}.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>` : ''}
+
     <div class="ficha-navegar">
       <button data-proyecto="${previo.slug}">← ${previo.titulo}</button>
       <button data-proyecto="${sigue.slug}">${sigue.titulo} →</button>
     </div>`;
 
-  contenido.querySelector('#galeria').dataset.orden = JSON.stringify(resto.map(n => ruta2x(p.slug, n)));
+  contenido.querySelector('#galeria').dataset.orden = JSON.stringify(resto.map(n => ruta2x(p.arch, n)));
+  const tira = contenido.querySelector('#tira-extra');
+  if (tira) tira.dataset.orden = JSON.stringify(extra.map(n => ruta2x(p.arch, n)));
 
   const obs = new IntersectionObserver(en => {
     en.forEach(e => {
@@ -906,7 +1183,7 @@ function abrirFicha(slug, hoja) {
   ficha.scrollTop = 0;
   const hasta = contenido.querySelector('.ficha-principal').getBoundingClientRect();
 
-  // La ficha se vuelve opaca MIENTRAS el clon viaja, no al final. Si se
+  // La ficha se vuelve opaca MIENTRAS el clon viaja, no al final: si se
   // espera al aterrizaje, durante todo el vuelo se ve la pagina anterior
   // por detras del clon y el movimiento se lee sucio.
   ficha.animate([{ opacity:0 }, { opacity:1 }],
@@ -926,9 +1203,13 @@ function abrirFicha(slug, hoja) {
 }
 
 function cerrarFicha() {
-  document.body.classList.remove('bloqueado');
   history.replaceState(null, '', location.pathname);
   contenido.querySelectorAll('video').forEach(v => v.pause());
+
+  // Si se entro desde el indice, el indice sigue montado detras: el
+  // desplazamiento del cuerpo solo se libera cuando tampoco queda el.
+  const indiceVivo = capaIndice.classList.contains('abierta');
+  if (!indiceVivo) document.body.classList.remove('bloqueado');
 
   const quieto  = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const princ   = contenido.querySelector('.ficha-principal');
@@ -972,66 +1253,76 @@ function mudarProyecto(slug) {
   }, 310);
 }
 
-/* Salto desde el menu con corte plano. Se desactiva el desplazamiento
-   suave del navegador durante el salto: el movimiento tiene que ocurrir
-   entero detras del panel, no verse a medias cuando este se retira. */
-const wipe = document.getElementById('wipe');
-let saltando = false;
+/* =================================================================
+   NAVEGACION
+   Cada seccion arranca en su propio borde superior, asi que basta
+   con desplazarse a su offsetTop para que quede encuadrada entera.
+   ================================================================= */
+/* Desplazamiento animado propio. Curva de salida larga: arranca
+   rapido y se posa despacio, que es lo que hace que el salto se lea
+   como un movimiento de camara y no como un brinco. */
+let animScroll = null;
+function irA(destino, dur = 950) {
+  const inicio = scrollY;
+  const delta  = Math.round(destino) - inicio;
+  if (Math.abs(delta) < 2) return;
+  if (animScroll) cancelAnimationFrame(animScroll);
+
+  const t0 = performance.now();
+  const curva = t => 1 - Math.pow(1 - t, 4);           // easeOutQuart
+
+  const paso = ahora => {
+    const t = Math.min(1, (ahora - t0) / dur);
+    scrollTo(0, inicio + delta * curva(t));
+    animScroll = t < 1 ? requestAnimationFrame(paso) : null;
+  };
+  animScroll = requestAnimationFrame(paso);
+}
+/* Si el usuario toma el control con la rueda o el dedo, el salto se
+   abandona: pelear contra su gesto se siente como un tiron. */
+['wheel','touchstart'].forEach(ev => addEventListener(ev, () => {
+  if (animScroll) { cancelAnimationFrame(animScroll); animScroll = null; }
+}, { passive:true }));
 
 function saltarA(destino) {
   const seccion = document.querySelector(destino);
-  if (!seccion || saltando) return;
-  saltando = true;
-
-  wipe.classList.remove('saliendo');
-  wipe.classList.add('entrando');
-
-  setTimeout(() => {
-    const previo = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = 'auto';
-    seccion.scrollIntoView();
-    document.documentElement.style.scrollBehavior = previo;
-    history.replaceState(null, '', destino);
-
-    wipe.classList.remove('entrando');
-    wipe.classList.add('saliendo');
-    setTimeout(() => { saltando = false; }, 390);
-  }, 390);
+  if (!seccion) return;
+  irA(seccion.offsetTop);
+  history.replaceState(null, '', destino);
 }
 
-/* Volver al inicio vuelve a tocar la entrada completa: la mascara
-   tipografica, la lamina abriendose y el titulo emergiendo. Se rehacen
-   los nodos animados porque una animacion CSS ya consumida no se puede
-   rebobinar sin reemplazar el elemento. */
+/* Volver a Inicio no lleva corte de pantalla: vuelve a tocarse la
+   entrada de STICK INDUSTRIES sobre un render de fachada distinto al
+   de la vuelta anterior. */
 function volverAlInicio() {
-  if (saltando) return;
-  saltando = true;
+  if (animScroll) { cancelAnimationFrame(animScroll); animScroll = null; }
+  scrollTo(0, 0);
+  history.replaceState(null, '', location.pathname);
 
-  wipe.classList.remove('saliendo');
-  wipe.classList.add('entrando');
+  fachadaActual = (fachadaActual + 1) % FACHADAS.length;
+  const nombre = FACHADAS[fachadaActual];
+  const img = document.getElementById('render-inicio');
+  if (img) {
+    img.src    = `assets/renders/${nombre}.webp`;
+    img.srcset = `assets/renders/${nombre}.webp 1600w, assets/renders/${nombre}@2x.webp 2560w`;
+  }
+  // Las letras de la entrada se recortan sobre el mismo render
+  document.documentElement.style.setProperty('--render-marca', `url('assets/renders/${nombre}.webp')`);
 
-  setTimeout(() => {
-    const previo = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = 'auto';
-    scrollTo(0, 0);
-    document.documentElement.style.scrollBehavior = previo;
-    history.replaceState(null, '', location.pathname);
-
-    const mascara = document.querySelector('.mascara-marca');
-    const inicio  = document.getElementById('inicio');
-    if (mascara && inicio) {
-      const copiaMascara = mascara.cloneNode(true);
-      const copiaInicio  = inicio.cloneNode(true);
-      mascara.replaceWith(copiaMascara);
-      inicio.replaceWith(copiaInicio);
-      repartir(copiaMascara.querySelector('#linea1'), 'STICK', .35);
-      repartir(copiaMascara.querySelector('#linea2'), 'INDUSTRIES', .75);
-    }
-
-    wipe.classList.remove('entrando');
-    wipe.classList.add('saliendo');
-    setTimeout(() => { saltando = false; }, 390);
-  }, 390);
+  // Una animacion CSS ya consumida no se rebobina: hay que reemplazar
+  // el nodo para que vuelva a correr desde el principio.
+  const mascara = document.querySelector('.mascara-marca');
+  const lamina  = document.querySelector('.lamina img');
+  if (mascara) {
+    const copia = mascara.cloneNode(true);
+    mascara.replaceWith(copia);
+    marcarEntrada(copia);
+  }
+  if (lamina) {
+    lamina.style.animation = 'none';
+    void lamina.offsetWidth;
+    lamina.style.animation = '';
+  }
 }
 
 document.addEventListener('click', e => {
@@ -1041,8 +1332,7 @@ document.addEventListener('click', e => {
     return;
   }
 
-  // Inicio no solo sube: vuelve a tocar la animación de entrada
-  const reinicio = e.target.closest('[data-reiniciar], .marca');
+  const reinicio = e.target.closest('[data-reiniciar]');
   if (reinicio) { e.preventDefault(); volverAlInicio(); return; }
 
   const enlace = e.target.closest('.menu a');
@@ -1062,6 +1352,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter' || e.key === ' ') {
     const foco = document.activeElement;
     if (foco && foco.classList.contains('hoja')) { e.preventDefault(); abrirFicha(foco.dataset.slug, foco); }
+    if (foco && foco.classList.contains('tarjeta')) { e.preventDefault(); abrirFicha(foco.dataset.slug, foco.querySelector('.tarjeta-marco')); }
   }
 });
 
@@ -1079,9 +1370,10 @@ function mostrar(i) {
   visorPie.textContent = `${proyectoActual ? proyectoActual.titulo : ''} — ${indiceVisor + 1} / ${galeria.length}`;
 }
 contenido.addEventListener('click', e => {
-  const pieza = e.target.closest('.galeria figure');
+  const pieza = e.target.closest('.galeria figure, .tira-extra figure');
   if (!pieza) return;
-  galeria = JSON.parse(pieza.closest('.galeria').dataset.orden);
+  galeria = JSON.parse(pieza.parentElement.dataset.orden || '[]');
+  if (!galeria.length) return;
   visor.classList.add('abierto');
   mostrar(Number(pieza.dataset.k));
 });
@@ -1098,7 +1390,10 @@ document.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight') mostrar(indiceVisor + 1);
     return;
   }
-  if (e.key === 'Escape' && ficha.classList.contains('abierta')) cerrarFicha();
+  if (e.key === 'Escape') {
+    if (ficha.classList.contains('abierta')) { cerrarFicha(); return; }
+    if (capaIndice.classList.contains('abierta')) cerrarIndice();
+  }
 });
 
 let tactilX = null;
@@ -1116,10 +1411,11 @@ visor.addEventListener('touchend', e => {
 const avance    = document.getElementById('avance');
 const secciones = [...document.querySelectorAll('#proyectos, #sobre, #contacto')];
 const enlaces   = [...document.querySelectorAll('.menu a')];
+const laminaImg = document.getElementById('render-inicio');
 
 function moverParallax(raiz, alto) {
   raiz.querySelectorAll('[data-parallax]').forEach(el => {
-    const caja   = el.getBoundingClientRect();
+    const caja = el.getBoundingClientRect();
     if (caja.bottom < -200 || caja.top > alto + 200) return;
     const grado  = Number(el.dataset.parallax) || .1;
     const centro = caja.top + caja.height / 2 - alto / 2;
@@ -1127,14 +1423,28 @@ function moverParallax(raiz, alto) {
   });
 }
 
+let tickScroll = false;
 addEventListener('scroll', () => {
-  const y = scrollY;
-  const alto = document.documentElement.scrollHeight - innerHeight;
-  avance.style.transform = `scaleX(${alto > 0 ? y / alto : 0})`;
+  if (tickScroll) return;
+  tickScroll = true;
+  requestAnimationFrame(() => {
+    const y = scrollY;
+    const alto = document.documentElement.scrollHeight - innerHeight;
+    avance.style.transform = `scaleX(${alto > 0 ? y / alto : 0})`;
 
-  let activa = '';
-  secciones.forEach(s => { if (s.getBoundingClientRect().top <= innerHeight * .4) activa = s.id; });
-  enlaces.forEach(a => a.classList.toggle('activo', a.getAttribute('href') === '#' + activa));
+    // La portada se hunde un poco mas lento que la pagina
+    if (laminaImg && y < innerHeight * 1.2) {
+      laminaImg.style.setProperty('--desvio', `${(y * .18).toFixed(1)}px`);
+      laminaImg.style.translate = `0 ${(y * .18).toFixed(1)}px`;
+    }
+
+    let activa = '';
+    secciones.forEach(s => { if (s.getBoundingClientRect().top <= innerHeight * .4) activa = s.id; });
+    enlaces.forEach(a => a.classList.toggle('activo', a.getAttribute('href') === '#' + activa));
+
+    pedirGiro();
+    tickScroll = false;
+  });
 }, { passive:true });
 
 ficha.addEventListener('scroll', () => moverParallax(contenido, innerHeight), { passive:true });
@@ -1146,7 +1456,7 @@ const observador = new IntersectionObserver(en => {
     observador.unobserve(e.target);
   });
 }, { threshold:.12, rootMargin:'0px 0px -60px 0px' });
-document.querySelectorAll('.revelar, .palabras, .herramientas, .hitos').forEach(el => observador.observe(el));
+document.querySelectorAll('.revelar, .palabras, .herramientas, .cortina, .vitrina').forEach(el => observador.observe(el));
 
 /* Enlace directo a un proyecto */
 function desdeDireccion() {
