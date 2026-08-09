@@ -330,6 +330,43 @@ body.bloqueado .masa { animation-play-state:paused; }
   animation:gotear 2.2s var(--suave) infinite; }
 @keyframes gotear { 0% { transform:translateY(-12px); opacity:0 } 40% { opacity:1 } 100% { transform:translateY(34px); opacity:0 } }
 
+/* ============ PROCESO — la obra que se levanta ================ */
+/* Seccion alta con el contenido pegado: el desplazamiento de la
+   pagina hace de linea de tiempo de la escena. */
+.proceso { position:relative; height:340vh; }
+.proceso-fijo { position:sticky; top:0; height:100svh; overflow:hidden;
+  display:flex; align-items:center; }
+.proceso canvas { position:absolute; inset:0; width:100%; height:100%; }
+.proceso-texto { position:relative; z-index:2; padding:0 var(--margen); max-width:34rem; }
+.proceso-texto h2 { font-size:clamp(1.8rem,4.2vw,3.1rem); font-weight:600;
+  letter-spacing:-.035em; line-height:1.07; margin-bottom:1.1rem; }
+.proceso-apunte { color:var(--tenue); font-size:.95rem; max-width:38ch; margin-bottom:1.8rem; }
+
+/* Las fases se encienden conforme la obra llega a ellas */
+.fases { display:flex; flex-direction:column; gap:.1rem; }
+.fase { display:grid; grid-template-columns:26px 1fr; gap:.9rem; align-items:baseline;
+  padding:.42rem 0; opacity:.28; transition:opacity .45s var(--suave); }
+.fase.viva { opacity:1; }
+.fase .n { font-family:var(--mono); font-size:.55rem; letter-spacing:.16em; color:var(--debil); }
+.fase b { font-size:.92rem; font-weight:500; letter-spacing:-.01em; position:relative; }
+.fase.viva .n { color:var(--tenue); }
+.fase b::after { content:''; position:absolute; left:0; right:0; bottom:-3px; height:1px;
+  background:var(--tinta); transform:scaleX(0); transform-origin:left;
+  transition:transform .55s var(--salida); }
+.fase.viva b::after { transform:scaleX(1); }
+
+.proceso-regla { position:absolute; right:var(--margen); top:50%; transform:translateY(-50%);
+  z-index:2; width:1px; height:min(42vh,320px); background:var(--linea); }
+.proceso-regla span { display:block; width:100%; height:0; background:var(--tinta);
+  box-shadow:0 0 14px rgba(255,255,255,.5); }
+@media (max-width:860px){
+  .proceso { height:300vh; }
+  .proceso-fijo { align-items:flex-end; padding-bottom:8vh; }
+  .proceso-texto { max-width:none; }
+  .proceso-apunte { margin-bottom:1.2rem; }
+  .proceso-regla { display:none; }
+}
+
 /* ============ PROYECTOS — vitrina a sangre ==================== */
 .vitrina { display:flex; width:100%; flex:1; min-height:clamp(420px,56vh,760px); overflow:hidden;
   border-top:1px solid var(--linea); border-bottom:1px solid var(--linea); }
@@ -924,6 +961,25 @@ body.bloqueado .masa { animation-play-state:paused; }
   <div class="baja"><span>Desplace</span><span class="hilo"></span></div>
 </section>
 
+<!-- ===================== PROCESO ===================== -->
+<!-- La seccion es alta y su contenido va pegado: asi el desplazamiento
+     de la pagina se convierte en el tiempo de la escena. El dibujo es
+     provisional — cuando llegue el video de OmniFlash se sustituye el
+     canvas por un <video> y se le ata el mismo progreso. -->
+<section class="proceso" id="proceso">
+  <div class="proceso-fijo">
+    <canvas id="obra" aria-hidden="true"></canvas>
+    <div class="proceso-texto">
+      <div class="etiqueta revelar"><span>Proceso</span></div>
+      <h2 class="palabras" data-texto="Del modelo a la imagen."></h2>
+      <p class="proceso-apunte">La imagen no se dibuja: se levanta. Cada render sale de
+         un modelo que ya tiene los espesores, los apoyos y las cotas con que se construye.</p>
+      <div class="fases" id="fases"></div>
+    </div>
+    <div class="proceso-regla"><span id="proceso-avance"></span></div>
+  </div>
+</section>
+
 <!-- ===================== PROYECTOS ===================== -->
 <section class="seccion" id="proyectos">
   <div class="seccion-cuerpo">
@@ -1248,6 +1304,171 @@ addEventListener('pointermove', e => {
   v.style.setProperty('--mx', `${((e.clientX - c.left) / c.width * 100).toFixed(1)}%`);
   v.style.setProperty('--my', `${((e.clientY - c.top) / c.height * 100).toFixed(1)}%`);
 }, { passive:true });
+
+/* =================================================================
+   PROCESO — la obra se levanta con el desplazamiento
+
+   Geometria propia, sin librerias: una lista de aristas con el
+   instante en que aparece cada una y una proyeccion isometrica que
+   gira despacio. Cada arista se DIBUJA (crece de su origen a su
+   destino) en vez de encenderse, que es lo que hace que se lea como
+   construccion y no como un interruptor.
+
+   Cuando llegue el video de OmniFlash, esto se sustituye atando el
+   mismo `avance` al currentTime del video. El andamiaje ya sirve.
+   ================================================================= */
+const FASES = [
+  { n:'01', t:'Cimentación',  desde:.00 },
+  { n:'02', t:'Estructura',   desde:.16 },
+  { n:'03', t:'Entrepiso',    desde:.40 },
+  { n:'04', t:'Cubierta',     desde:.62 },
+  { n:'05', t:'Cerramiento',  desde:.80 }
+];
+document.getElementById('fases').innerHTML = FASES.map(f => `
+  <div class="fase" data-desde="${f.desde}">
+    <span class="n">${f.n}</span><b>${f.t}</b>
+  </div>`).join('');
+
+(function montarObra() {
+  const lienzo = document.getElementById('obra');
+  const seccion = document.getElementById('proceso');
+  if (!lienzo || !seccion) return;
+  const ctx = lienzo.getContext('2d');
+
+  const W = 10, D = 8, H = 3.1;                 // ancho, fondo, altura de piso
+  const PILARES = [[0,0],[5,0],[10,0],[0,8],[5,8],[10,8]];
+  const A = [];                                  // {a, b, t}  t = instante de trazo
+  const arista = (a, b, t) => A.push({ a, b, t });
+  const rect = (p1, p2, p3, p4, t, paso = .004) => {
+    arista(p1, p2, t); arista(p2, p3, t + paso);
+    arista(p3, p4, t + paso * 2); arista(p4, p1, t + paso * 3);
+  };
+
+  // 01 · zapatas
+  PILARES.forEach(([x, y], i) => {
+    const s = .85, t = .015 + i * .018;
+    rect([x-s,y-s,0], [x+s,y-s,0], [x+s,y+s,0], [x-s,y+s,0], t);
+  });
+  // 02 · columnas del primer nivel
+  PILARES.forEach(([x, y], i) => arista([x,y,0], [x,y,H], .17 + i * .022));
+  // vigas de amarre del primer nivel
+  [[[0,0],[10,0]], [[0,8],[10,8]], [[0,0],[0,8]], [[10,0],[10,8]], [[5,0],[5,8]]]
+    .forEach(([p, q], i) => arista([p[0],p[1],H], [q[0],q[1],H], .30 + i * .018));
+  // 03 · losa de entrepiso — retícula
+  for (let x = 0; x <= W; x += 2.5) arista([x,0,H], [x,D,H], .41 + x * .006);
+  for (let y = 0; y <= D; y += 2)   arista([0,y,H], [W,y,H], .45 + y * .007);
+  // columnas del segundo nivel
+  PILARES.forEach(([x, y], i) => arista([x,y,H], [x,y,H*2], .52 + i * .02));
+  // 04 · vigas y losa de cubierta
+  [[[0,0],[10,0]], [[0,8],[10,8]], [[0,0],[0,8]], [[10,0],[10,8]]]
+    .forEach(([p, q], i) => arista([p[0],p[1],H*2], [q[0],q[1],H*2], .63 + i * .02));
+  for (let x = 0; x <= W; x += 2.5) arista([x,0,H*2], [x,D,H*2], .70 + x * .005);
+  for (let y = 0; y <= D; y += 2)   arista([0,y,H*2], [W,y,H*2], .73 + y * .006);
+  // 05 · cerramiento: montantes de fachada y huecos de ventana
+  for (let x = 0; x <= W; x += 1.25) {
+    arista([x,0,0], [x,0,H*2], .81 + x * .008);
+    arista([x,D,0], [x,D,H*2], .84 + x * .008);
+  }
+  for (let y = 0; y <= D; y += 1.6) {
+    arista([0,y,0], [0,y,H*2], .87 + y * .008);
+    arista([W,y,0], [W,y,H*2], .89 + y * .008);
+  }
+  // dos ventanas a doble altura en la fachada principal
+  rect([2,0,1.2], [4.4,0,1.2], [4.4,0,H*2-.5], [2,0,H*2-.5], .93, .008);
+  rect([6,0,1.2], [8.4,0,1.2], [8.4,0,H*2-.5], [6,0,H*2-.5], .95, .008);
+
+  const proy = (p, rot, cx, cy, esc) => {
+    const X = p[0] - W/2, Y = p[1] - D/2, Z = p[2];
+    const c = Math.cos(rot), s = Math.sin(rot);
+    const xr = X * c - Y * s, yr = X * s + Y * c;
+    return [cx + xr * esc, cy + (yr * .52 - Z * .92) * esc];
+  };
+
+  let lado = { w:0, h:0 }, avance = 0, pedido = false;
+  function medir() {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    lado = { w: lienzo.clientWidth, h: lienzo.clientHeight };
+    lienzo.width = Math.round(lado.w * dpr);
+    lienzo.height = Math.round(lado.h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function pintar() {
+    const { w, h } = lado;
+    if (!w) return;
+    ctx.clearRect(0, 0, w, h);
+
+    const p = avance;
+    // La camara gira un poco mientras se levanta: da volumen sin que
+    // el usuario tenga que hacer nada.
+    const rot = (-.62 + p * .42);
+    /* La escala sale de lo que MIDE la pieza proyectada — unas 13,5
+       unidades de ancho por 12,6 de alto contando la diagonal — no de
+       un divisor a ojo: asi la obra cabe entera en cualquier ventana. */
+    const anchoUtil = w > 900 ? w * .46 : w * .88;
+    const esc = Math.min(anchoUtil / 13.5, h * .74 / 12.6);
+    const cx = w > 900 ? w * .70 : w * .5;
+    const cy = h * (w > 900 ? .62 : .52);
+
+    // suelo de referencia
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(255,255,255,.05)';
+    for (let x = -3; x <= W + 3; x += 2.5) {
+      const a = proy([x,-3,0], rot, cx, cy, esc), b = proy([x,D+3,0], rot, cx, cy, esc);
+      ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+    }
+    for (let y = -3; y <= D + 3; y += 2.5) {
+      const a = proy([-3,y,0], rot, cx, cy, esc), b = proy([W+3,y,0], rot, cx, cy, esc);
+      ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+    }
+
+    const TRAZO = .045;   // cuanto dura el dibujado de cada arista
+    A.forEach(({ a, b, t }) => {
+      const k = (p - t) / TRAZO;
+      if (k <= 0) return;
+      const q = Math.min(1, k);
+      const pa = proy(a, rot, cx, cy, esc), pb = proy(b, rot, cx, cy, esc);
+      const fx = pa[0] + (pb[0] - pa[0]) * q, fy = pa[1] + (pb[1] - pa[1]) * q;
+      // recien trazada = brillante; ya asentada = tenue
+      const fresco = Math.max(0, 1 - k / 3);
+      ctx.lineWidth = 1 + fresco * .9;
+      ctx.strokeStyle = `rgba(255,255,255,${(.30 + fresco * .55).toFixed(3)})`;
+      ctx.beginPath(); ctx.moveTo(pa[0], pa[1]); ctx.lineTo(fx, fy); ctx.stroke();
+      if (fresco > .05) {                       // punto de avance del trazo
+        ctx.beginPath(); ctx.arc(fx, fy, 1.6, 0, 7);
+        ctx.fillStyle = `rgba(255,255,255,${(fresco * .9).toFixed(2)})`; ctx.fill();
+      }
+    });
+  }
+
+  function pedirPintado() {
+    if (pedido) return;
+    pedido = true;
+    requestAnimationFrame(() => { pintar(); pedido = false; });
+  }
+
+  const fases = [...document.querySelectorAll('.fase')];
+  const regla = document.getElementById('proceso-avance');
+  function recalcular() {
+    const caja = seccion.getBoundingClientRect();
+    const recorrido = seccion.offsetHeight - innerHeight;
+    avance = recorrido > 0 ? Math.min(1, Math.max(0, -caja.top / recorrido)) : 0;
+    if (quieto()) avance = 1;
+    regla.style.height = `${(avance * 100).toFixed(1)}%`;
+    fases.forEach(f => f.classList.toggle('viva', avance >= Number(f.dataset.desde)));
+    pedirPintado();
+  }
+
+  let aLaVista = false;
+  new IntersectionObserver(en => {
+    aLaVista = en[0].isIntersecting;
+    if (aLaVista) { medir(); recalcular(); }
+  }, { rootMargin:'200px' }).observe(seccion);
+
+  addEventListener('scroll', () => { if (aLaVista) recalcular(); }, { passive:true });
+  addEventListener('resize', () => { medir(); recalcular(); });
+  medir(); recalcular();
+})();
 
 /* =================================================================
    VITRINA

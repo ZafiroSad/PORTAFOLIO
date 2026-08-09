@@ -46,6 +46,13 @@ PORTAFOLIO/
 
 Todo se recorre desplazando. El menú salta con un desplazamiento animado.
 
+0. **Proceso** — entre Inicio y Proyectos. Sección de 340 vh con el contenido
+   pegado: el desplazamiento hace de línea de tiempo y **la obra se levanta**
+   —zapatas, columnas, vigas, entrepiso, cubierta, cerramiento— dibujada en
+   canvas con geometría propia. Es el argumento del portafolio dicho en
+   imagen: *la imagen no se dibuja, se levanta*.
+   **Provisional**: cuando llegue el vídeo de OmniFlash se sustituye el canvas
+   por un `<video>` atando el mismo `avance` a su `currentTime`.
 1. **Inicio** — render de fachada a pantalla completa y la palabra
    **PORTAFOLIO** recortando ese mismo render. El botón *Inicio*
    vuelve a tocar la entrada de STICK INDUSTRIES **con un render distinto
