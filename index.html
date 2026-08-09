@@ -555,8 +555,17 @@ body.bloqueado .masa { animation-play-state:paused; }
   color:var(--n-200); background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.08);
   border-radius:999px; padding:.2rem .55rem; margin-left:.6rem;
   vertical-align:middle; white-space:nowrap; }
+/* El hito del centro no solo es el mas grande: es el que tiene luz.
+   El halo lo separa del eje y lleva la mirada sin necesidad de marcos. */
+.hito .escudo::after { content:''; position:absolute; inset:-14px; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,255,.22), transparent 68%);
+  opacity:0; transition:opacity .45s var(--suave); pointer-events:none; }
 .hito.foco .escudo { border-color:var(--tinta);
-  box-shadow:0 0 0 4px rgba(21,22,27,1), 0 0 22px -4px rgba(255,255,255,.28); }
+  box-shadow:0 0 0 4px var(--base), 0 0 26px -2px rgba(255,255,255,.45); }
+.hito.foco .escudo::after { opacity:1; }
+.hito.foco .escudo img { filter:brightness(1.12); }
+.hito.foco .anio { color:var(--tenue); }
+.hito.foco h4 { text-shadow:0 0 26px rgba(255,255,255,.25); }
 
 /* ============ CONTACTO ======================================== */
 /* Toda la seccion se centra, cabecera incluida: el titulo alineado a
