@@ -229,24 +229,30 @@ body.bloqueado .masa { animation-play-state:paused; }
   text-align:center; text-transform:uppercase; }
 .linea2 { display:block; font-size:.42em; letter-spacing:.08em; font-weight:300; margin-top:.35em; }
 
-/* El recorte va en cada letra. background-attachment:fixed ancla el
-   fondo a la ventana y no a la letra, asi todas componen entre si una
-   sola imagen continua. Solo se animan opacity y filter: al animar
-   transform el recorte se rompe y el texto sale en color plano. */
+/* Las letras se recortaban sobre el propio render. Sobre una fachada
+   con contraste quedaba bien; sobre una zona plana —y sobre todo en
+   movil, donde el fondo no se puede anclar a la ventana y hay que
+   repetirlo— la palabra salia troceada y parecia un fallo de dibujo.
+   Ahora son solidas: entran una a una desde abajo, desenfocadas y algo
+   giradas, y al final un brillo las recorre. Se lee siempre, y se
+   mueve. */
 .letra {
-  display:inline-block;
-  background-image:var(--render-marca, url('assets/renders/cazadores-09.webp'));
-  background-attachment:fixed; background-size:cover; background-position:center 45%;
-  -webkit-background-clip:text; background-clip:text; color:transparent;
-  opacity:0; filter:blur(16px);
-  animation:enfocar 1.1s var(--salida) forwards;
+  display:inline-block; color:var(--tinta);
+  opacity:0; transform:translateY(.34em) rotate(2.5deg); filter:blur(13px);
+  animation:asentarLetra .95s var(--salida) forwards;
 }
-/* `background-attachment:fixed` obliga a recomponer el recorte en cada
-   cuadro del desplazamiento. Cuando el titular ya salio de pantalla no
-   aporta nada, y soltarlo devuelve fluidez al resto de la pagina. */
-.titular.suelto .letra { background-attachment:scroll; }
-@keyframes enfocar { to { opacity:1; filter:blur(0); } }
-@media (hover:none) { .letra { background-attachment:scroll; background-size:700% auto; } }
+@keyframes asentarLetra { to { opacity:1; transform:none; filter:blur(0) } }
+
+/* El brillo que recorre la palabra una vez asentada */
+.titular { position:relative; }
+.titular::after {
+  content:attr(data-texto); position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(100deg, transparent 40%, rgba(255,255,255,.9) 50%, transparent 60%);
+  background-size:300% 100%; background-position:130% 0;
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation:barrerLuz 2.4s var(--suave) 4.3s;
+}
+@keyframes barrerLuz { from { background-position:130% 0 } to { background-position:-70% 0 } }
 .regla-marca {
   position:absolute; left:50%; bottom:34%; width:min(78vw,900px); height:1px;
   transform:translateX(-50%) scaleX(0);
@@ -290,6 +296,17 @@ body.bloqueado .masa { animation-play-state:paused; }
 
 .revelar > * { opacity:0; transform:translateY(22px); }
 .revelar.visible > * { opacity:1; transform:none; transition:opacity .9s var(--suave), transform 1s var(--salida); }
+
+/* `.revelar` anima a los HIJOS de un bloque. `.asoma` anima al bloque
+   mismo, que es lo que hacia falta para todo lo que hasta ahora
+   aparecia de golpe: el boton del archivo, la biografia, la rueda del
+   trayecto, el recorrido, los saltos entre proyectos, los filtros y el
+   pie. `--r` escalona los hermanos. */
+.asoma { opacity:0; transform:translateY(26px); }
+.asoma.visible { opacity:1; transform:none;
+  transition:opacity .85s var(--suave) var(--r,0s), transform .95s var(--salida) var(--r,0s); }
+.asoma.lateral { transform:translateX(-24px); }
+.asoma.lateral.der { transform:translateX(24px); }
 
 /* ============ INICIO ========================================== */
 .inicio { position:relative; min-height:100svh; display:flex; flex-direction:column; justify-content:flex-end;
@@ -383,6 +400,9 @@ body.bloqueado .masa { animation-play-state:paused; }
 .proceso-regla span { display:block; width:100%; height:0; background:var(--tinta);
   box-shadow:0 0 14px rgba(255,255,255,.5); }
 @media (max-width:860px){
+  .titular { margin-bottom:.7rem; }
+  .subtitular span { font-size:.48rem; letter-spacing:.14em; }
+
   .proceso { height:300vh; }
   .proceso-fijo { align-items:flex-end; padding-bottom:8vh; }
   .proceso-texto { max-width:none; }
@@ -1000,6 +1020,9 @@ body.bloqueado .masa { animation-play-state:paused; }
   .btn-todos { padding:.85rem 1rem .85rem 1.5rem; font-size:.82rem; }
 
   /* --- Proceso: la escena arriba, el texto debajo --- */
+  .titular { margin-bottom:.7rem; }
+  .subtitular span { font-size:.48rem; letter-spacing:.14em; }
+
   .proceso { height:300vh; }
   .proceso-fijo { align-items:flex-end; padding-bottom:5vh; }
   .proceso-texto { max-width:none; }
@@ -1072,7 +1095,8 @@ body.bloqueado .masa { animation-play-state:paused; }
   /* Las letras arrancan con blur(16px): sin animacion que lo retire,
      el titular se quedaba borroso. No basta con devolver la opacidad. */
   .titular .letra, .letra { opacity:1 !important; filter:none !important; }
-  .subtitular span, .revelar > *, .enlace { opacity:1 !important; transform:none !important; }
+  .subtitular span, .revelar > *, .enlace, .asoma { opacity:1 !important; transform:none !important; }
+  .titular::after { animation:none; opacity:0 }
   .inicio-aparte, .baja, .mas-filo .marca-mas { opacity:1 }
   .etapa { opacity:1 !important; transform:none !important }
   .mas-filo .raya { transform:none }
@@ -1124,7 +1148,7 @@ body.bloqueado .masa { animation-play-state:paused; }
   </div>
   <div class="inicio-texto">
     <div>
-      <h1 class="titular" id="titular"></h1>
+      <h1 class="titular" id="titular" data-texto="PORTAFOLIO"></h1>
       <div class="subtitular"><span>Ingeniero civil · Visualización arquitectónica</span></div>
     </div>
     <div class="inicio-aparte">
@@ -1168,7 +1192,7 @@ body.bloqueado .masa { animation-play-state:paused; }
       </div>
     </div>
     <div class="vitrina" id="vitrina"></div>
-    <div class="ver-todos">
+    <div class="ver-todos asoma">
       <button class="btn-todos vidrio" data-ver-todos>
         <span>Ver todo el archivo</span>
         <span class="cuenta" id="cuenta-todos"></span>
@@ -1192,7 +1216,7 @@ body.bloqueado .masa { animation-play-state:paused; }
       </div>
 
       <div class="bio">
-        <div>
+        <div class="asoma">
           <p class="destacado">No llego al render desde la imagen: llego desde el modelo. Cuando levanto
              un proyecto en Revit, los espesores, las luces y los apoyos son los que se van a construir.</p>
           <p><strong>Kevin Stick Gil Arévalo.</strong> Estudiante de ingeniería civil en la Universidad
@@ -1204,7 +1228,7 @@ body.bloqueado .masa { animation-play-state:paused; }
              imagen que se puede construir.</p>
         </div>
 
-        <div class="bio-trayecto">
+        <div class="bio-trayecto asoma" style="--r:.12s">
           <div class="etiqueta">Trayecto</div>
           <div class="rueda-marco">
             <span class="rueda-eje" aria-hidden="true"></span>
@@ -1234,7 +1258,7 @@ body.bloqueado .masa { animation-play-state:paused; }
   </div>
 </section>
 
-<div class="pie">
+<div class="pie asoma">
   <span>KEVIN GIL · BUCARAMANGA, COLOMBIA</span>
   <span>VISUAL 3D STUDIO</span>
 </div>
@@ -1248,7 +1272,7 @@ body.bloqueado .masa { animation-play-state:paused; }
     <span class="nombre mono">Archivo completo</span>
     <button class="ficha-cerrar" id="indice-cerrar"><span class="aspa"></span> Cerrar</button>
   </div>
-  <div class="filtros" id="filtros"></div>
+  <div class="filtros asoma" id="filtros"></div>
   <div class="rejilla-todos" id="rejilla-todos"></div>
 </div>
 
@@ -1740,6 +1764,8 @@ document.getElementById('filtros').addEventListener('click', e => {
 function abrirIndice() {
   capaIndice.classList.add('abierta');
   document.body.classList.add('bloqueado');
+  // `visibility` no dispara al observador: lo de dentro se enciende a mano
+  capaIndice.querySelectorAll('.asoma').forEach(el => el.classList.add('visible'));
   ajustarRejilla();
   requestAnimationFrame(() => rejilla.classList.add('visible'));
 }
@@ -1981,7 +2007,7 @@ function pintarFicha(p) {
       </div>` : ''}
 
     ${p.video ? `
-      <div class="ficha-recorrido">
+      <div class="ficha-recorrido asoma">
         <div class="rotulo">Recorrido</div>
         <div class="marco">
           <video controls preload="none" playsinline poster="assets/video/${p.video}-poster.webp">
@@ -1991,9 +2017,9 @@ function pintarFicha(p) {
       </div>` : ''}
 
     <div class="ficha-navegar">
-      <button class="salto izq vidrio" data-proyecto="${previo.slug}">
+      <button class="salto izq vidrio asoma lateral" data-proyecto="${previo.slug}">
         <span class="rot">← Anterior</span><span class="nom">${previo.titulo}</span></button>
-      <button class="salto der vidrio" data-proyecto="${sigue.slug}">
+      <button class="salto der vidrio asoma lateral der" style="--r:.08s" data-proyecto="${sigue.slug}">
         <span class="rot">Siguiente →</span><span class="nom">${sigue.titulo}</span></button>
     </div>`;
 
@@ -2029,6 +2055,7 @@ function pintarFicha(p) {
   const filo = contenido.querySelector('#mas-filo');
   if (filo) obs.observe(filo);
   if (tira) obs.observe(tira);
+  contenido.querySelectorAll('.asoma').forEach(el => obs.observe(el));
 
   const obsCinta = new IntersectionObserver(en => {
     en.forEach(e => { if (e.isIntersecting) { contar(); obsCinta.unobserve(e.target); } });
@@ -2227,9 +2254,6 @@ function volverAlInicio() {
     img.src    = `assets/renders/${nombre}.webp`;
     img.srcset = `assets/renders/${nombre}.webp 1600w, assets/renders/${nombre}@2x.webp 2560w`;
   }
-  // Las letras de la entrada y del titular se recortan sobre el mismo render
-  document.documentElement.style.setProperty('--render-marca', `url('assets/renders/${nombre}.webp')`);
-
   // Una animacion CSS ya consumida no se rebobina: hay que reemplazar
   // el nodo para que vuelva a correr desde el principio.
   const mascara = document.querySelector('.mascara-marca');
@@ -2453,14 +2477,18 @@ const observador = new IntersectionObserver(en => {
 document.querySelectorAll('.revelar, .palabras, .vitrina, .enlaces, .flujo')
   .forEach(el => observador.observe(el));
 
-/* El recorte anclado a la ventana solo hace falta mientras el titular
-   se ve; despues es peso muerto en cada cuadro del desplazamiento. */
-(function soltarTitular() {
-  const t = document.getElementById('titular');
-  if (!t) return;
-  new IntersectionObserver(en => t.classList.toggle('suelto', !en[0].isIntersecting))
-    .observe(t);
-})();
+/* `.asoma` va con un observador mas permisivo: el de arriba exige que
+   el elemento entre 60 px y cubra el 12 % de su alto, y un bloque bajo
+   al final del documento —el pie— no llega a cumplirlo nunca. Medido:
+   en movil se quedaba invisible. */
+const asomador = new IntersectionObserver(en => {
+  en.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('visible');
+    asomador.unobserve(e.target);
+  });
+}, { threshold:0, rootMargin:'0px 0px -8px 0px' });
+document.querySelectorAll('.asoma').forEach(el => asomador.observe(el));
 
 /* Enlace directo a un proyecto */
 function desdeDireccion() {
