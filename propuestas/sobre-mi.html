@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sobre mí — tres propuestas</title>
+<style>
+/* Tres maneras de resolver la seccion «Sobre mi». Mismo contenido,
+   misma paleta y mismo vidrio que el sitio: lo que cambia es como se
+   reparte el peso entre el texto, el trayecto y las herramientas. */
+:root{
+  --base:#15161b; --base-2:#1d1f26; --tinta:#f7f8fa; --n-200:#dfe1e8;
+  --tenue:#adb0bb; --debil:#797d8a;
+  --linea:rgba(255,255,255,.10); --linea-fuerte:rgba(255,255,255,.26);
+  --salida:cubic-bezier(.16,1,.3,1); --suave:cubic-bezier(.4,0,.2,1);
+  --resorte:cubic-bezier(.34,1.56,.64,1);
+  --margen:clamp(1.25rem,4vw,4.5rem);
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--base);color:var(--tinta);font-family:var(--sans);line-height:1.65;
+  -webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+.campo{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  background:radial-gradient(130% 85% at 50% -12%,rgba(196,204,220,.07),transparent 62%),
+  linear-gradient(180deg,var(--base-2) 0%,var(--base) 48%,#101116 100%)}
+.masa{position:absolute;border-radius:50%;filter:blur(72px);opacity:.55}
+.m1{width:66vmax;height:66vmax;left:-20vmax;top:-16vmax;
+  background:radial-gradient(circle,hsl(214 22% 62%/.30),transparent 68%)}
+.m2{width:56vmax;height:56vmax;right:-18vmax;top:6vmax;
+  background:radial-gradient(circle,hsl(32 30% 64%/.22),transparent 66%)}
+.m3{width:74vmax;height:74vmax;left:10vmax;bottom:-32vmax;
+  background:radial-gradient(circle,hsl(28 16% 58%/.20),transparent 68%)}
+.lienzo{position:relative;z-index:1}
+
+/* Rotulo de cada propuesta */
+.marca-prop{position:sticky;top:0;z-index:20;display:flex;align-items:baseline;gap:1rem;
+  padding:1rem var(--margen);backdrop-filter:blur(16px) saturate(175%);
+  background:rgba(21,22,27,.72);border-bottom:1px solid var(--linea)}
+.marca-prop b{font-size:1rem;font-weight:600;letter-spacing:-.02em}
+.marca-prop span{font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--debil)}
+.marca-prop em{font-style:normal;color:var(--tenue);font-size:.85rem;margin-left:auto;text-align:right}
+
+section{position:relative;min-height:100vh;display:flex;flex-direction:column;
+  justify-content:center;padding:clamp(3rem,9vh,6rem) var(--margen)}
+.etiqueta{font-family:var(--mono);font-size:.61rem;letter-spacing:.28em;
+  text-transform:uppercase;color:var(--debil);margin-bottom:.9rem}
+h2{font-size:clamp(1.8rem,4.2vw,3.1rem);font-weight:600;letter-spacing:-.035em;line-height:1.07}
+p{color:var(--tenue);font-size:.95rem;margin-bottom:.85rem;max-width:56ch}
+p strong{color:var(--tinta);font-weight:500}
+
+/* ============================================================
+   A · MANIFIESTO
+   La frase es el protagonista y ocupa el ancho completo. Debajo,
+   una franja baja con la bio breve y el trayecto en horizontal.
+   Las herramientas orbitan grandes por detras de la frase.
+   ============================================================ */
+.A .frase{font-size:clamp(1.9rem,5.2vw,4.2rem);font-weight:200;letter-spacing:-.04em;
+  line-height:1.1;max-width:19ch;color:var(--n-200);margin:1rem 0 3rem}
+.A .frase b{font-weight:600;color:var(--tinta)}
+.A .pie-manifiesto{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);
+  gap:clamp(2rem,5vw,4rem);align-items:start;
+  padding-top:2rem;border-top:1px solid var(--linea)}
+.A .bio-corta p{font-size:.9rem}
+.A .linea-h{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;padding-bottom:.5rem}
+.A .linea-h::-webkit-scrollbar{display:none}
+.A .paso{flex:none;width:172px;padding-right:1.2rem;position:relative}
+.A .paso::before{content:'';position:absolute;left:0;top:9px;right:0;height:1px;background:var(--linea)}
+.A .paso i{position:relative;display:block;width:9px;height:9px;border-radius:50%;
+  background:var(--base);border:1px solid var(--linea-fuerte);margin:5px 0 .8rem}
+.A .paso.hoy i{background:var(--tinta);border-color:var(--tinta);box-shadow:0 0 16px -2px rgba(255,255,255,.6)}
+.A .paso span{display:block;font-family:var(--mono);font-size:.55rem;letter-spacing:.2em;color:var(--debil)}
+.A .paso b{display:block;font-size:.82rem;font-weight:500;margin-top:.25rem;line-height:1.3}
+
+/* ============================================================
+   B · FICHA TECNICA
+   Dos columnas serias: a la izquierda quien es, a la derecha el
+   trayecto como una lista de obra. Las herramientas pasan abajo
+   en una cinta continua, a color, siempre en movimiento.
+   ============================================================ */
+.B .cuerpo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:clamp(2rem,6vw,5rem);align-items:start;margin-bottom:3rem}
+.B .destacado{font-size:clamp(1.05rem,1.5vw,1.24rem);color:var(--n-200);line-height:1.5;
+  letter-spacing:-.01em;margin-bottom:1.2rem}
+.B .lista{border-top:1px solid var(--linea)}
+.B .fila{display:grid;grid-template-columns:56px 1fr auto;gap:1rem;align-items:center;
+  padding:.85rem 0;border-bottom:1px solid var(--linea);
+  transition:background .35s var(--suave),padding-left .35s var(--suave)}
+.B .fila:hover{background:rgba(255,255,255,.03);padding-left:.6rem}
+.B .fila .anio{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;color:var(--debil)}
+.B .fila .que{font-size:.92rem;font-weight:500;letter-spacing:-.01em}
+.B .fila .que small{display:block;font-size:.78rem;font-weight:400;color:var(--tenue);
+  letter-spacing:0;margin-top:.1rem}
+.B .fila .sello{width:30px;height:30px;border-radius:50%;overflow:hidden;flex:none;
+  background:rgba(255,255,255,.05);border:1px solid var(--linea);display:grid;place-items:center}
+.B .fila .sello img{width:100%;height:100%;object-fit:contain;padding:4px}
+.B .cinta{position:relative;overflow:hidden;padding:1.6rem 0;
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 12%,#000 88%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 12%,#000 88%,transparent)}
+.B .rodillo{display:flex;gap:2.6rem;width:max-content;animation:rodar 26s linear infinite}
+.B .cinta:hover .rodillo{animation-play-state:paused}
+@keyframes rodar{to{transform:translateX(-50%)}}
+.B .util{display:flex;align-items:center;gap:.7rem;flex:none}
+.B .util .disco{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(120% 120% at 30% 20%,rgba(var(--c),.30),rgba(var(--c),.10) 60%,rgba(255,255,255,.03));
+  border:1px solid rgba(var(--c),.30);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 22px -8px rgba(var(--c),.6);
+  transition:transform .5s var(--resorte)}
+.B .util:hover .disco{transform:scale(1.12)}
+.B .util img{width:58%;height:58%;object-fit:contain}
+.B .util.negativo img{filter:invert(1) brightness(1.15)}
+.B .util span{font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--tenue);white-space:nowrap}
+
+/* ============================================================
+   C · SALA DE CONTROL
+   El sistema de herramientas pasa al centro y manda: grande, a
+   color y girando. El texto se reparte a los lados en dos
+   columnas estrechas y el trayecto corre por la base.
+   ============================================================ */
+.C .escena{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  gap:clamp(1.5rem,4vw,3.5rem);align-items:center;margin-bottom:2.5rem}
+.C .col p{font-size:.88rem;max-width:34ch}
+.C .col.der{text-align:right}
+.C .col.der p{margin-left:auto}
+.C .nucleo-marco{position:relative;width:clamp(260px,32vw,420px);aspect-ratio:1}
+.C .anillo-c{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,255,255,.06)}
+.C .anillo-c.dos{inset:16%}
+.C .gira{position:absolute;inset:0;animation:girar 70s linear infinite}
+.C .gira.inv{inset:16%;animation-duration:52s;animation-direction:reverse}
+@keyframes girar{to{transform:rotate(360deg)}}
+.C .sat{position:absolute;inset:0;transform:rotate(var(--a))}
+.C .sat .pos{position:absolute;left:50%;top:0}
+.C .sat .cara{position:absolute;left:0;top:0;width:46px;height:46px;
+  transform:translate(-50%,-50%) rotate(calc(-1 * var(--a)));
+  display:grid;place-items:center;border-radius:50%;
+  background:radial-gradient(120% 120% at 30% 20%,rgba(var(--c),.32),rgba(var(--c),.10) 60%,rgba(255,255,255,.03));
+  border:1px solid rgba(var(--c),.32);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 24px -8px rgba(var(--c),.7)}
+.C .sat img{width:58%;height:58%;object-fit:contain}
+.C .sat.negativo img{filter:invert(1) brightness(1.15)}
+.C .centro{position:absolute;inset:26%;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle,rgba(255,255,255,.07),transparent 70%);
+  text-align:center}
+.C .centro b{display:block;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:600;letter-spacing:-.04em;line-height:1}
+.C .centro span{font-family:var(--mono);font-size:.52rem;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--debil);margin-top:.4rem;display:block}
+.C .base{display:flex;gap:0;border-top:1px solid var(--linea);padding-top:1.4rem;
+  overflow-x:auto;scrollbar-width:none}
+.C .base::-webkit-scrollbar{display:none}
+.C .hito-c{flex:1 0 154px;padding-right:1.2rem;position:relative;opacity:.5;
+  transition:opacity .4s var(--suave)}
+.C .hito-c:hover,.C .hito-c.hoy{opacity:1}
+.C .hito-c span{font-family:var(--mono);font-size:.54rem;letter-spacing:.2em;color:var(--debil)}
+.C .hito-c b{display:block;font-size:.82rem;font-weight:500;margin-top:.2rem;line-height:1.3}
+
+@media (max-width:900px){
+  .A .pie-manifiesto,.B .cuerpo{grid-template-columns:1fr}
+  .C .escena{grid-template-columns:1fr}
+  .C .col.der{text-align:left}
+  .C .nucleo-marco{margin:0 auto}
+}
+</style>
+</head>
+<body>
+
+<div class="campo" aria-hidden="true">
+  <div class="masa m1"></div><div class="masa m2"></div><div class="masa m3"></div>
+</div>
+
+<div class="lienzo">
+
+<!-- ============ A ============ -->
+<div class="marca-prop"><span>Propuesta</span><b>A · Manifiesto</b>
+  <em>La frase manda. Bio y trayecto se repliegan a una franja baja.</em></div>
+<section class="A">
+  <div class="etiqueta">Quién</div>
+  <div class="frase">No llego al render desde la imagen:
+    <b>llego desde el modelo.</b></div>
+  <div class="pie-manifiesto">
+    <div class="bio-corta">
+      <p><strong>Kevin Stick Gil Arévalo.</strong> Ingeniería civil en la UPB Bucaramanga,
+         nueve semestres. En 2026 fundé <strong>VISUAL 3D STUDIO</strong>.</p>
+      <p>Subo a obra varias veces por semana. Esa distancia entre lo que se dibuja y lo
+         que se levanta es la que corrijo antes de que llegue al concreto.</p>
+    </div>
+    <div class="linea-h" id="lineaA"></div>
+  </div>
+</section>
+
+<!-- ============ B ============ -->
+<div class="marca-prop"><span>Propuesta</span><b>B · Ficha técnica</b>
+  <em>Dos columnas serias y las herramientas en cinta continua abajo.</em></div>
+<section class="B">
+  <div class="etiqueta">Quién</div>
+  <h2 style="margin-bottom:2rem">Ingeniero civil y visualizador.</h2>
+  <div class="cuerpo">
+    <div>
+      <p class="destacado">No llego al render desde la imagen: llego desde el modelo.
+         Cuando levanto un proyecto en Revit, los espesores, las luces y los apoyos son
+         los que se van a construir.</p>
+      <p><strong>Kevin Stick Gil Arévalo.</strong> Estudiante de ingeniería civil en la
+         Universidad Pontificia Bolivariana, seccional Bucaramanga, con nueve semestres
+         culminados. En 2026 fundé <strong>VISUAL 3D STUDIO</strong>.</p>
+      <p>Subo a obra varias veces por semana. Es lo que separa una imagen bonita de una
+         imagen que se puede construir.</p>
+    </div>
+    <div>
+      <div class="etiqueta">Trayecto</div>
+      <div class="lista" id="listaB"></div>
+    </div>
+  </div>
+  <div class="cinta"><div class="rodillo" id="rodilloB"></div></div>
+</section>
+
+<!-- ============ C ============ -->
+<div class="marca-prop"><span>Propuesta</span><b>C · Sala de control</b>
+  <em>El sistema al centro, el texto a los lados, el trayecto en la base.</em></div>
+<section class="C">
+  <div class="etiqueta" style="text-align:center">Quién</div>
+  <div class="escena">
+    <div class="col">
+      <p><strong>Kevin Stick Gil Arévalo.</strong> Ingeniería civil en la UPB Bucaramanga,
+         nueve semestres culminados. Fundador de <strong>VISUAL 3D STUDIO</strong>.</p>
+      <p>No llego al render desde la imagen: llego desde el modelo.</p>
+    </div>
+    <div class="nucleo-marco" id="nucleoC">
+      <div class="anillo-c"></div><div class="anillo-c dos"></div>
+      <div class="centro"><b>8</b><span>Herramientas</span></div>
+    </div>
+    <div class="col der">
+      <p>Subo a obra varias veces por semana. Esa distancia entre lo que se dibuja y lo
+         que se levanta es la que corrijo antes de que llegue al concreto.</p>
+      <p>Es lo que separa una imagen bonita de una imagen que se puede construir.</p>
+    </div>
+  </div>
+  <div class="base" id="baseC"></div>
+</section>
+
+</div>
+
+<script>
+const UTILES = [
+  { nombre:'Revit',       logo:'../assets/logos/revit.webp',      color:'54,142,235' },
+  { nombre:'AutoCAD',     logo:'../assets/logos/autocad.webp',    color:'229,16,80'  },
+  { nombre:'Civil 3D',    logo:'../assets/logos/civil3d.webp',    color:'196,19,126' },
+  { nombre:'SketchUp',    logo:'../assets/logos/sketchup.webp',   color:'23,124,180' },
+  { nombre:'D5 Render',   logo:'../assets/logos/d5.webp',         color:'138,86,246' },
+  { nombre:'Twinmotion',  logo:'../assets/logos/twinmotion.webp', color:'236,240,248', negativo:true },
+  { nombre:'Claude Code', logo:'../assets/logos/claudecode.webp', color:'217,119,87'  },
+  { nombre:'ChatGPT',     logo:'../assets/logos/chatgpt.webp',    color:'116,170,156', negativo:true }
+];
+
+const HITOS = [
+  { anio:'2021', titulo:'Bachiller bilingüe',        detalle:'Colegio San Juan de Ávila · IELTS B2', escudo:'../assets/logos/sja.webp' },
+  { anio:'2022', titulo:'Ingeniería Civil',          detalle:'UPB Bucaramanga · 4.2/5',              escudo:'../assets/logos/upb.webp' },
+  { anio:'2023', titulo:'Ayudante de obra',          detalle:'Replanteo y control de material',      escudo:null },
+  { anio:'2025', titulo:'Congreso XOpen',            detalle:'Competencia de puentes · SSI',         escudo:null },
+  { anio:'2025', titulo:'Representante estudiantil', detalle:'Facultad de Ing. Civil · UPB',         escudo:'../assets/logos/upb.webp' },
+  { anio:'2025', titulo:'Modelado BIM',              detalle:'Revit · UIS',                          escudo:'../assets/logos/uis.webp' },
+  { anio:'2026', titulo:'VISUAL 3D STUDIO',          detalle:'Fundador',                             escudo:'../assets/marca/favicon.png' },
+  { anio:'2026', titulo:'Vías Terrestres',           detalle:'Especialización · cursando',           escudo:'../assets/logos/upb.webp', hoy:true }
+];
+
+/* A — trayecto en horizontal */
+document.getElementById('lineaA').innerHTML = HITOS.map(h => `
+  <div class="paso${h.hoy ? ' hoy' : ''}">
+    <i></i><span>${h.anio}</span><b>${h.titulo}</b>
+  </div>`).join('');
+
+/* B — trayecto como lista de obra + cinta de herramientas */
+document.getElementById('listaB').innerHTML = HITOS.map(h => `
+  <div class="fila">
+    <span class="anio">${h.anio}</span>
+    <span class="que">${h.titulo}<small>${h.detalle}</small></span>
+    <span class="sello">${h.escudo ? `<img src="${h.escudo}" alt="">` : ''}</span>
+  </div>`).join('');
+
+const util = u => `
+  <div class="util${u.negativo ? ' negativo' : ''}" style="--c:${u.color}">
+    <span class="disco"><img src="${u.logo}" alt="${u.nombre}"></span>
+    <span>${u.nombre}</span>
+  </div>`;
+// duplicado para que el rodillo empalme sin costura
+document.getElementById('rodilloB').innerHTML = UTILES.map(util).join('') + UTILES.map(util).join('');
+
+/* C — sistema al centro */
+const nucleo = document.getElementById('nucleoC');
+[[0, 6, 'gira'], [1, 2, 'gira inv']].forEach(([capa, n, clase]) => {
+  const dentro = capa === 0 ? UTILES.slice(0, 6) : UTILES.slice(6);
+  const g = document.createElement('div');
+  g.className = clase;
+  g.innerHTML = dentro.map((u, i) => {
+    const a = (360 / dentro.length) * i;
+    return `<span class="sat${u.negativo ? ' negativo' : ''}" style="--a:${a}deg; --c:${u.color}">
+              <span class="pos"><span class="cara"><img src="${u.logo}" alt="${u.nombre}"></span></span>
+            </span>`;
+  }).join('');
+  nucleo.appendChild(g);
+});
+
+document.getElementById('baseC').innerHTML = HITOS.map(h => `
+  <div class="hito-c${h.hoy ? ' hoy' : ''}"><span>${h.anio}</span><b>${h.titulo}</b></div>`).join('');
+</script>
+</body>
+</html>
