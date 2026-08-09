@@ -7,9 +7,9 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v9.0 — campo vivo, vidrio líquido y globo de ubicación.
-Verificado en escritorio (1600 px) y en móvil (412 px) con Chrome headless.
-Sin publicar.**
+**v12.1 — la obra se levanta con el scroll, campo de piedra, herramientas
+por etapa. Verificado en escritorio (1600 px) y en móvil (412 px) con
+Chrome real. Sin publicar.**
 
 Pendientes antes de publicar:
 1. Verificar en un **teléfono real** (lo automatizado cubre el ancho, no el
@@ -17,6 +17,9 @@ Pendientes antes de publicar:
 2. Identidad gráfica propia — la entrada sigue diciendo **STICK INDUSTRIES**
    y la barra ya dice **KEVIN GIL**: falta decidir cuál manda
 3. Publicar en GitHub Pages o dominio propio
+
+Lo que más subiría el nivel, y depende de material de Kevin:
+**fotos de obra construida en el mismo encuadre del render.**
 
 ## Arquitectura
 
@@ -27,18 +30,21 @@ sin dependencias ni framework.
 PORTAFOLIO/
 ├── index.html                   el sitio completo
 ├── CLAUDE.md                    este archivo
-├── propuestas/                  las tres portadas que se compararon
+├── propuestas/                  variantes que se compararon y se descartaron
+├── fuentes/                     material pesado de origen (fuera del repo)
 ├── assets/
 │   ├── marca/                   favicon
 │   ├── logos/                   logos de software y escudos de formación
 │   ├── renders/                 imágenes en 1600 y 2560 px
 │   ├── video/                   6 recorridos (1280x720) + fotogramas de portada
+│   ├── proceso/g · proceso/p    la obra levantándose: 80 y 60 cuadros
 │   ├── datos/tierra.json        silueta de continentes para el globo (13 KB)
 │   └── paletas.json             color dominante por proyecto
 └── herramientas/
     ├── optimizar-imagenes.ps1   extrae y convierte los renders del archivo
     ├── optimizar-videos.ps1     comprime los recorridos
     ├── extraer-paletas.ps1      saca el color dominante de cada portada
+    ├── preparar-proceso.ps1     saca los cuadros de la escena de Proceso
     └── preparar-tierra.py       adelgaza el GeoJSON de Natural Earth
 ```
 
@@ -57,9 +63,9 @@ Todo se recorre desplazando. El menú salta con un desplazamiento animado.
    cada vez**, tomado de la lista `FACHADAS`.
 2. **Proyectos** — cuatro hojas verticales a sangre, de borde a borde de la
    ventana. Botón *Ver todos los proyectos* → índice con filtros por grupo.
-3. **Sobre mí** — biografía y el trayecto como **rueda**: el hito del centro
-   va entero y los vecinos se reducen según su distancia al centro. Detrás,
-   las herramientas **orbitan** en dos anillos como parte del campo.
+3. **Sobre mí** — biografía; el trayecto como **rueda** —el hito del centro
+   va entero, con luz propia, y los vecinos se reducen según su distancia—;
+   y abajo las herramientas **por etapa**: Modelo, Representación, Apoyo.
 4. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail y los dos
    Instagram. Sin texto de venta.
 
@@ -67,8 +73,11 @@ Todo se recorre desplazando. El menú salta con un desplazamiento animado.
 
 **No hay color de fondo: hay un campo.** Cuatro masas de luz desenfocadas
 derivan muy despacio detrás de todo, con grano de película encima y una base
-grafito azulada (`#0b0c10`) que nunca llega a negro. El negro plano de la v8
-hacía que la página se leyera básica.
+grafito (`#15161b`) que nunca llega a negro. El negro plano de la v8 hacía
+que la página se leyera básica, y los azules y violetas saturados de la v9
+le daban aire de portada de IA: ahora el campo se mueve en tonos de piedra,
+hormigón y luz de tarde. **El mismo campo en todas las capas** — archivo y
+fichas incluidos, sin tintes por proyecto.
 
 **Vidrio líquido.** El contenido no se apoya en paneles opacos sino en
 superficies translúcidas con filo especular (`inset` claro arriba, oscuro
@@ -101,8 +110,8 @@ técnico, un solo CTA por bloque, bordes con opacidad y radios.
 - **La ficha va por encima del índice** (z-index 260 contra 210). Al revés,
   abrir un proyecto desde el índice lo montaba tapado y solo aparecía al
   cerrar el índice: era el fallo de «no abre, pero al cerrar me lleva».
-- **Los logos de software van a color siempre**, sobre placa oscura. El gris
-  que se revelaba al señalar escondía justo lo que hay que mostrar.
+- **Los logos de software van a color siempre.** El gris que se revelaba al
+  señalar escondía justo lo que hay que mostrar.
 - **Marca de agua propia: se elimina recortando 12% del encuadre**, no con
   `delogo` de ffmpeg, que deja borrón sobre líneas rectas.
 - **En la portada las letras no se animan con `transform`**: rompe el recorte
@@ -114,7 +123,7 @@ técnico, un solo CTA por bloque, bordes con opacidad y radios.
   El contenido de la ficha arranca su entrada a los 340 ms, con el clon aún
   en vuelo. Los tres juntos son lo que quita el corte al abrir un proyecto.
 - **La ficha es opaca.** Translúcida dejaba leer el texto de la página por
-  detrás de los renders. Lleva su propio campo teñido con `--th/--ts`.
+  detrás de los renders.
 - **La ficha no lleva párrafo descriptivo ni año ni estado**: basta el título
   sobre el render. Debajo queda una sola cinta con DÓNDE y CUÁNTAS.
 - **El lugar se responde girando un globo**, no escribiéndolo: canvas 2D con
