@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Herramientas — cuatro maneras, sin burbuja</title>
+<style>
+/* Cuatro formas de presentar las herramientas SIN encerrarlas en una
+   moneda. Lo que se conserva es lo unico que funcionaba: que cada logo
+   emita su propia luz. El resplandor se saca con drop-shadow sobre el
+   PNG, asi que toma la silueta real del logo y no la de una caja. */
+:root{
+  --base:#15161b; --base-2:#1d1f26; --tinta:#f7f8fa; --n-200:#dfe1e8;
+  --tenue:#adb0bb; --debil:#797d8a;
+  --linea:rgba(255,255,255,.10); --linea-fuerte:rgba(255,255,255,.26);
+  --salida:cubic-bezier(.16,1,.3,1); --suave:cubic-bezier(.4,0,.2,1);
+  --resorte:cubic-bezier(.34,1.56,.64,1);
+  --margen:clamp(1.25rem,4vw,4.5rem);
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--base);color:var(--tinta);font-family:var(--sans);line-height:1.65;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+.campo{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  background:radial-gradient(130% 85% at 50% -12%,rgba(196,204,220,.07),transparent 62%),
+  linear-gradient(180deg,var(--base-2) 0%,var(--base) 48%,#101116 100%)}
+.masa{position:absolute;border-radius:50%;filter:blur(72px);opacity:.55}
+.m1{width:66vmax;height:66vmax;left:-20vmax;top:-16vmax;
+  background:radial-gradient(circle,hsl(214 22% 62%/.30),transparent 68%)}
+.m2{width:56vmax;height:56vmax;right:-18vmax;top:6vmax;
+  background:radial-gradient(circle,hsl(32 30% 64%/.22),transparent 66%)}
+.lienzo{position:relative;z-index:1}
+
+.marca-prop{position:sticky;top:0;z-index:20;display:flex;align-items:baseline;gap:1rem;
+  padding:1rem var(--margen);backdrop-filter:blur(16px) saturate(175%);
+  background:rgba(21,22,27,.72);border-bottom:1px solid var(--linea)}
+.marca-prop b{font-size:1rem;font-weight:600;letter-spacing:-.02em}
+.marca-prop span{font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--debil)}
+.marca-prop em{font-style:normal;color:var(--tenue);font-size:.85rem;margin-left:auto;text-align:right}
+section{position:relative;min-height:92vh;display:flex;flex-direction:column;
+  justify-content:center;padding:clamp(3rem,8vh,5rem) var(--margen);overflow:hidden}
+.etiqueta{font-family:var(--mono);font-size:.61rem;letter-spacing:.28em;
+  text-transform:uppercase;color:var(--debil);margin-bottom:1.6rem}
+
+/* El brillo, comun a las cuatro: sigue la silueta del logo */
+.luz{filter:drop-shadow(0 0 10px rgba(var(--c),.55)) drop-shadow(0 0 26px rgba(var(--c),.28));
+  transition:filter .5s var(--suave),transform .55s var(--resorte)}
+.negativo .luz{filter:invert(1) brightness(1.1) drop-shadow(0 0 12px rgba(255,255,255,.3))}
+
+/* ============================================================
+   1 · CONSTELACION — los logos flotan sueltos, unidos por hilos
+   ============================================================ */
+.uno .cielo{position:relative;height:min(62vh,520px)}
+.uno svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.uno svg line{stroke:rgba(255,255,255,.12);stroke-width:1;
+  stroke-dasharray:var(--l);stroke-dashoffset:var(--l);
+  animation:trazar 1.6s var(--salida) forwards var(--r)}
+@keyframes trazar{to{stroke-dashoffset:0}}
+.uno .estrella{position:absolute;transform:translate(-50%,-50%);cursor:default;
+  display:flex;flex-direction:column;align-items:center;gap:.55rem;
+  animation:flotar var(--f) var(--suave) infinite alternate;animation-delay:var(--r)}
+@keyframes flotar{to{transform:translate(-50%,calc(-50% - 12px))}}
+.uno .estrella img{width:var(--s,46px);height:var(--s,46px);object-fit:contain}
+.uno .estrella b{font-family:var(--mono);font-size:.55rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--debil);font-weight:400;
+  opacity:0;transition:opacity .4s var(--suave)}
+.uno .estrella:hover b{opacity:1;color:var(--tenue)}
+.uno .estrella:hover .luz{transform:scale(1.16);
+  filter:drop-shadow(0 0 16px rgba(var(--c),.9)) drop-shadow(0 0 44px rgba(var(--c),.5))}
+
+/* ============================================================
+   2 · FLUJO — no es un inventario, es el orden real de trabajo
+   ============================================================ */
+.dos .etapas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(1.5rem,4vw,3.5rem);align-items:start}
+.dos .etapa{position:relative;padding-top:2.4rem}
+.dos .etapa::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(to right,var(--linea-fuerte),transparent)}
+.dos .etapa .n{position:absolute;top:-.75rem;left:0;font-family:var(--mono);font-size:.58rem;
+  letter-spacing:.22em;color:var(--debil);background:var(--base);padding-right:.7rem}
+.dos .etapa h4{font-size:1.05rem;font-weight:500;letter-spacing:-.02em;margin-bottom:.3rem}
+.dos .etapa p{color:var(--tenue);font-size:.84rem;max-width:32ch;margin-bottom:1.4rem}
+.dos .fila{display:flex;gap:1.6rem;flex-wrap:wrap;align-items:flex-end}
+.dos .pieza{display:flex;flex-direction:column;align-items:center;gap:.5rem;cursor:default}
+.dos .pieza img{width:44px;height:44px;object-fit:contain}
+.dos .pieza b{font-family:var(--mono);font-size:.53rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--debil);font-weight:400}
+.dos .pieza:hover .luz{transform:translateY(-5px) scale(1.1);
+  filter:drop-shadow(0 0 16px rgba(var(--c),.9)) drop-shadow(0 0 40px rgba(var(--c),.45))}
+.dos .pieza:hover b{color:var(--tenue)}
+@media(max-width:900px){.dos .etapas{grid-template-columns:1fr;gap:2.6rem}}
+
+/* ============================================================
+   3 · CINTA — logos grandes que cruzan, sin caja
+   ============================================================ */
+.tres .via{position:relative;padding:2.2rem 0;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 10%,#000 90%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 10%,#000 90%,transparent)}
+.tres .via + .via{margin-top:.4rem}
+.tres .rodillo{display:flex;gap:clamp(3rem,7vw,7rem);width:max-content;
+  animation:rodar var(--v,32s) linear infinite}
+.tres .via:hover .rodillo{animation-play-state:paused}
+.tres .via.atras .rodillo{animation-direction:reverse}
+@keyframes rodar{to{transform:translateX(-50%)}}
+.tres .paso{display:flex;align-items:center;gap:1rem;flex:none;cursor:default}
+.tres .paso img{width:clamp(48px,5vw,68px);height:clamp(48px,5vw,68px);object-fit:contain}
+.tres .paso b{font-size:clamp(1rem,1.8vw,1.5rem);font-weight:300;letter-spacing:-.02em;
+  color:var(--tenue);white-space:nowrap;transition:color .4s var(--suave)}
+.tres .paso:hover b{color:var(--tinta)}
+.tres .paso:hover .luz{transform:scale(1.1);
+  filter:drop-shadow(0 0 18px rgba(var(--c),.95)) drop-shadow(0 0 46px rgba(var(--c),.5))}
+
+/* ============================================================
+   4 · LINTERNA — apagados hasta que el cursor los alcanza
+   ============================================================ */
+.cuatro .muro{display:grid;grid-template-columns:repeat(4,1fr);
+  gap:clamp(1.5rem,4vw,3.4rem);max-width:1100px;margin:0 auto}
+@media(max-width:780px){.cuatro .muro{grid-template-columns:repeat(2,1fr)}}
+.cuatro .celda{display:flex;flex-direction:column;align-items:center;gap:.7rem;
+  padding:1.4rem .6rem;cursor:default}
+.cuatro .celda img{width:clamp(46px,5vw,62px);height:clamp(46px,5vw,62px);object-fit:contain;
+  filter:grayscale(1) opacity(.28);transition:filter .55s var(--suave),transform .55s var(--resorte)}
+.cuatro .celda b{font-family:var(--mono);font-size:.55rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--debil);font-weight:400;
+  opacity:.4;transition:opacity .45s var(--suave),color .45s var(--suave)}
+/* cerca = lo marca el JS segun la distancia al cursor */
+.cuatro .celda.cerca img{filter:drop-shadow(0 0 14px rgba(var(--c),.75)) drop-shadow(0 0 36px rgba(var(--c),.35));
+  transform:translateY(-4px) scale(1.06)}
+.cuatro .celda.cerca.negativo img{filter:invert(1) brightness(1.1) drop-shadow(0 0 14px rgba(255,255,255,.35))}
+.cuatro .celda.cerca b{opacity:1;color:var(--tenue)}
+.cuatro .pista{text-align:center;font-family:var(--mono);font-size:.55rem;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--debil);margin-top:2rem}
+</style>
+</head>
+<body>
+
+<div class="campo" aria-hidden="true"><div class="masa m1"></div><div class="masa m2"></div></div>
+
+<div class="lienzo">
+
+<div class="marca-prop"><span>Herramientas</span><b>1 · Constelación</b>
+  <em>Sueltos y unidos por hilos. Flotan; al señalar uno se enciende.</em></div>
+<section class="uno">
+  <div class="etiqueta">Con qué trabajo</div>
+  <div class="cielo" id="cielo"></div>
+</section>
+
+<div class="marca-prop"><span>Herramientas</span><b>2 · Flujo de trabajo</b>
+  <em>No un inventario: el orden real en que se usan. Cuenta el proceso.</em></div>
+<section class="dos">
+  <div class="etiqueta">Cómo se hace</div>
+  <div class="etapas" id="etapas"></div>
+</section>
+
+<div class="marca-prop"><span>Herramientas</span><b>3 · Cinta</b>
+  <em>Dos vías cruzando en sentidos opuestos. Se detienen al pasar el cursor.</em></div>
+<section class="tres">
+  <div class="etiqueta">Con qué trabajo</div>
+  <div class="via" id="via1"></div>
+  <div class="via atras" id="via2"></div>
+</section>
+
+<div class="marca-prop"><span>Herramientas</span><b>4 · Linterna</b>
+  <em>Apagados hasta que el cursor los alcanza. Invita a recorrerlos.</em></div>
+<section class="cuatro">
+  <div class="etiqueta">Con qué trabajo</div>
+  <div class="muro" id="muro"></div>
+  <div class="pista">Mueva el cursor sobre ellos</div>
+</section>
+
+</div>
+
+<script>
+const UTILES = [
+  { nombre:'Revit',       logo:'../assets/logos/revit.webp',      color:'54,142,235', etapa:0 },
+  { nombre:'AutoCAD',     logo:'../assets/logos/autocad.webp',    color:'229,16,80',  etapa:0 },
+  { nombre:'Civil 3D',    logo:'../assets/logos/civil3d.webp',    color:'196,19,126', etapa:0 },
+  { nombre:'SketchUp',    logo:'../assets/logos/sketchup.webp',   color:'23,124,180', etapa:0 },
+  { nombre:'D5 Render',   logo:'../assets/logos/d5.webp',         color:'138,86,246', etapa:1 },
+  { nombre:'Twinmotion',  logo:'../assets/logos/twinmotion.webp', color:'236,240,248', etapa:1, negativo:true },
+  { nombre:'Claude Code', logo:'../assets/logos/claudecode.webp', color:'217,119,87', etapa:2 },
+  { nombre:'ChatGPT',     logo:'../assets/logos/chatgpt.webp',    color:'116,170,156', etapa:2, negativo:true }
+];
+const cl = u => u.negativo ? ' negativo' : '';
+
+/* ---- 1 · Constelación ---------------------------------------- */
+/* Posiciones a mano: una constelación repartida no se consigue al
+   azar, hay que componerla. */
+const CIELO = [
+  {x:14,y:26},{x:33,y:62},{x:26,y:16},{x:47,y:34},
+  {x:62,y:70},{x:72,y:24},{x:86,y:56},{x:56,y:12}
+];
+const ENLACES_C = [[0,2],[2,3],[3,1],[1,4],[4,6],[3,7],[7,5],[5,6]];
+const cielo = document.getElementById('cielo');
+let svg = '<svg>';
+ENLACES_C.forEach(([a,b], i) => {
+  const p = CIELO[a], q = CIELO[b];
+  svg += `<line x1="${p.x}%" y1="${p.y}%" x2="${q.x}%" y2="${q.y}%"
+           style="--l:600; --r:${(i*.12).toFixed(2)}s"></line>`;
+});
+svg += '</svg>';
+cielo.innerHTML = svg + UTILES.map((u, i) => `
+  <div class="estrella${cl(u)}" style="left:${CIELO[i].x}%; top:${CIELO[i].y}%;
+       --c:${u.color}; --s:${44 + (i % 3) * 7}px; --f:${(4 + i * .5).toFixed(1)}s; --r:${(i*.3).toFixed(1)}s">
+    <img class="luz" src="${u.logo}" alt="${u.nombre}">
+    <b>${u.nombre}</b>
+  </div>`).join('');
+
+/* ---- 2 · Flujo ------------------------------------------------ */
+const ETAPAS = [
+  { n:'01', t:'Modelo',        d:'El proyecto se levanta con los espesores, los apoyos y las cotas con que se va a construir.' },
+  { n:'02', t:'Representación', d:'Del mismo modelo salen las imágenes y los recorridos. Nada se dibuja aparte.' },
+  { n:'03', t:'Apoyo',          d:'Cálculo, revisión y automatización de lo repetitivo alrededor del proyecto.' }
+];
+document.getElementById('etapas').innerHTML = ETAPAS.map((e, k) => `
+  <div class="etapa">
+    <span class="n mono">${e.n}</span>
+    <h4>${e.t}</h4>
+    <p>${e.d}</p>
+    <div class="fila">
+      ${UTILES.filter(u => u.etapa === k).map(u => `
+        <div class="pieza${cl(u)}" style="--c:${u.color}">
+          <img class="luz" src="${u.logo}" alt="${u.nombre}"><b>${u.nombre}</b>
+        </div>`).join('')}
+    </div>
+  </div>`).join('');
+
+/* ---- 3 · Cinta ------------------------------------------------ */
+const paso = u => `
+  <div class="paso${cl(u)}" style="--c:${u.color}">
+    <img class="luz" src="${u.logo}" alt="${u.nombre}"><b>${u.nombre}</b>
+  </div>`;
+const via = (lista, dur) =>
+  `<div class="rodillo" style="--v:${dur}">${lista.map(paso).join('')}${lista.map(paso).join('')}</div>`;
+document.getElementById('via1').innerHTML = via(UTILES.slice(0, 4).concat(UTILES.slice(4)), '34s');
+document.getElementById('via2').innerHTML = via(UTILES.slice(4).concat(UTILES.slice(0, 4)), '44s');
+
+/* ---- 4 · Linterna --------------------------------------------- */
+const muro = document.getElementById('muro');
+muro.innerHTML = UTILES.map(u => `
+  <div class="celda${cl(u)}" style="--c:${u.color}">
+    <img src="${u.logo}" alt="${u.nombre}"><b>${u.nombre}</b>
+  </div>`).join('');
+
+/* La cercania se calcula una vez por cuadro y solo cuando el muro
+   esta a la vista: nada de medir en cada movimiento del raton. */
+const celdas = [...muro.querySelectorAll('.celda')];
+let raton = null, pedido = false, aLaVista = false;
+new IntersectionObserver(en => { aLaVista = en[0].isIntersecting; }).observe(muro);
+addEventListener('pointermove', e => {
+  if (!aLaVista) return;
+  raton = { x:e.clientX, y:e.clientY };
+  if (pedido) return;
+  pedido = true;
+  requestAnimationFrame(() => {
+    celdas.forEach(c => {
+      const r = c.getBoundingClientRect();
+      const dx = raton.x - (r.left + r.width / 2), dy = raton.y - (r.top + r.height / 2);
+      c.classList.toggle('cerca', Math.hypot(dx, dy) < 190);
+    });
+    pedido = false;
+  });
+}, { passive:true });
+</script>
+</body>
+</html>
