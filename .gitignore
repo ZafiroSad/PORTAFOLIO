@@ -1,3 +1,7 @@
+# Material fuente pesado: de aqui salen los fotogramas de assets/proceso
+# con  herramientas/preparar-proceso.ps1 . No hace falta publicarlo.
+fuentes/
+
 # Material derivado: se regenera con los scripts de herramientas/
 # Se versiona igual porque GitHub Pages necesita servirlo. Si el repositorio
 # se vuelve pesado, descomentar la linea de video y publicar los recorridos

@@ -129,7 +129,7 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 /* Grano: quita el bandeado de los degradados y da textura de pelicula.
    Sin mix-blend-mode y sin desbordar la ventana: mezclar una capa del
    quintuple del area en cada cuadro costaba mas que todo lo demas. */
-.grano { position:absolute; inset:0; opacity:.045;
+.grano { position:absolute; inset:0; opacity:.045; will-change:opacity;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E"); }
 
 /* Con una capa encima el campo no se ve: no hay por que seguir
@@ -166,10 +166,16 @@ body.bloqueado .masa { animation-play-state:paused; }
   width:min(calc(100% - 2 * var(--margen)), 1180px); height:var(--barra);
   display:flex; align-items:center; justify-content:space-between;
   padding:0 .55rem 0 1.15rem; border-radius:999px;
-  transition:transform .6s var(--salida), opacity .5s var(--suave),
-             width .6s var(--salida), background .6s var(--suave);
+  transform-origin:top center;
+  transform:translateX(-50%) scale(var(--k,1));
+  transition:transform .55s var(--salida), opacity .45s var(--suave),
+             background .6s var(--suave), box-shadow .5s var(--suave);
 }
-.barra.oculta { transform:translateX(-50%) translateY(-140%); opacity:0; }
+/* Al bajar se retira a un tamaño discreto; basta acercar el cursor
+   para que vuelva entera. No se esconde: seguir viendola es lo que
+   permite saltar de seccion sin volver arriba. */
+.barra.compacta { --k:.78; opacity:.84; }
+.barra.compacta:hover, .barra.compacta:focus-within { --k:1; opacity:1; }
 .marca { display:flex; align-items:center; gap:.6rem; padding:.4rem .2rem; }
 .marca span.rotulo {
   font-family:var(--mono); font-size:.63rem; font-weight:700; letter-spacing:.22em;
@@ -207,7 +213,7 @@ body.bloqueado .masa { animation-play-state:paused; }
 }
 
 .avance { position:fixed; top:0; left:0; right:0; height:1.5px; z-index:121;
-  background:linear-gradient(to right, transparent, hsl(var(--th) 70% 70%), var(--tinta));
+  background:linear-gradient(to right, transparent, var(--n-200), var(--tinta));
   transform:scaleX(0); transform-origin:left; }
 
 /* ============ Entrada ========================================= */
@@ -249,7 +255,8 @@ body.bloqueado .masa { animation-play-state:paused; }
 @keyframes cruzar { to { transform:translateX(-50%) scaleX(1); } }
 
 /* ============ Secciones ======================================= */
-.seccion { position:relative; min-height:100svh; padding-top:calc(var(--barra) + 1.8rem);
+.seccion { content-visibility:auto; contain-intrinsic-size:auto 100svh;
+  position:relative; min-height:100svh; padding-top:calc(var(--barra) + 1.8rem);
   display:flex; flex-direction:column; }
 .seccion-cuerpo {
   flex:1; display:flex; flex-direction:column;
@@ -337,7 +344,20 @@ body.bloqueado .masa { animation-play-state:paused; }
 .proceso-fijo { position:sticky; top:0; height:100svh; overflow:hidden;
   display:flex; align-items:center; }
 .proceso canvas { position:absolute; inset:0; width:100%; height:100%; }
-.proceso-texto { position:relative; z-index:2; padding:0 var(--margen); max-width:34rem; }
+/* El video es negro por la izquierda al principio y abre a cielo al
+   final: el velo apaga esa mitad para que el texto se lea siempre,
+   sin recuadros. */
+.proceso-velo { position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:linear-gradient(100deg, rgba(21,22,27,.92) 0%, rgba(21,22,27,.70) 24%,
+             rgba(21,22,27,.14) 48%, rgba(21,22,27,0) 66%); }
+@media (max-width:860px){
+  .proceso-velo { background:linear-gradient(to top, rgba(21,22,27,.96) 12%,
+                  rgba(21,22,27,.55) 42%, rgba(21,22,27,0) 72%); }
+}
+/* El final de la escena abre a cielo claro: el texto necesita su
+   propia sombra, que cuesta menos que apagar el render entero. */
+.proceso-texto { position:relative; z-index:2; padding:0 var(--margen); max-width:34rem;
+  text-shadow:0 1px 18px rgba(12,13,17,.75), 0 0 44px rgba(12,13,17,.55); }
 .proceso-texto h2 { font-size:clamp(1.8rem,4.2vw,3.1rem); font-weight:600;
   letter-spacing:-.035em; line-height:1.07; margin-bottom:1.1rem; }
 .proceso-apunte { color:var(--tenue); font-size:.95rem; max-width:38ch; margin-bottom:1.8rem; }
@@ -452,48 +472,44 @@ body.bloqueado .masa { animation-play-state:paused; }
 .btn-todos:hover .disco svg { stroke:var(--base); }
 
 /* ============ SOBRE MÍ ======================================== */
-/* CONSTELACION DE HERRAMIENTAS
-   Los logos no van en cajas: flotan sueltos por el borde de la
-   seccion, unidos por hilos que se dibujan al entrar, y cada uno
-   emite su propia luz. El resplandor se saca con drop-shadow sobre el
-   PNG, asi que toma la silueta real del logo y no la de una moneda.
-   Las posiciones rodean el contenido en vez de cruzarlo. */
-.sobre-marco { position:relative; overflow:hidden; }
-.constelacion { position:absolute; inset:0; z-index:0; pointer-events:none;
-  opacity:0; transition:opacity 1.8s var(--suave); }
-.constelacion.viva { opacity:.62; }
-.constelacion svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
-.constelacion svg line { stroke:rgba(255,255,255,.10); stroke-width:1;
-  stroke-dasharray:900; stroke-dashoffset:900; }
-.constelacion.viva svg line { animation:trazarHilo 1.8s var(--salida) forwards var(--r,0s); }
-@keyframes trazarHilo { to { stroke-dashoffset:0 } }
-
-.estrella { position:absolute; transform:translate(-50%,-50%); pointer-events:auto;
-  display:flex; flex-direction:column; align-items:center; gap:.5rem;
-  animation:flotar var(--f,6s) var(--suave) infinite alternate; animation-delay:var(--r,0s); }
-@keyframes flotar { to { transform:translate(-50%, calc(-50% - 13px)) } }
-.estrella img { width:var(--s,46px); height:var(--s,46px); object-fit:contain;
-  filter:drop-shadow(0 0 10px rgba(var(--c),.55)) drop-shadow(0 0 26px rgba(var(--c),.26));
+/* HERRAMIENTAS — el orden real de trabajo
+   No es un inventario de logos flotando: son tres etapas, y cada
+   herramienta esta en la suya. Deja de decir «se usar ocho programas»
+   y pasa a decir «asi trabajo». Sin cajas: el resplandor sale de
+   drop-shadow sobre el propio PNG, asi que toma su silueta. */
+.sobre-marco { position:relative; }
+.flujo { display:grid; grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:clamp(1.2rem,3vw,2.6rem); margin-top:clamp(1.2rem,2.6vh,2rem);
+  padding-top:clamp(1.1rem,2.2vh,1.6rem); border-top:1px solid var(--linea); }
+.etapa { position:relative; opacity:0; transform:translateY(20px);
+  transition:opacity .8s var(--suave), transform .9s var(--salida); }
+.flujo.visible .etapa { opacity:1; transform:none; }
+.flujo.visible .etapa:nth-child(2) { transition-delay:.10s }
+.flujo.visible .etapa:nth-child(3) { transition-delay:.20s }
+.etapa .n { font-family:var(--mono); font-size:.55rem; letter-spacing:.22em; color:var(--debil); }
+.etapa h4 { font-size:.98rem; font-weight:500; letter-spacing:-.015em; margin:.25rem 0 .3rem; }
+.etapa p { font-size:.82rem; line-height:1.5; color:var(--tenue); max-width:30ch; margin-bottom:1.1rem; }
+.utiles { display:flex; gap:clamp(.9rem,2vw,1.5rem); flex-wrap:wrap; align-items:flex-end; }
+.util { display:flex; flex-direction:column; align-items:center; gap:.5rem; }
+.util img { width:clamp(34px,3.4vw,44px); height:clamp(34px,3.4vw,44px); object-fit:contain;
+  filter:drop-shadow(0 0 9px rgba(var(--c),.5)) drop-shadow(0 0 22px rgba(var(--c),.22));
   transition:filter .5s var(--suave), transform .55s var(--resorte); }
-.estrella.negativo img {
-  filter:invert(1) brightness(1.1) drop-shadow(0 0 11px rgba(255,255,255,.28)); }
-.estrella b { font-family:var(--mono); font-size:.52rem; letter-spacing:.16em;
-  text-transform:uppercase; color:var(--debil); font-weight:400;
-  opacity:0; transition:opacity .4s var(--suave); }
-.estrella:hover b { opacity:1; color:var(--tenue); }
-.estrella:hover img { transform:scale(1.16);
-  filter:drop-shadow(0 0 16px rgba(var(--c),.95)) drop-shadow(0 0 44px rgba(var(--c),.5)); }
-.estrella.negativo:hover img {
-  filter:invert(1) brightness(1.15) drop-shadow(0 0 18px rgba(255,255,255,.5)); }
-@media (max-width:960px){ .constelacion { display:none; } }
+.util.negativo img { filter:invert(1) brightness(1.1) drop-shadow(0 0 10px rgba(255,255,255,.26)); }
+.util b { font-family:var(--mono); font-size:.5rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--debil); font-weight:400; transition:color .4s var(--suave); }
+.util:hover img { transform:translateY(-4px) scale(1.1);
+  filter:drop-shadow(0 0 15px rgba(var(--c),.95)) drop-shadow(0 0 38px rgba(var(--c),.45)); }
+.util.negativo:hover img { filter:invert(1) brightness(1.15) drop-shadow(0 0 16px rgba(255,255,255,.45)); }
+.util:hover b { color:var(--tenue); }
+@media (max-width:900px){ .flujo { grid-template-columns:1fr; gap:1.8rem } }
 
 .sobre-contenido { position:relative; z-index:1; }
-.bio { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); gap:clamp(2rem,6vw,6rem); align-items:center; }
+.bio { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); gap:clamp(1.6rem,5vw,4.5rem); align-items:center; }
 @media (max-width:960px){ .bio { grid-template-columns:1fr; gap:2.5rem } }
-.bio p { color:var(--tenue); font-size:.95rem; margin-bottom:.85rem; max-width:56ch; }
+.bio p { color:var(--tenue); font-size:.92rem; margin-bottom:.7rem; max-width:56ch; }
 .bio p strong { color:var(--tinta); font-weight:500; }
-.bio .destacado { font-size:clamp(1.05rem,1.5vw,1.24rem); color:var(--n-200); line-height:1.5;
-  letter-spacing:-.01em; margin-bottom:1.2rem; }
+.bio .destacado { font-size:clamp(1rem,1.35vw,1.15rem); color:var(--n-200); line-height:1.45;
+  letter-spacing:-.01em; margin-bottom:.9rem; }
 
 /* --- Rueda del trayecto --------------------------------------- */
 /* Los hitos se desplazan dentro de su propia caja. El que queda en el
@@ -511,11 +527,11 @@ body.bloqueado .masa { animation-play-state:paused; }
   -webkit-mask-image:linear-gradient(to bottom, transparent, #000 24%, #000 76%, transparent);
           mask-image:linear-gradient(to bottom, transparent, #000 24%, #000 76%, transparent); }
 /* El eje sobre el que van ensartados los hitos */
-.rueda-eje { position:absolute; left:22px; top:0; bottom:0; width:1px; z-index:0;
+.rueda-eje { position:absolute; left:32px; top:0; bottom:0; width:1px; z-index:0;
   background:linear-gradient(to bottom, transparent, var(--linea) 22%, var(--linea) 78%, transparent); }
 
 .rueda {
-  height:clamp(300px, 44vh, 450px);
+  height:clamp(250px, 34vh, 360px);
   /* overscroll auto a proposito: al llegar al extremo de la rueda el
      desplazamiento continua en la pagina en vez de quedarse atrapado */
   overflow-y:auto; overscroll-behavior:auto;
@@ -528,21 +544,27 @@ body.bloqueado .masa { animation-play-state:paused; }
 
 .hito {
   scroll-snap-align:center;
-  display:grid; grid-template-columns:46px 1fr; gap:1rem; align-items:start;
+  display:grid; grid-template-columns:64px 1fr; gap:1.2rem; align-items:start;
   padding:.7rem 0;
   transform:scale(var(--k,.8)); opacity:var(--o,.3);
   transform-origin:left center;
   transition:transform .28s var(--suave), opacity .28s var(--suave);
 }
+/* Sin burbuja: el escudo va desnudo y grande. Encerrarlo en un circulo
+   lo encogia justo donde hay que leerlo. El eje se corta con una
+   sombra del color del fondo, no con un disco dibujado. */
 .hito .escudo {
   position:relative; z-index:1;
-  width:46px; height:46px; border-radius:50%; overflow:hidden;
-  background:var(--base); border:1px solid var(--linea);
+  width:64px; height:64px;
   display:flex; align-items:center; justify-content:center;
-  font-family:var(--mono); font-size:.5rem; font-weight:700; color:var(--debil);
-  transition:border-color .4s, box-shadow .4s, background .4s;
+  font-family:var(--mono); font-size:.56rem; font-weight:700; color:var(--debil);
+  letter-spacing:.06em;
+  transition:filter .4s var(--suave);
 }
-.hito .escudo img { width:100%; height:100%; object-fit:contain; padding:7px; }
+.hito .escudo::before { content:''; position:absolute; inset:-6px -10px; z-index:-1;
+  background:radial-gradient(closest-side, var(--base) 62%, transparent); }
+.hito .escudo img { width:100%; height:100%; object-fit:contain;
+  filter:drop-shadow(0 4px 14px rgba(0,0,0,.7)); }
 .hito .anio { font-family:var(--mono); font-size:.56rem; letter-spacing:.2em; color:var(--debil); }
 .hito h4 { font-size:1rem; font-weight:500; margin:.15rem 0 .2rem; letter-spacing:-.01em; line-height:1.25; }
 .hito p { font-size:.81rem; line-height:1.5; color:var(--tenue); margin:0; max-width:44ch; }
@@ -552,13 +574,12 @@ body.bloqueado .masa { animation-play-state:paused; }
   vertical-align:middle; white-space:nowrap; }
 /* El hito del centro no solo es el mas grande: es el que tiene luz.
    El halo lo separa del eje y lleva la mirada sin necesidad de marcos. */
-.hito .escudo::after { content:''; position:absolute; inset:-14px; border-radius:50%;
-  background:radial-gradient(circle, rgba(255,255,255,.22), transparent 68%);
-  opacity:0; transition:opacity .45s var(--suave); pointer-events:none; }
-.hito.foco .escudo { border-color:var(--tinta);
-  box-shadow:0 0 0 4px var(--base), 0 0 26px -2px rgba(255,255,255,.45); }
+.hito .escudo::after { content:''; position:absolute; inset:-18px; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,255,.17), transparent 66%);
+  opacity:0; transition:opacity .45s var(--suave); pointer-events:none; z-index:-1; }
 .hito.foco .escudo::after { opacity:1; }
-.hito.foco .escudo img { filter:brightness(1.12); }
+.hito.foco .escudo img { filter:drop-shadow(0 4px 16px rgba(0,0,0,.7)) brightness(1.1); }
+.hito.foco .escudo { color:var(--tenue); }
 .hito.foco .anio { color:var(--tenue); }
 .hito.foco h4 { text-shadow:0 0 26px rgba(255,255,255,.25); }
 
@@ -577,11 +598,14 @@ body.bloqueado .masa { animation-play-state:paused; }
    color sube y tiñe la pieza entera. Sin datos a la vista — el numero,
    el correo y el usuario personal no se publican; el unico usuario que
    se muestra es el del estudio, porque ahi el usuario ES la marca. */
-.enlaces { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-  gap:.9rem; max-width:900px; margin:0 auto; }
+.enlaces { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:1rem; max-width:860px; margin:0 auto; }
+/* Rectangulares hacia abajo, no cuadradas: el icono arriba, el nombre
+   abajo y aire entre medias. */
 .enlace { --c:255,255,255;
-  position:relative; display:flex; flex-direction:column; align-items:center; gap:1rem;
-  padding:1.8rem 1.2rem 1.5rem; border-radius:24px; overflow:hidden; text-align:center;
+  position:relative; display:flex; flex-direction:column; align-items:center;
+  justify-content:space-between; gap:1.6rem; min-height:clamp(190px,24vh,238px);
+  padding:2rem 1.2rem 1.7rem; border-radius:26px; overflow:hidden; text-align:center;
   opacity:0; transform:translateY(26px);
   transition:opacity .8s var(--suave), transform .55s var(--salida),
              border-color .45s var(--suave), box-shadow .5s var(--suave), background .5s var(--suave); }
@@ -621,9 +645,9 @@ body.bloqueado .masa { animation-play-state:paused; }
    que es justo lo que se veia como fallo. */
 .ficha { position:fixed; inset:0; z-index:260;
   background:
-    radial-gradient(120% 68% at 12% 0%,   hsl(var(--th) var(--ts) 16% / .62), transparent 62%),
-    radial-gradient(110% 62% at 88% 100%, hsl(var(--th) var(--ts) 13% / .50), transparent 62%),
-    linear-gradient(180deg, #0d0e13 0%, #0a0b0f 55%, #07080b 100%);
+    radial-gradient(120% 68% at 12% 0%,   hsl(214 22% 62% / .16), transparent 64%),
+    radial-gradient(110% 62% at 88% 100%, hsl(32 30% 64% / .12),  transparent 64%),
+    linear-gradient(180deg, var(--base-2) 0%, var(--base) 52%, #101116 100%);
   overflow-y:auto; overscroll-behavior:contain;
   opacity:0; visibility:hidden;
   transition:opacity .5s var(--suave), visibility .5s, background .9s var(--suave); }
@@ -659,10 +683,10 @@ body.bloqueado .masa { animation-play-state:paused; }
 
 /* Portada de la ficha: el nombre del proyecto va SOBRE el render */
 .ficha-principal { position:relative; width:100%; height:clamp(440px,88vh,1060px); overflow:hidden; }
-.ficha-principal img { width:100%; height:116%; object-fit:cover; will-change:transform; }
+.ficha-principal img { width:100%; height:116%; object-fit:cover; }
 .ficha-principal::after { content:''; position:absolute; inset:0;
-  background:linear-gradient(to top, hsl(var(--th) 20% 5% / .94) 0%, rgba(11,12,16,.28) 42%,
-             rgba(11,12,16,.04) 72%, rgba(11,12,16,.42) 100%); }
+  background:linear-gradient(to top, rgba(21,22,27,.94) 0%, rgba(21,22,27,.28) 42%,
+             rgba(21,22,27,.04) 72%, rgba(21,22,27,.42) 100%); }
 .ficha-portada-texto { position:absolute; left:0; right:0; bottom:0; z-index:2;
   padding:clamp(1.8rem,4vw,3.6rem) var(--margen); color:#fff; }
 .ficha-portada-texto .tipo { font-family:var(--mono); font-size:.6rem; letter-spacing:.26em;
@@ -687,7 +711,7 @@ body.bloqueado .masa { animation-play-state:paused; }
   width:clamp(96px,13vw,132px); height:clamp(96px,13vw,132px); }
 .globo-marco canvas { width:100%; height:100%; display:block; }
 .globo-marco .halo { position:absolute; inset:-14%; border-radius:50%; pointer-events:none;
-  background:radial-gradient(circle, hsl(var(--th) 70% 60% / .22), transparent 62%);
+  background:radial-gradient(circle, rgba(214,224,244,.16), transparent 62%);
   filter:blur(14px); }
 .lugar-texto .rot { font-family:var(--mono); font-size:.55rem; letter-spacing:.24em;
   text-transform:uppercase; color:var(--debil); }
@@ -731,7 +755,7 @@ body.bloqueado .masa { animation-play-state:paused; }
 .galeria .fila.doble figure { height:clamp(260px,42vh,520px); }
 .galeria .fila.unica figure { height:clamp(340px,66vh,840px); }
 .galeria figure.dentro { clip-path:inset(0 0 0 0); opacity:1; }
-.galeria img { width:100%; height:110%; object-fit:cover; transition:transform 1.3s var(--salida); will-change:transform; }
+.galeria img { width:100%; height:110%; object-fit:cover; transition:transform 1.3s var(--salida); }
 .galeria figure:hover img { transform:scale(1.045); }
 .galeria figcaption { position:absolute; left:0; bottom:0; padding:1rem 1.2rem; z-index:2;
   font-family:var(--mono); font-size:.55rem; letter-spacing:.2em; text-transform:uppercase; color:#fff;
@@ -810,13 +834,14 @@ body.bloqueado .masa { animation-play-state:paused; }
 .viajero img { width:100%; height:100%; object-fit:cover; }
 
 /* ============ Índice de todos los proyectos =================== */
-/* Opaca, como la ficha: translucida dejaba leer el texto de Contacto
-   por detras de las tarjetas. */
+/* Mismo campo que el resto del sitio — piedra y luz de tarde, sin
+   tintes de color. Opaca: translucida dejaba leer el texto de
+   Contacto por detras de las tarjetas. */
 .indice-capa { position:fixed; inset:0; z-index:210;
   background:
-    radial-gradient(120% 62% at 18% 0%,   rgba(58,74,110,.30), transparent 62%),
-    radial-gradient(110% 58% at 86% 100%, rgba(72,58,110,.26), transparent 62%),
-    linear-gradient(180deg, #0d0e13 0%, #0a0b0f 55%, #07080b 100%);
+    radial-gradient(120% 62% at 18% 0%,   hsl(214 22% 62% / .16), transparent 64%),
+    radial-gradient(110% 58% at 86% 100%, hsl(32 30% 64% / .12),  transparent 64%),
+    linear-gradient(180deg, var(--base-2) 0%, var(--base) 52%, #101116 100%);
   overflow-y:auto; overscroll-behavior:contain;
   opacity:0; visibility:hidden; transition:opacity .45s var(--suave), visibility .45s; }
 .indice-capa.abierta { opacity:1; visibility:visible; }
@@ -860,7 +885,7 @@ body.bloqueado .masa { animation-play-state:paused; }
 
 /* ============ Visor ========================================== */
 .visor { position:fixed; inset:0; z-index:300;
-  background:rgba(8,9,13,.92); backdrop-filter:blur(28px) saturate(140%);
+  background:rgba(16,17,22,.975);
   display:flex; align-items:center; justify-content:center; padding:clamp(1rem,4vh,3rem);
   opacity:0; visibility:hidden; transition:opacity .45s var(--suave), visibility .45s; }
 .visor.abierto { opacity:1; visibility:visible; }
@@ -896,8 +921,8 @@ body.bloqueado .masa { animation-play-state:paused; }
      el titular se quedaba borroso. No basta con devolver la opacidad. */
   .titular .letra, .letra { opacity:1 !important; filter:none !important; }
   .subtitular span, .revelar > *, .enlace { opacity:1 !important; transform:none !important; }
-  .inicio-aparte, .baja, .constelacion, .mas-filo .marca-mas { opacity:1 }
-  .estrella { animation:none }
+  .inicio-aparte, .baja, .mas-filo .marca-mas { opacity:1 }
+  .etapa { opacity:1 !important; transform:none !important }
   .mas-filo .raya { transform:none }
   .galeria figure, .hoja, .tira-extra figure { clip-path:none !important; opacity:1 !important; transform:none !important; }
   .ficha-portada-texto h2 span, .ficha .entra { transform:none; opacity:1; filter:none }
@@ -969,6 +994,7 @@ body.bloqueado .masa { animation-play-state:paused; }
 <section class="proceso" id="proceso">
   <div class="proceso-fijo">
     <canvas id="obra" aria-hidden="true"></canvas>
+    <div class="proceso-velo" aria-hidden="true"></div>
     <div class="proceso-texto">
       <div class="etiqueta revelar"><span>Proceso</span></div>
       <h2 class="palabras" data-texto="Del modelo a la imagen."></h2>
@@ -1005,8 +1031,6 @@ body.bloqueado .masa { animation-play-state:paused; }
 <section class="seccion" id="sobre">
   <div class="seccion-cuerpo acolchado sobre-marco">
 
-    <div class="constelacion" id="constelacion" aria-hidden="true"></div>
-
     <div class="sobre-contenido">
       <div class="cabeza">
         <div>
@@ -1036,6 +1060,8 @@ body.bloqueado .masa { animation-play-state:paused; }
           </div>
         </div>
       </div>
+
+      <div class="flujo" id="flujo"></div>
     </div>
 
   </div>
@@ -1051,10 +1077,6 @@ body.bloqueado .masa { animation-play-state:paused; }
       </div>
     </div>
     <div class="contacto-cuerpo">
-      <div class="revelar">
-        <p class="apunte">Si algo de aquí le <b>despertó una pregunta</b>,
-           me gusta responderla.</p>
-      </div>
       <div class="enlaces" id="enlaces"></div>
     </div>
   </div>
@@ -1248,14 +1270,20 @@ const HITOS = [
    resplandor; negativo = logos negros, que sobre fondo oscuro hay que
    invertir para que se vean. */
 const UTILES = [
-  { nombre:'Revit',       logo:'assets/logos/revit.webp', color:'54,142,235' },
-  { nombre:'AutoCAD',     logo:'assets/logos/autocad.webp', color:'229,16,80'  },
-  { nombre:'Civil 3D',    logo:'assets/logos/civil3d.webp', color:'196,19,126' },
-  { nombre:'SketchUp',    logo:'assets/logos/sketchup.webp', color:'23,124,180' },
-  { nombre:'D5 Render',   logo:'assets/logos/d5.webp', color:'138,86,246' },
-  { nombre:'Twinmotion',  logo:'assets/logos/twinmotion.webp', color:'236,240,248', negativo:true },
-  { nombre:'Claude Code', logo:'assets/logos/claudecode.webp', color:'217,119,87'  },
-  { nombre:'ChatGPT',     logo:'assets/logos/chatgpt.webp', color:'116,170,156', negativo:true }
+  { nombre:'Revit',       logo:'assets/logos/revit.webp',      color:'54,142,235',  etapa:0 },
+  { nombre:'AutoCAD',     logo:'assets/logos/autocad.webp',    color:'229,16,80',   etapa:0 },
+  { nombre:'Civil 3D',    logo:'assets/logos/civil3d.webp',    color:'196,19,126',  etapa:0 },
+  { nombre:'SketchUp',    logo:'assets/logos/sketchup.webp',   color:'23,124,180',  etapa:0 },
+  { nombre:'D5 Render',   logo:'assets/logos/d5.webp',         color:'138,86,246',  etapa:1 },
+  { nombre:'Twinmotion',  logo:'assets/logos/twinmotion.webp', color:'236,240,248', etapa:1, negativo:true },
+  { nombre:'Claude Code', logo:'assets/logos/claudecode.webp', color:'217,119,87',  etapa:2 },
+  { nombre:'ChatGPT',     logo:'assets/logos/chatgpt.webp',    color:'116,170,156', etapa:2, negativo:true }
+];
+
+const ETAPAS = [
+  { n:'01', t:'Modelo',         d:'El proyecto se levanta con los espesores, los apoyos y las cotas con que se va a construir.' },
+  { n:'02', t:'Representación', d:'Del mismo modelo salen las imágenes y los recorridos. Nada se dibuja aparte.' },
+  { n:'03', t:'Apoyo',          d:'Cálculo, revisión y automatización de lo repetitivo alrededor del proyecto.' }
 ];
 
 let PALETAS = {};
@@ -1330,144 +1358,111 @@ document.getElementById('fases').innerHTML = FASES.map(f => `
   </div>`).join('');
 
 (function montarObra() {
-  const lienzo = document.getElementById('obra');
+  const lienzo  = document.getElementById('obra');
   const seccion = document.getElementById('proceso');
   if (!lienzo || !seccion) return;
-  const ctx = lienzo.getContext('2d');
+  const ctx = lienzo.getContext('2d', { alpha:false });
 
-  const W = 10, D = 8, H = 3.1;                 // ancho, fondo, altura de piso
-  const PILARES = [[0,0],[5,0],[10,0],[0,8],[5,8],[10,8]];
-  const A = [];                                  // {a, b, t}  t = instante de trazo
-  const arista = (a, b, t) => A.push({ a, b, t });
-  const rect = (p1, p2, p3, p4, t, paso = .004) => {
-    arista(p1, p2, t); arista(p2, p3, t + paso);
-    arista(p3, p4, t + paso * 2); arista(p4, p1, t + paso * 3);
+  /* SECUENCIA DE FOTOGRAMAS, no <video>.
+     Con un video habria que mover `currentTime` en cada cuadro, y un
+     salto pedido antes de que resuelva el anterior se descarta: medido,
+     el video se quedaba clavado con `seeking` en true para siempre.
+     Dibujar la imagen que toca no depende del decodificador, se puede
+     precargar y va igual de fino en movil. */
+  const angosto = innerWidth < 900 ||
+                  (navigator.connection && /2g|3g/.test(navigator.connection.effectiveType || ''));
+  const CARPETA = angosto ? 'assets/proceso/p/' : 'assets/proceso/g/';
+  const TOTAL   = angosto ? 60 : 120;
+
+  const cuadros = new Array(TOTAL);
+  let listos = 0, ultimo = -1, avance = 0;
+
+  const cargar = (i, prisa) => {
+    if (cuadros[i]) return;
+    const im = new Image();
+    im.decoding = 'async';
+    im.fetchPriority = prisa ? 'high' : 'low';
+    im.src = CARPETA + String(i + 1).padStart(3, '0') + '.webp';
+    im.onload = () => { listos++; if (i === indice()) pintar(); };
+    cuadros[i] = im;
   };
+  const indice = () => Math.min(TOTAL - 1, Math.round(avance * (TOTAL - 1)));
 
-  // 01 · zapatas
-  PILARES.forEach(([x, y], i) => {
-    const s = .85, t = .015 + i * .018;
-    rect([x-s,y-s,0], [x+s,y-s,0], [x+s,y+s,0], [x-s,y+s,0], t);
-  });
-  // 02 · columnas del primer nivel
-  PILARES.forEach(([x, y], i) => arista([x,y,0], [x,y,H], .17 + i * .022));
-  // vigas de amarre del primer nivel
-  [[[0,0],[10,0]], [[0,8],[10,8]], [[0,0],[0,8]], [[10,0],[10,8]], [[5,0],[5,8]]]
-    .forEach(([p, q], i) => arista([p[0],p[1],H], [q[0],q[1],H], .30 + i * .018));
-  // 03 · losa de entrepiso — retícula
-  for (let x = 0; x <= W; x += 2.5) arista([x,0,H], [x,D,H], .41 + x * .006);
-  for (let y = 0; y <= D; y += 2)   arista([0,y,H], [W,y,H], .45 + y * .007);
-  // columnas del segundo nivel
-  PILARES.forEach(([x, y], i) => arista([x,y,H], [x,y,H*2], .52 + i * .02));
-  // 04 · vigas y losa de cubierta
-  [[[0,0],[10,0]], [[0,8],[10,8]], [[0,0],[0,8]], [[10,0],[10,8]]]
-    .forEach(([p, q], i) => arista([p[0],p[1],H*2], [q[0],q[1],H*2], .63 + i * .02));
-  for (let x = 0; x <= W; x += 2.5) arista([x,0,H*2], [x,D,H*2], .70 + x * .005);
-  for (let y = 0; y <= D; y += 2)   arista([0,y,H*2], [W,y,H*2], .73 + y * .006);
-  // 05 · cerramiento: montantes de fachada y huecos de ventana
-  for (let x = 0; x <= W; x += 1.25) {
-    arista([x,0,0], [x,0,H*2], .81 + x * .008);
-    arista([x,D,0], [x,D,H*2], .84 + x * .008);
+  /* Primero un puñado repartido para tener el recorrido entero cuanto
+     antes, y el relleno despues y en segunda fila: asi nunca se ve un
+     hueco, solo mas o menos detalle. La secuencia pesa mas que la
+     portada entera, asi que no puede competir con ella: el relleno
+     espera a que la pagina haya terminado de cargar. */
+  function precargar() {
+    for (let i = 0; i < TOTAL; i += 12) cargar(i, true);
+    const resto = () => {
+      let i = 0;
+      const tanda = () => {
+        let n = 0;
+        while (i < TOTAL && n < 5) { cargar(i); i++; n++; }
+        if (i < TOTAL) setTimeout(tanda, 110);
+      };
+      tanda();
+    };
+    if (document.readyState === 'complete') setTimeout(resto, 600);
+    else addEventListener('load', () => setTimeout(resto, 600), { once:true });
   }
-  for (let y = 0; y <= D; y += 1.6) {
-    arista([0,y,0], [0,y,H*2], .87 + y * .008);
-    arista([W,y,0], [W,y,H*2], .89 + y * .008);
-  }
-  // dos ventanas a doble altura en la fachada principal
-  rect([2,0,1.2], [4.4,0,1.2], [4.4,0,H*2-.5], [2,0,H*2-.5], .93, .008);
-  rect([6,0,1.2], [8.4,0,1.2], [8.4,0,H*2-.5], [6,0,H*2-.5], .95, .008);
 
-  const proy = (p, rot, cx, cy, esc) => {
-    const X = p[0] - W/2, Y = p[1] - D/2, Z = p[2];
-    const c = Math.cos(rot), s = Math.sin(rot);
-    const xr = X * c - Y * s, yr = X * s + Y * c;
-    return [cx + xr * esc, cy + (yr * .52 - Z * .92) * esc];
-  };
-
-  let lado = { w:0, h:0 }, avance = 0, pedido = false;
   function medir() {
     const dpr = Math.min(devicePixelRatio || 1, 2);
-    lado = { w: lienzo.clientWidth, h: lienzo.clientHeight };
-    lienzo.width = Math.round(lado.w * dpr);
-    lienzo.height = Math.round(lado.h * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    lienzo.width  = Math.round(lienzo.clientWidth  * dpr);
+    lienzo.height = Math.round(lienzo.clientHeight * dpr);
   }
 
   function pintar() {
-    const { w, h } = lado;
-    if (!w) return;
-    ctx.clearRect(0, 0, w, h);
-
-    const p = avance;
-    // La camara gira un poco mientras se levanta: da volumen sin que
-    // el usuario tenga que hacer nada.
-    const rot = (-.62 + p * .42);
-    /* La escala sale de lo que MIDE la pieza proyectada — unas 13,5
-       unidades de ancho por 12,6 de alto contando la diagonal — no de
-       un divisor a ojo: asi la obra cabe entera en cualquier ventana. */
-    const anchoUtil = w > 900 ? w * .46 : w * .88;
-    const esc = Math.min(anchoUtil / 13.5, h * .74 / 12.6);
-    const cx = w > 900 ? w * .70 : w * .5;
-    const cy = h * (w > 900 ? .62 : .52);
-
-    // suelo de referencia
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = 'rgba(255,255,255,.05)';
-    for (let x = -3; x <= W + 3; x += 2.5) {
-      const a = proy([x,-3,0], rot, cx, cy, esc), b = proy([x,D+3,0], rot, cx, cy, esc);
-      ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
-    }
-    for (let y = -3; y <= D + 3; y += 2.5) {
-      const a = proy([-3,y,0], rot, cx, cy, esc), b = proy([W+3,y,0], rot, cx, cy, esc);
-      ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
-    }
-
-    const TRAZO = .045;   // cuanto dura el dibujado de cada arista
-    A.forEach(({ a, b, t }) => {
-      const k = (p - t) / TRAZO;
-      if (k <= 0) return;
-      const q = Math.min(1, k);
-      const pa = proy(a, rot, cx, cy, esc), pb = proy(b, rot, cx, cy, esc);
-      const fx = pa[0] + (pb[0] - pa[0]) * q, fy = pa[1] + (pb[1] - pa[1]) * q;
-      // recien trazada = brillante; ya asentada = tenue
-      const fresco = Math.max(0, 1 - k / 3);
-      ctx.lineWidth = 1 + fresco * .9;
-      ctx.strokeStyle = `rgba(255,255,255,${(.30 + fresco * .55).toFixed(3)})`;
-      ctx.beginPath(); ctx.moveTo(pa[0], pa[1]); ctx.lineTo(fx, fy); ctx.stroke();
-      if (fresco > .05) {                       // punto de avance del trazo
-        ctx.beginPath(); ctx.arc(fx, fy, 1.6, 0, 7);
-        ctx.fillStyle = `rgba(255,255,255,${(fresco * .9).toFixed(2)})`; ctx.fill();
+    const i = indice();
+    // Si el que toca aun no ha llegado, se usa el mas cercano que si
+    let im = cuadros[i];
+    if (!im || !im.complete || !im.naturalWidth) {
+      for (let d = 1; d < TOTAL; d++) {
+        const a = cuadros[i-d], b = cuadros[i+d];
+        if (a && a.complete && a.naturalWidth) { im = a; break; }
+        if (b && b.complete && b.naturalWidth) { im = b; break; }
       }
-    });
-  }
+    }
+    if (!im || !im.complete || !im.naturalWidth) return;
 
-  function pedirPintado() {
-    if (pedido) return;
-    pedido = true;
-    requestAnimationFrame(() => { pintar(); pedido = false; });
+    const W = lienzo.width, H = lienzo.height;
+    const escala = Math.max(W / im.naturalWidth, H / im.naturalHeight);
+    const w = im.naturalWidth * escala, h = im.naturalHeight * escala;
+    ctx.fillStyle = '#0c0d10';
+    ctx.fillRect(0, 0, W, H);
+    ctx.drawImage(im, (W - w) * .62, (H - h) * .5, w, h);
+    ultimo = i;
   }
 
   const fases = [...document.querySelectorAll('.fase')];
   const regla = document.getElementById('proceso-avance');
+  let pedido = false;
   function recalcular() {
-    const caja = seccion.getBoundingClientRect();
-    const recorrido = seccion.offsetHeight - innerHeight;
-    avance = recorrido > 0 ? Math.min(1, Math.max(0, -caja.top / recorrido)) : 0;
-    if (quieto()) avance = 1;
-    regla.style.height = `${(avance * 100).toFixed(1)}%`;
-    fases.forEach(f => f.classList.toggle('viva', avance >= Number(f.dataset.desde)));
-    pedirPintado();
+    if (pedido) return;
+    pedido = true;
+    requestAnimationFrame(() => {
+      pedido = false;
+      const caja = seccion.getBoundingClientRect();
+      const recorrido = seccion.offsetHeight - innerHeight;
+      avance = recorrido > 0 ? Math.min(1, Math.max(0, -caja.top / recorrido)) : 0;
+      regla.style.height = (avance * 100).toFixed(1) + '%';
+      fases.forEach(f => f.classList.toggle('viva', avance >= Number(f.dataset.desde)));
+      if (indice() !== ultimo) pintar();
+    });
   }
 
-  let aLaVista = false;
+  let aLaVista = false, arrancado = false;
   new IntersectionObserver(en => {
     aLaVista = en[0].isIntersecting;
+    if (aLaVista && !arrancado) { arrancado = true; precargar(); }
     if (aLaVista) { medir(); recalcular(); }
-  }, { rootMargin:'200px' }).observe(seccion);
+  }, { rootMargin: '250px' }).observe(seccion);
 
-  addEventListener('scroll', () => { if (aLaVista) recalcular(); }, { passive:true });
-  addEventListener('resize', () => { medir(); recalcular(); });
-  medir(); recalcular();
+  addEventListener('scroll', () => { if (aLaVista) recalcular(); }, { passive: true });
+  addEventListener('resize', () => { medir(); ultimo = -1; recalcular(); });
+  medir();
 })();
 
 /* =================================================================
@@ -1627,42 +1622,19 @@ rueda.addEventListener('scroll', () => { ruedaALaVista = true; pedirGiro(); }, {
 addEventListener('resize', pedirGiro);
 girarRueda();
 
-/* --- Constelacion de herramientas ----------------------------- */
-/* Las posiciones van a mano y en porcentaje: rodean el contenido por
-   el borde en vez de cruzarlo, que era el problema de los anillos —
-   los logos pasaban por encima del texto. Los hilos enlazan cada una
-   con la siguiente, de modo que el conjunto enmarca la seccion. */
-(function montarConstelacion() {
-  const cielo = document.getElementById('constelacion');
-  if (!cielo) return;
-  /* Franja de arriba y franja de abajo: son las dos bandas que ningun
-     texto ocupa. El titulo vive sobre el 27% y la bio baja hasta el
-     80%, asi que cualquier estrella ahi en medio se le monta encima. */
-  const SITIOS = [
-    { x:5,  y:15 }, { x:20, y:6  }, { x:38, y:13 }, { x:57, y:5  },
-    { x:75, y:12 }, { x:92, y:18 }, { x:66, y:92 }, { x:23, y:94 }
-  ];
-  // La cadena no se cierra: un hilo del final al principio cruzaria
-  // la seccion entera por la diagonal.
-  const hilos = [[0,1],[1,2],[2,3],[3,4],[4,5],[7,6]];
-
-  const svg = `<svg aria-hidden="true">${hilos.map(([a, b], i) => {
-    const p = SITIOS[a], q = SITIOS[b];
-    return `<line x1="${p.x}%" y1="${p.y}%" x2="${q.x}%" y2="${q.y}%"
-                  style="--r:${(i * .13).toFixed(2)}s"></line>`;
-  }).join('')}</svg>`;
-
-  cielo.innerHTML = svg + UTILES.map((u, i) => {
-    const s = SITIOS[i % SITIOS.length];
-    return `<div class="estrella${u.negativo ? ' negativo' : ''}"
-                 style="left:${s.x}%; top:${s.y}%; --c:${u.color};
-                        --s:${44 + (i % 3) * 8}px; --f:${(5 + i * .55).toFixed(1)}s;
-                        --r:${(i * .28).toFixed(2)}s">
-              <img src="${u.logo}" alt="${u.nombre}" loading="lazy">
-              <b>${u.nombre}</b>
-            </div>`;
-  }).join('');
-})();
+/* --- Herramientas por etapa ----------------------------------- */
+document.getElementById('flujo').innerHTML = ETAPAS.map((e, k) => `
+  <div class="etapa">
+    <span class="n mono">${e.n}</span>
+    <h4>${e.t}</h4>
+    <p>${e.d}</p>
+    <div class="utiles">
+      ${UTILES.filter(u => u.etapa === k).map(u => `
+        <span class="util${u.negativo ? ' negativo' : ''}" style="--c:${u.color}">
+          <img src="${u.logo}" alt="${u.nombre}" loading="lazy"><b>${u.nombre}</b>
+        </span>`).join('')}
+    </div>
+  </div>`).join('');
 
 /* =================================================================
    CONTACTO
@@ -1839,11 +1811,10 @@ const contenido   = document.getElementById('ficha-contenido');
 const fichaNombre = document.getElementById('ficha-nombre');
 let proyectoActual = null, hojaOrigen = null, globoActual = null;
 
-function aplicarTinte(slug) {
-  const p = PALETAS[slug];
-  document.documentElement.style.setProperty('--th', p ? p.h : 210);
-  document.documentElement.style.setProperty('--ts', p ? p.s + '%' : '16%');
-}
+/* El fondo ya no se tiñe con el color del proyecto: todo el sitio
+   comparte el mismo campo de piedra. Se conservan las paletas por si
+   vuelven a hacer falta en otra parte. */
+function aplicarTinte() {}
 
 /* Reparte las piezas en filas COMPLETAS: dos iguales o una a lo ancho.
    Se alterna para que la lectura tenga ritmo, y lo que sobre al final
@@ -2356,11 +2327,14 @@ const enlacesMenu = [...document.querySelectorAll('.menu a')];
 const laminaImg = document.getElementById('render-inicio');
 
 /* El indicador liquido se coloca bajo el enlace activo */
+/* Se mide con offsetLeft y no con getBoundingClientRect: la barra se
+   escala al encogerse, y las medidas de pantalla ya vienen escaladas
+   mientras que la gota vive dentro de esa misma escala. Mezclarlas
+   dejaba el indicador corrido. */
 function moverGota(a) {
   if (!a) { menu.classList.remove('viva'); return; }
-  const c = a.getBoundingClientRect(), m = menu.getBoundingClientRect();
-  gota.style.width = `${c.width}px`;
-  gota.style.transform = `translateX(${c.left - m.left}px)`;
+  gota.style.width = `${a.offsetWidth}px`;
+  gota.style.transform = `translateX(${a.offsetLeft}px)`;
   menu.classList.add('viva');
 }
 enlacesMenu.forEach(a => a.addEventListener('pointerenter', () => moverGota(a)));
@@ -2376,7 +2350,7 @@ function moverParallax(raiz, alto) {
   });
 }
 
-let tickScroll = false, ultimaY = 0, seccionActiva = null;
+let tickScroll = false, seccionActiva = null;
 addEventListener('scroll', () => {
   if (tickScroll) return;
   tickScroll = true;
@@ -2388,9 +2362,8 @@ addEventListener('scroll', () => {
     // El campo del fondo se desplaza con la pagina, mas lento
     campo.style.setProperty('--y', `${(y * .08).toFixed(1)}px`);
 
-    // La barra se esconde al bajar y vuelve al subir
-    barra.classList.toggle('oculta', y > ultimaY + 4 && y > innerHeight * .7);
-    ultimaY = y;
+    // La barra se encoge en cuanto se deja atras la portada
+    barra.classList.toggle('compacta', y > innerHeight * .6);
 
     // La portada se hunde un poco mas lento que la pagina
     if (laminaImg && y < innerHeight * 1.2) {
@@ -2428,7 +2401,7 @@ const observador = new IntersectionObserver(en => {
     observador.unobserve(e.target);
   });
 }, { threshold:.12, rootMargin:'0px 0px -60px 0px' });
-document.querySelectorAll('.revelar, .palabras, .vitrina, .enlaces, .constelacion')
+document.querySelectorAll('.revelar, .palabras, .vitrina, .enlaces, .flujo')
   .forEach(el => observador.observe(el));
 
 /* El recorte anclado a la ventana solo hace falta mientras el titular
