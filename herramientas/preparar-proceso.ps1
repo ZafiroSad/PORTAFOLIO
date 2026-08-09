@@ -27,15 +27,17 @@ foreach ($d in @($grandes, $chicos)) {
   New-Item -ItemType Directory -Force $d | Out-Null
 }
 
-# Escritorio: uno de cada dos cuadros (120 de 240), 1040 px de ancho
+# Escritorio: uno de cada TRES cuadros (80 de 240) a 1920 px y calidad
+# alta. En un portafolio de visualizacion la imagen ES el producto: se
+# prefiere pesar mas antes que servir un render blando.
 ffmpeg -y -v error -i $Fuente `
-  -vf "select='not(mod(n\,2))',scale=1040:-2" -vsync vfr `
-  -c:v libwebp -quality 68 -compression_level 6 "$grandes\%03d.webp"
+  -vf "select='not(mod(n\,3))',scale=1920:-2" -vsync vfr `
+  -c:v libwebp -quality 86 -compression_level 6 "$grandes\%03d.webp"
 
-# Movil: uno de cada cuatro, 720 px
+# Movil: uno de cada cuatro, 1080 px
 ffmpeg -y -v error -i $Fuente `
-  -vf "select='not(mod(n\,4))',scale=720:-2" -vsync vfr `
-  -c:v libwebp -quality 68 -compression_level 6 "$chicos\%03d.webp"
+  -vf "select='not(mod(n\,4))',scale=1080:-2" -vsync vfr `
+  -c:v libwebp -quality 82 -compression_level 6 "$chicos\%03d.webp"
 
 $ng = (Get-ChildItem $grandes).Count
 $np = (Get-ChildItem $chicos).Count

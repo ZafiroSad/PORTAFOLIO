@@ -142,9 +142,14 @@ técnico, un solo CTA por bloque, bordes con opacidad y radios.
   Chrome, el vídeo se quedaba clavado con `seeking` en `true` para siempre,
   con `readyState` cayendo de 4 a 1. Dibujar la imagen que toca no depende
   del decodificador. Se regenera con `herramientas/preparar-proceso.ps1`.
-- **La secuencia no compite con la portada**: unos pocos cuadros repartidos
-  entran con prioridad alta y el relleno espera al evento `load`. Hasta que
-  la página está lista se descargan 1,1 MB y **cero** fotogramas.
+- **La secuencia va a 1920 px y calidad 86** — 80 cuadros, 13 MB. Se probó
+  a 1040 px para ahorrar peso y el resultado fue un render blando: en un
+  portafolio de visualización la imagen ES el producto, así que aquí el peso
+  cede. El lienzo además limita su densidad de píxeles al ancho real de la
+  fuente, porque pedirle más solo estira la imagen.
+- **La secuencia no compite con la portada**: solo el primer cuadro entra
+  antes, y el resto espera al evento `load`. Hasta que la página está lista
+  se descargan ~2,3 MB y **un** fotograma; los otros 79 llegan después.
 - **Los escudos del trayecto van sin burbuja y a 64 px.** El eje se corta con
   una sombra del color del fondo, no con un disco. Del logotipo de la UPB se
   recortó **solo el escudo**: el texto va en negro y desaparecía sobre el
