@@ -3,57 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PORTAFOLIO - KEVIN GIL</title>
-<meta name="description" content="Ingeniero civil y visualizador arquitectónico. Renders y recorridos 3D. Bucaramanga, Colombia.">
+<title>PORTAFOLIO · KEVIN GIL</title>
+<meta name="description" content="Portafolio de Kevin Gil. Ingeniero civil y visualizador arquitectónico. Modelo, imagen y recorrido de proyectos construibles. Bucaramanga, Colombia.">
 <link rel="icon" href="assets/marca/favicon.png">
-<meta property="og:title" content="PORTAFOLIO - KEVIN GIL">
+<meta property="og:title" content="PORTAFOLIO · KEVIN GIL">
 <meta property="og:description" content="Ingeniero civil y visualizador arquitectónico.">
 <meta property="og:image" content="assets/renders/cazadores-09.webp">
 <meta property="og:type" content="website">
 
 <style>
 /* =================================================================
-   STICK INDUSTRIES — portafolio de Kevin Gil
+   PORTAFOLIO — Kevin Gil
    Un solo archivo, sin librerias ni dependencias externas.
 
-   ESCALA OSCURA. El render es la unica fuente de luz de la pagina:
-   todo lo demas —fondo, texto, bordes— se mantiene por debajo de el
-   en luminosidad para que la imagen sea siempre lo mas brillante en
-   pantalla. Es la convencion de los estudios de visualizacion y la
-   razon por la que un mismo render se ve mejor sobre negro.
+   No hay "color de fondo". Hay un CAMPO: cuatro masas de luz que
+   derivan muy despacio detras de todo, grano de pelicula encima y
+   una base que nunca llega a negro. El contenido no se apoya en
+   paneles opacos sino en VIDRIO: superficies translucidas con filo
+   especular que dejan pasar ese campo. El render sigue siendo lo
+   mas brillante de la pantalla; el vidrio solo lo enmarca.
 
    Se conservan las reglas del STICK_UI_SYSTEM: mono para todo dato
    tecnico, un solo CTA por bloque, bordes con opacidad y radios.
    ================================================================= */
 :root {
-  --n-950:#09090b;   /* fondo */
-  --n-900:#0e0e10;   /* panel */
-  --n-850:#161618;   /* hueco de imagen */
-  --n-800:#232326;
-  --n-600:#52525b;
-  --n-500:#71717a;   /* debil */
-  --n-400:#a1a1aa;   /* tenue */
-  --n-200:#e4e4e7;
-  --n-50: #fafafa;   /* tinta */
+  /* --- Base: grafito azulado, nunca negro puro --- */
+  --base:   #0b0c10;
+  --base-2: #101219;
+  --tinta:  #f7f8fa;
+  --n-200:  #dfe1e8;
+  --tenue:  #a6a9b6;
+  --debil:  #6f7383;
 
-  --fondo:var(--n-950);
-  --panel:var(--n-900);
-  --tinta:var(--n-50);
-  --tenue:var(--n-400);
-  --debil:var(--n-500);
-  --linea:rgba(250,250,250,.11);
-  --linea-fuerte:rgba(250,250,250,.28);
-  --vidrio:rgba(9,9,11,.72);
+  --linea:        rgba(255,255,255,.10);
+  --linea-fuerte: rgba(255,255,255,.26);
 
-  /* Tinte del proyecto abierto: el color dominante de su render tiñe
-     el fondo de la ficha muy por debajo del umbral de lectura. */
-  --th:0; --ts:0%;
+  /* --- Vidrio liquido --- */
+  --v-fondo: linear-gradient(148deg,
+              rgba(255,255,255,.085) 0%,
+              rgba(255,255,255,.028) 44%,
+              rgba(255,255,255,.055) 100%);
+  --v-borde: rgba(255,255,255,.11);
+  --v-blur:  blur(26px) saturate(180%);
+  --v-filo:  inset 0 1px 0 rgba(255,255,255,.18),
+             inset 0 -1px 0 rgba(255,255,255,.045),
+             inset 1px 0 0 rgba(255,255,255,.05),
+             inset -1px 0 0 rgba(255,255,255,.05);
+  --v-sombra: 0 22px 60px -26px rgba(0,0,0,.85);
+
+  /* Tinte del proyecto abierto: el color dominante de su render
+     empuja el campo del fondo, muy por debajo del umbral de lectura */
+  --th:210; --ts:16%;
 
   --margen: clamp(1.25rem, 4vw, 4.5rem);
-  --barra: 62px;
+  --barra: 60px;
 
   --salida: cubic-bezier(.16, 1, .3, 1);
   --suave:  cubic-bezier(.4, 0, .2, 1);
+  --resorte: cubic-bezier(.34, 1.56, .64, 1);
 
   --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
           "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -68,7 +75,7 @@
    la curva del movimiento. */
 html { scroll-behavior:auto; }
 body {
-  background:var(--fondo); color:var(--tinta);
+  background:var(--base); color:var(--tinta);
   font-family:var(--sans); line-height:1.65;
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
@@ -77,55 +84,136 @@ body.bloqueado { overflow:hidden; }
 img, video { display:block; max-width:100%; }
 a { color:inherit; text-decoration:none; }
 button { font:inherit; color:inherit; background:none; border:none; cursor:pointer; }
-::selection { background:var(--tinta); color:var(--fondo); }
+::selection { background:var(--tinta); color:var(--base); }
 :focus-visible { outline:1px solid var(--tinta); outline-offset:3px; }
 .mono { font-family:var(--mono); }
 
-/* ============ Barra superior ================================== */
-.barra {
-  position:fixed; top:0; left:0; right:0; z-index:120;
-  height:var(--barra);
-  display:flex; align-items:center; justify-content:space-between;
-  padding:0 var(--margen);
-  background:var(--vidrio);
-  backdrop-filter:blur(22px) saturate(140%); -webkit-backdrop-filter:blur(22px) saturate(140%);
-  border-bottom:1px solid var(--linea);
+/* =================================================================
+   EL CAMPO — lo que sustituye al fondo plano
+   ================================================================= */
+.campo { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(120,150,210,.09), transparent 60%),
+    linear-gradient(180deg, var(--base-2) 0%, var(--base) 45%, #08090d 100%); }
+
+.masa { position:absolute; border-radius:50%; filter:blur(84px); opacity:.5;
+  will-change:transform; }
+/* Cada masa deriva por su cuenta y ademas responde al scroll (--y):
+   el campo se mueve con la pagina, asi nunca se lee como un fondo fijo */
+.m1 { width:62vmax; height:62vmax; left:-18vmax; top:-14vmax;
+      background:radial-gradient(circle, hsl(var(--th) 62% 46% / .40), transparent 68%);
+      animation:derivaA 46s var(--suave) infinite; }
+.m2 { width:52vmax; height:52vmax; right:-16vmax; top:8vmax;
+      background:radial-gradient(circle, hsl(28 78% 52% / .22), transparent 66%);
+      animation:derivaB 58s var(--suave) infinite; }
+.m3 { width:70vmax; height:70vmax; left:12vmax; bottom:-30vmax;
+      background:radial-gradient(circle, hsl(258 55% 50% / .26), transparent 68%);
+      animation:derivaC 64s var(--suave) infinite; }
+.m4 { width:40vmax; height:40vmax; right:6vmax; bottom:-8vmax;
+      background:radial-gradient(circle, hsl(190 62% 48% / .18), transparent 66%);
+      animation:derivaB 52s var(--suave) infinite reverse; }
+@keyframes derivaA {
+  0%,100% { transform:translate3d(0, calc(var(--y,0px) * .22), 0) scale(1) }
+  50%     { transform:translate3d(9vmax, calc(var(--y,0px) * .22 + 6vmax), 0) scale(1.14) } }
+@keyframes derivaB {
+  0%,100% { transform:translate3d(0, calc(var(--y,0px) * .32), 0) scale(1.08) }
+  50%     { transform:translate3d(-11vmax, calc(var(--y,0px) * .32 + 9vmax), 0) scale(.92) } }
+@keyframes derivaC {
+  0%,100% { transform:translate3d(0, calc(var(--y,0px) * -.18), 0) scale(1) }
+  50%     { transform:translate3d(7vmax, calc(var(--y,0px) * -.18 - 7vmax), 0) scale(1.18) } }
+
+/* Grano: quita el bandeado de los degradados y da textura de pelicula */
+.grano { position:absolute; inset:-200%; opacity:.05; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E");
+  animation:temblar 5s steps(4) infinite; }
+@keyframes temblar {
+  0%{transform:translate(0,0)} 25%{transform:translate(-2%,1%)}
+  50%{transform:translate(1%,-2%)} 75%{transform:translate(-1%,-1%)} 100%{transform:translate(0,0)} }
+
+/* Todo el contenido vive por encima del campo */
+.lienzo { position:relative; z-index:1; }
+
+/* =================================================================
+   VIDRIO LIQUIDO
+   El filo especular (::before) es lo que separa un panel translucido
+   de un vidrio: recorre el borde y se enciende donde da la luz. El
+   reflejo (::after) sigue al cursor.
+   ================================================================= */
+.vidrio {
+  position:relative; isolation:isolate;
+  background:var(--v-fondo);
+  backdrop-filter:var(--v-blur); -webkit-backdrop-filter:var(--v-blur);
+  border:1px solid var(--v-borde);
+  box-shadow:var(--v-filo), var(--v-sombra);
 }
-.marca { display:flex; align-items:center; gap:.55rem; }
-.marca span {
-  font-family:var(--mono); font-size:.66rem; font-weight:700; letter-spacing:.24em;
+.vidrio::after {
+  content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  background:radial-gradient(220px circle at var(--mx,50%) var(--my,0%),
+             rgba(255,255,255,.16), transparent 62%);
+  opacity:0; transition:opacity .55s var(--suave); z-index:-1;
+}
+.vidrio:hover::after { opacity:1; }
+
+/* ============ Barra superior — pildora flotante ================ */
+.barra {
+  position:fixed; top:.9rem; left:50%; transform:translateX(-50%); z-index:120;
+  width:min(calc(100% - 2 * var(--margen)), 1180px); height:var(--barra);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 .55rem 0 1.15rem; border-radius:999px;
+  transition:transform .6s var(--salida), opacity .5s var(--suave),
+             width .6s var(--salida), background .6s var(--suave);
+}
+.barra.oculta { transform:translateX(-50%) translateY(-140%); opacity:0; }
+.marca { display:flex; align-items:center; gap:.6rem; padding:.4rem .2rem; }
+.marca span.rotulo {
+  font-family:var(--mono); font-size:.63rem; font-weight:700; letter-spacing:.22em;
 }
 .marca .punto {
-  width:5px; height:5px; border-radius:50%; background:var(--tinta);
-  animation:latir 3.4s ease-in-out infinite;
+  width:6px; height:6px; border-radius:50%; background:var(--tinta);
+  box-shadow:0 0 0 0 rgba(255,255,255,.5);
+  animation:latir 3.4s var(--suave) infinite;
 }
-@keyframes latir { 0%,100% { opacity:1 } 50% { opacity:.25 } }
+@keyframes latir {
+  0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(255,255,255,.45) }
+  50%     { opacity:.35; box-shadow:0 0 0 6px rgba(255,255,255,0) } }
 
-.menu { display:flex; gap:.15rem; }
+/* El indicador liquido se desliza bajo el enlace activo en vez de que
+   cada enlace pinte su propia caja: es un solo objeto que viaja. */
+.menu { position:relative; display:flex; gap:.1rem; padding:.25rem; border-radius:999px; }
+.menu .gota { position:absolute; top:.25rem; bottom:.25rem; left:0; width:0; border-radius:999px;
+  background:rgba(255,255,255,.12); box-shadow:inset 0 1px 0 rgba(255,255,255,.22);
+  transition:transform .55s var(--salida), width .55s var(--salida), opacity .4s;
+  opacity:0; pointer-events:none; }
+.menu.viva .gota { opacity:1; }
 .menu a {
-  position:relative;
-  font-family:var(--mono); font-size:.63rem; letter-spacing:.18em; text-transform:uppercase;
-  color:var(--debil); padding:.5rem .85rem; border-radius:10px;
-  transition:color .35s var(--suave), background .35s var(--suave);
+  position:relative; z-index:1;
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--tenue); padding:.55rem .95rem; border-radius:999px;
+  text-shadow:0 1px 10px rgba(0,0,0,.6);
+  transition:color .35s var(--suave);
 }
-.menu a:hover { color:var(--tenue); background:rgba(250,250,250,.05); }
-.menu a.activo { color:var(--tinta); background:rgba(250,250,250,.08); }
-@media (max-width:700px){ .menu a { padding:.4rem .5rem; letter-spacing:.08em; } }
+.menu a:hover { color:var(--tinta); }
+.menu a.activo { color:var(--tinta); }
+@media (max-width:700px){
+  .barra { padding:0 .4rem 0 .85rem; }
+  .marca span.rotulo { font-size:.55rem; letter-spacing:.14em; }
+  .menu a { padding:.5rem .5rem; letter-spacing:.06em; font-size:.55rem; }
+}
 
-/* Barra de avance con el nombre de la seccion en curso */
 .avance { position:fixed; top:0; left:0; right:0; height:1.5px; z-index:121;
-  background:linear-gradient(to right, var(--n-400), var(--n-50));
+  background:linear-gradient(to right, transparent, hsl(var(--th) 70% 70%), var(--tinta));
   transform:scaleX(0); transform-origin:left; }
 
 /* ============ Entrada ========================================= */
 .mascara-marca {
   position:fixed; inset:0; z-index:400;
   display:flex; align-items:center; justify-content:center;
-  background:var(--fondo);
-  animation:disolverMarca 1.3s var(--salida) 2.4s forwards;
+  background:var(--base);
+  animation:disolverMarca 1.2s var(--salida) 2.2s forwards;
 }
 @keyframes disolverMarca { to { opacity:0; visibility:hidden; } }
-.palabra { font-size:clamp(3rem,13vw,12rem); font-weight:800; letter-spacing:-.05em; line-height:.9; text-align:center; text-transform:uppercase; }
+.palabra { font-size:clamp(3rem,13vw,12rem); font-weight:800; letter-spacing:-.05em; line-height:.9;
+  text-align:center; text-transform:uppercase; }
 .linea2 { display:block; font-size:.42em; letter-spacing:.08em; font-weight:300; margin-top:.35em; }
 
 /* El recorte va en cada letra. background-attachment:fixed ancla el
@@ -138,7 +226,7 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   background-attachment:fixed; background-size:cover; background-position:center 45%;
   -webkit-background-clip:text; background-clip:text; color:transparent;
   opacity:0; filter:blur(16px);
-  animation:enfocar 1.15s var(--salida) forwards;
+  animation:enfocar 1.1s var(--salida) forwards;
 }
 @keyframes enfocar { to { opacity:1; filter:blur(0); } }
 @media (hover:none) { .letra { background-attachment:scroll; background-size:700% auto; } }
@@ -146,20 +234,13 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   position:absolute; left:50%; bottom:34%; width:min(78vw,900px); height:1px;
   transform:translateX(-50%) scaleX(0);
   background:linear-gradient(to right, transparent, var(--linea-fuerte), transparent);
-  animation:cruzar 1.5s var(--salida) 1.4s forwards;
+  animation:cruzar 1.4s var(--salida) 1.2s forwards;
 }
 @keyframes cruzar { to { transform:translateX(-50%) scaleX(1); } }
 
 /* ============ Secciones ======================================= */
-/* Cada seccion arranca justo bajo la barra y ocupa la pantalla
-   completa: al saltar desde el menu queda encuadrada de borde a
-   borde, nunca a media altura ni con el titulo cortado. */
-.seccion {
-  position:relative;
-  min-height:100svh;
-  padding-top:var(--barra);
-  display:flex; flex-direction:column;
-}
+.seccion { position:relative; min-height:100svh; padding-top:calc(var(--barra) + 1.8rem);
+  display:flex; flex-direction:column; }
 .seccion-cuerpo {
   flex:1; display:flex; flex-direction:column;
   /* "safe" centra mientras el contenido quepa y lo alinea arriba
@@ -170,59 +251,69 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 }
 .acolchado { padding-left:var(--margen); padding-right:var(--margen); }
 
-.cabeza { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(1.5rem,4vw,4rem); align-items:end;
-  margin-bottom:clamp(1.2rem,3vh,2.2rem); padding-bottom:1.2rem; border-bottom:1px solid var(--linea); }
-@media (max-width:860px){ .cabeza { grid-template-columns:1fr; gap:.8rem } }
-.etiqueta { font-family:var(--mono); font-size:.62rem; letter-spacing:.28em; text-transform:uppercase; color:var(--debil); margin-bottom:.9rem; }
+.cabeza { display:flex; align-items:flex-end; justify-content:space-between; gap:2rem; flex-wrap:wrap;
+  margin-bottom:clamp(1.2rem,3vh,2.4rem); padding-bottom:1.2rem; border-bottom:1px solid var(--linea); }
+.etiqueta { font-family:var(--mono); font-size:.61rem; letter-spacing:.28em; text-transform:uppercase;
+  color:var(--debil); margin-bottom:.9rem; }
 .cabeza h2 { font-size:clamp(1.8rem,4.2vw,3.1rem); font-weight:600; letter-spacing:-.035em; line-height:1.07; }
 .cabeza h2 .suave { font-weight:200; color:var(--tenue); }
 
 /* --- Revelados al entrar en pantalla ------------------------- */
-/* Las palabras suben desde detras de su propia caja */
-.palabras span { display:inline-block; overflow:hidden; vertical-align:top; }
-.palabras span i { display:inline-block; font-style:normal; transform:translateY(105%); transition:transform 1s var(--salida); }
+/* Las palabras suben desde detras de su propia caja. El relleno de
+   abajo compensado con margen negativo es lo que impide que overflow
+   corte los trazos que bajan de la linea base: la g, la j, la y. */
+.palabras span { display:inline-block; overflow:hidden; vertical-align:top;
+  padding-bottom:.16em; margin-bottom:-.16em; }
+.palabras span i { display:inline-block; font-style:normal;
+  transform:translateY(105%); transition:transform 1s var(--salida); }
 .palabras.visible span i { transform:translateY(0); }
 
 .revelar > * { opacity:0; transform:translateY(22px); }
 .revelar.visible > * { opacity:1; transform:none; transition:opacity .9s var(--suave), transform 1s var(--salida); }
 
-/* Las imagenes no aparecen por opacidad: se descubren con una
-   mascara que se abre desde el centro. Pesa mucho mas. */
-.cortina { clip-path:inset(46% 0 46% 0); transition:clip-path 1.4s var(--salida); }
-.cortina.visible { clip-path:inset(0 0 0 0); }
-
 /* ============ INICIO ========================================== */
 .inicio { position:relative; min-height:100svh; display:flex; flex-direction:column; justify-content:flex-end;
   padding:var(--barra) 0 0; overflow:hidden; }
-.lamina { position:absolute; inset:0; overflow:hidden; background:var(--n-850); }
+.lamina { position:absolute; inset:0; overflow:hidden; }
 .lamina img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
   transform:scale(1.3); opacity:0;
-  animation:asentar 2.6s var(--salida) 2.3s forwards; will-change:transform; }
+  animation:asentar 2.4s var(--salida) 2.1s forwards; will-change:transform; }
 @keyframes asentar { to { transform:scale(1.06); opacity:1 } }
-/* Sobre el render, un degradado que apaga la parte baja para que el
-   texto se lea sin recuadros ni cajas de color */
+/* Degradado que apaga la parte baja para que el texto se lea sin
+   recuadros, y funde el render con el campo por el borde inferior */
 .lamina::after { content:''; position:absolute; inset:0;
-  background:linear-gradient(to top, var(--fondo) 2%, rgba(9,9,11,.72) 32%, rgba(9,9,11,.18) 62%, rgba(9,9,11,.45) 100%); }
+  background:linear-gradient(to top, var(--base) 1%, rgba(11,12,16,.74) 30%,
+             rgba(11,12,16,.16) 62%, rgba(11,12,16,.48) 100%); }
 
 .inicio-texto { position:relative; z-index:2;
-  display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:clamp(1.5rem,4vw,4rem); align-items:end;
-  padding:0 var(--margen) clamp(3rem,9vh,6rem); }
-@media (max-width:860px){ .inicio-texto { grid-template-columns:1fr; gap:1.2rem } }
-.bloque { overflow:hidden; }
-.bloque > * { display:block; transform:translateY(112%); animation:emerger 1.25s var(--salida) forwards; }
+  display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:clamp(1.5rem,4vw,4rem);
+  align-items:end; padding:0 var(--margen) clamp(3rem,9vh,6rem); }
+@media (max-width:900px){ .inicio-texto { grid-template-columns:1fr; gap:1.4rem } }
+
+/* El titulo recorta el mismo render que tiene detras: no es una capa
+   sobre la imagen, es la imagen leida a traves de las letras. */
+.titular { font-size:clamp(2.6rem,7.2vw,8.4rem); font-weight:800; letter-spacing:-.055em;
+  line-height:.88; text-transform:uppercase; margin-bottom:.7rem; white-space:nowrap; }
+.titular .letra { animation-duration:1.3s; }
+@media (max-width:900px){ .titular { font-size:clamp(2.6rem,12.4vw,5.4rem); } }
+.subtitular { overflow:hidden; padding-bottom:.14em; margin-bottom:-.14em; }
+.subtitular span { display:block; transform:translateY(115%);
+  animation:emerger 1.15s var(--salida) 3.5s forwards;
+  font-family:var(--mono); font-size:clamp(.6rem,1.35vw,.78rem); letter-spacing:.24em;
+  text-transform:uppercase; color:var(--n-200); }
 @keyframes emerger { to { transform:translateY(0) } }
-.inicio-texto h1 { font-size:clamp(2rem,5.4vw,4.4rem); font-weight:600; line-height:1.02; letter-spacing:-.04em; }
-.inicio-texto h1 .suave { font-weight:200; color:var(--tenue); }
-.t1 { animation-delay:3.3s } .t2 { animation-delay:3.44s }
-.inicio-aparte { opacity:0; animation:aparecer 1.2s ease 3.9s forwards; padding-bottom:.4rem; }
-.inicio-aparte p { color:var(--tenue); font-size:.95rem; max-width:34ch; }
-.inicio-aparte .dato { font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; color:var(--debil); margin-top:.9rem; }
+
+.inicio-aparte { opacity:0; animation:aparecer 1.2s ease 3.9s forwards; padding-bottom:.5rem; }
+.inicio-aparte p { color:var(--tenue); font-size:clamp(.9rem,1.1vw,1rem); max-width:40ch; }
+.inicio-aparte .dato { font-family:var(--mono); font-size:.6rem; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--debil); margin-top:1rem;
+  display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; }
+.inicio-aparte .dato .sep { width:16px; height:1px; background:var(--linea-fuerte); }
 @keyframes aparecer { to { opacity:1 } }
 
-/* Indicador de desplazamiento */
 .baja { position:absolute; left:50%; bottom:1.4rem; z-index:3; transform:translateX(-50%);
   display:flex; flex-direction:column; align-items:center; gap:.5rem;
-  font-family:var(--mono); font-size:.55rem; letter-spacing:.22em; text-transform:uppercase; color:var(--debil);
+  font-family:var(--mono); font-size:.53rem; letter-spacing:.22em; text-transform:uppercase; color:var(--debil);
   opacity:0; animation:aparecer 1s ease 4.4s forwards; }
 .baja .hilo { width:1px; height:34px; background:linear-gradient(to bottom, var(--linea-fuerte), transparent); }
 .baja .hilo::after { content:''; display:block; width:1px; height:12px; background:var(--tinta);
@@ -230,9 +321,7 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 @keyframes gotear { 0% { transform:translateY(-12px); opacity:0 } 40% { opacity:1 } 100% { transform:translateY(34px); opacity:0 } }
 
 /* ============ PROYECTOS — vitrina a sangre ==================== */
-/* Las cuatro hojas ocupan el ancho completo de la ventana, sin
-   margenes ni esquinas redondeadas: el render llega hasta el borde. */
-.vitrina { display:flex; width:100%; flex:1; min-height:clamp(420px,58vh,760px); overflow:hidden;
+.vitrina { display:flex; width:100%; flex:1; min-height:clamp(420px,56vh,760px); overflow:hidden;
   border-top:1px solid var(--linea); border-bottom:1px solid var(--linea); }
 @media (max-width:860px){ .vitrina { flex-direction:column; min-height:0; } }
 
@@ -240,7 +329,7 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
    abre de abajo arriba. Es lo que hace que la seccion "entre" en vez
    de aparecer ya montada. */
 .hoja { position:relative; flex:1 1 0; min-width:0; overflow:hidden; cursor:pointer;
-  border-right:1px solid rgba(9,9,11,.55); transition:flex-grow .9s var(--salida);
+  border-right:1px solid rgba(11,12,16,.5); transition:flex-grow .9s var(--salida);
   clip-path:inset(0 0 100% 0); }
 .vitrina.visible .hoja { clip-path:inset(0 0 0 0); transition:flex-grow .9s var(--salida), clip-path 1.15s var(--salida); }
 .vitrina.visible .hoja:nth-child(2) { transition-delay:0s, .09s }
@@ -250,7 +339,7 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 .vitrina:hover .hoja { flex-grow:.74; }
 .vitrina .hoja:hover { flex-grow:2.4; }
 @media (max-width:860px){
-  .hoja { flex:none; height:52vh; border-right:none; border-bottom:1px solid rgba(9,9,11,.55); }
+  .hoja { flex:none; height:52vh; border-right:none; border-bottom:1px solid rgba(11,12,16,.5); }
   .vitrina:hover .hoja, .vitrina .hoja:hover { flex-grow:1; }
   /* En tactil no hay cursor que señalar: la ficha de cada hoja va
      siempre desplegada y el rotulo vertical sobra. */
@@ -263,10 +352,10 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 .hoja-img { position:absolute; inset:0; }
 .hoja-img img { width:100%; height:100%; object-fit:cover; transform:scale(1.07);
   transition:transform 1.4s var(--salida), filter .9s var(--suave);
-  filter:saturate(.72) brightness(.62); }
+  filter:saturate(.72) brightness(.6); }
 .hoja:hover .hoja-img img { transform:scale(1); filter:saturate(1) brightness(1); }
 .hoja-velo { position:absolute; inset:0;
-  background:linear-gradient(to top, rgba(9,9,11,.92) 0%, rgba(9,9,11,.35) 42%, rgba(9,9,11,.08) 100%); }
+  background:linear-gradient(to top, rgba(11,12,16,.92) 0%, rgba(11,12,16,.34) 42%, rgba(11,12,16,.06) 100%); }
 
 /* El nombre en vertical sale por la izquierda cuando la hoja se abre.
    El desplazamiento va en el CONTENEDOR, no en el texto: dentro de un
@@ -281,261 +370,397 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 
 .hoja-abierta { position:absolute; left:0; right:0; bottom:0; z-index:3;
   padding:clamp(1.4rem,2.2vw,2.4rem); color:#fff; pointer-events:none; }
-.hoja-abierta > * { overflow:hidden; }
+.hoja-abierta > * { overflow:hidden; padding-bottom:.1em; margin-bottom:-.1em; }
 .hoja-abierta > * > * { display:block; transform:translateY(110%); transition:transform .7s var(--salida); }
 .hoja:hover .hoja-abierta > * > * { transform:translateY(0); }
 .hoja:hover .hoja-abierta > *:nth-child(2) > * { transition-delay:.06s }
 .hoja:hover .hoja-abierta > *:nth-child(3) > * { transition-delay:.12s }
 .hoja:hover .hoja-abierta > *:nth-child(4) > * { transition-delay:.18s }
-.hoja-abierta .num { font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; opacity:.82; }
+.hoja-abierta .num { font-family:var(--mono); font-size:.61rem; letter-spacing:.2em; opacity:.8; }
 .hoja-abierta h3 { font-size:clamp(1.3rem,2.2vw,2rem); font-weight:500; letter-spacing:-.02em; margin:.35rem 0 .5rem; }
-.hoja-abierta p { font-size:.86rem; line-height:1.6; max-width:44ch; opacity:.86; }
+.hoja-abierta p { font-size:.85rem; line-height:1.6; max-width:44ch; opacity:.84; }
 .hoja-abierta .entrar { display:inline-flex; align-items:center; gap:.5rem; margin-top:1.1rem;
-  font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; text-transform:uppercase;
-  border:1px solid rgba(255,255,255,.5); border-radius:10px; padding:.55rem 1rem; }
+  font-family:var(--mono); font-size:.6rem; letter-spacing:.2em; text-transform:uppercase;
+  border:1px solid rgba(255,255,255,.42); border-radius:999px; padding:.55rem 1.1rem;
+  background:rgba(255,255,255,.09); backdrop-filter:blur(12px); }
 
-/* ============ Boton de indice ================================= */
+/* ============ Boton de indice — pildora liquida =============== */
 .ver-todos { display:flex; justify-content:center; padding:clamp(1.4rem,3.5vh,2.4rem) var(--margen) 0; }
 .btn-todos {
   position:relative; overflow:hidden;
-  display:inline-flex; align-items:center; gap:1.2rem;
-  padding:1rem 2.2rem; border-radius:14px;
-  background:var(--tinta); color:var(--fondo);
-  font-size:.88rem; font-weight:500;
-  transition:transform .25s var(--suave), box-shadow .5s var(--suave);
+  display:inline-flex; align-items:center; gap:1.1rem;
+  padding:.95rem 1.3rem .95rem 1.9rem; border-radius:999px;
+  font-size:.86rem; font-weight:500; color:var(--tinta);
+  transition:transform .4s var(--resorte), box-shadow .5s var(--suave), border-color .4s;
 }
-.btn-todos:hover { transform:translateY(-2px); box-shadow:0 16px 40px rgba(0,0,0,.5); }
-.btn-todos:active { transform:scale(.98); }
-.btn-todos .cuenta { font-family:var(--mono); font-size:.65rem; letter-spacing:.16em; opacity:.55; }
-.btn-todos .flecha { width:22px; height:1px; background:currentColor; transition:width .5s var(--salida); }
-.btn-todos:hover .flecha { width:40px; }
-.btn-todos::before { content:''; position:absolute; inset:0; background:rgba(9,9,11,.14);
-  transform:translateX(-101%); transition:transform .6s var(--salida); }
-.btn-todos:hover::before { transform:translateX(101%); }
-.btn-todos > * { position:relative; z-index:1; }
+.btn-todos:hover { transform:translateY(-3px);
+  box-shadow:var(--v-filo), 0 26px 60px -22px rgba(0,0,0,.9); border-color:var(--linea-fuerte); }
+.btn-todos:active { transform:translateY(-1px) scale(.985); }
+.btn-todos .cuenta { font-family:var(--mono); font-size:.62rem; letter-spacing:.16em; color:var(--debil); }
+.btn-todos .disco { width:30px; height:30px; border-radius:50%; display:grid; place-items:center;
+  background:rgba(255,255,255,.1); box-shadow:inset 0 1px 0 rgba(255,255,255,.24);
+  transition:background .4s, transform .6s var(--salida); }
+.btn-todos:hover .disco { background:var(--tinta); transform:rotate(45deg); }
+.btn-todos .disco svg { transition:stroke .4s; }
+.btn-todos:hover .disco svg { stroke:var(--base); }
 
 /* ============ SOBRE MÍ ======================================== */
-.bio { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:clamp(2rem,5vw,5rem); align-items:stretch; }
-/* La rueda se centra contra la columna de texto: alineada arriba
-   dejaba un vacio largo debajo. */
-.bio-trayecto { display:flex; flex-direction:column; justify-content:center; }
-@media (max-width:960px){ .bio { grid-template-columns:1fr; gap:2.5rem } }
-.bio p { color:var(--tenue); font-size:.95rem; margin-bottom:.8rem; max-width:58ch; }
-.bio p strong { color:var(--tinta); font-weight:500; }
-.bio .destacado { font-size:1.08rem; color:var(--n-200); }
+/* El sistema orbital de herramientas vive DETRAS del contenido: es
+   parte del campo, no una rejilla de fichas. Libera la columna
+   entera que antes ocupaba la retícula de logos. */
+/* El sistema no puede salirse de su seccion: con el orbital mas alto
+   que la ventana, sus satelites aparecian flotando sobre Contacto. */
+.sobre-marco { position:relative; overflow:hidden; }
+.orbital { position:absolute; z-index:0; pointer-events:none;
+  left:50%; top:50%; transform:translate(-50%,-50%);
+  width:min(1020px, 94vw, 86vh); aspect-ratio:1; opacity:0;
+  transition:opacity 1.6s var(--suave); }
+.orbital.viva { opacity:1; }
+.orbital .nucleo { position:absolute; left:50%; top:50%; width:min(52%,560px); aspect-ratio:1;
+  transform:translate(-50%,-50%); border-radius:50%;
+  background:radial-gradient(circle, hsl(var(--th) 60% 55% / .13), transparent 62%);
+  filter:blur(28px); animation:pulsoNucleo 9s var(--suave) infinite; }
+@keyframes pulsoNucleo { 0%,100%{transform:translate(-50%,-50%) scale(1); opacity:.85}
+                         50%   {transform:translate(-50%,-50%) scale(1.12); opacity:1} }
+.anillo { position:absolute; inset:0; animation:girar var(--t,70s) linear infinite; }
+.anillo.inverso { animation-direction:reverse; }
+.anillo::before { content:''; position:absolute; inset:calc(50% - var(--r,0%)); border-radius:50%;
+  border:1px solid rgba(255,255,255,.045); }
+@keyframes girar { to { transform:rotate(360deg) } }
 
-/* --- Cifras ---------------------------------------------------- */
-.cifras { display:flex; flex-wrap:wrap; gap:clamp(1.4rem,3.5vw,2.8rem); margin:1.3rem 0 1.5rem;
-  padding:1rem 0; border-top:1px solid var(--linea); border-bottom:1px solid var(--linea); }
-.cifra b { display:block; font-size:clamp(1.4rem,2.6vw,1.9rem); font-weight:600; letter-spacing:-.03em; line-height:1; }
-.cifra span { font-family:var(--mono); font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--debil); }
+/* Cada transformacion vive en su propia capa. Una animacion de
+   `transform` reemplaza el transform completo del elemento: si la
+   contrarrotacion y la colocacion comparten nodo, la animacion se
+   come el centrado y los diez logos se apilan en el centro. */
+.satelite { position:absolute; inset:0; transform:rotate(var(--a)); pointer-events:none; }
+.satelite .orbe { position:absolute; left:50%; top:calc(50% - var(--r)); }
+.satelite .contra { display:block; animation:girar var(--t,70s) linear infinite reverse; }
+.anillo.inverso .satelite .contra { animation-direction:normal; }
+/* Sin placa ni recuadro: el logo flota desnudo y muy apagado, para
+   que se lea como parte del campo y no como una ficha por encima del
+   texto. Solo al señalarlo recupera su color y su vidrio. */
+.satelite .cara { position:absolute; left:0; top:0;
+  width:var(--s,54px); height:var(--s,54px);
+  transform:translate(-50%,-50%) rotate(calc(-1 * var(--a)));
+  pointer-events:auto;
+  display:grid; place-items:center; border-radius:18px;
+  background:transparent; border:1px solid transparent;
+  transition:background .45s, border-color .45s, box-shadow .45s;
+}
+.satelite img { width:62%; height:62%; object-fit:contain;
+  filter:grayscale(1) opacity(.20) contrast(.85); transition:filter .55s var(--suave); }
+.satelite .cara:hover { background:rgba(255,255,255,.09); border-color:rgba(255,255,255,.16);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24), 0 16px 38px -12px rgba(0,0,0,.85);
+  backdrop-filter:blur(10px); }
+.satelite .cara:hover img { filter:grayscale(0) opacity(1) contrast(1); }
+.satelite .nombre { position:absolute; left:0; top:calc(var(--s,54px) * .78);
+  transform:translate(-50%,0) rotate(calc(-1 * var(--a)));
+  font-family:var(--mono); font-size:.48rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--tenue); white-space:nowrap; opacity:0; transition:opacity .35s; }
+.satelite .cara:hover ~ .nombre { opacity:1; }
+@media (max-width:960px){ .orbital { opacity:0 !important; } }
+
+.sobre-contenido { position:relative; z-index:1; }
+.bio { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); gap:clamp(2rem,6vw,6rem); align-items:center; }
+@media (max-width:960px){ .bio { grid-template-columns:1fr; gap:2.5rem } }
+.bio p { color:var(--tenue); font-size:.95rem; margin-bottom:.85rem; max-width:56ch; }
+.bio p strong { color:var(--tinta); font-weight:500; }
+.bio .destacado { font-size:clamp(1.05rem,1.5vw,1.24rem); color:var(--n-200); line-height:1.5;
+  letter-spacing:-.01em; margin-bottom:1.2rem; }
 
 /* --- Rueda del trayecto --------------------------------------- */
 /* Los hitos se desplazan dentro de su propia caja. El que queda en el
    centro es el grande; los de arriba y abajo se van reduciendo segun
    su distancia al centro, como una rueda que gira. La escala y la
    opacidad las calcula el JS en cada cuadro. */
-.rueda-marco { position:relative; }
+.bio-trayecto { display:flex; flex-direction:column; justify-content:center; }
+.rueda-marco { position:relative; border-radius:24px; padding:.2rem .4rem; }
 .rueda-marco::before, .rueda-marco::after {
-  content:''; position:absolute; left:0; right:0; height:34%; z-index:3; pointer-events:none;
-}
-.rueda-marco::before { top:0;    background:linear-gradient(to bottom, var(--fondo) 8%, transparent); }
-.rueda-marco::after  { bottom:0; background:linear-gradient(to top,    var(--fondo) 8%, transparent); }
+  content:''; position:absolute; left:1px; right:1px; height:30%; z-index:3; pointer-events:none; }
+.rueda-marco::before { top:1px;    border-radius:24px 24px 0 0;
+  background:linear-gradient(to bottom, rgba(11,12,16,.92) 4%, transparent); }
+.rueda-marco::after  { bottom:1px; border-radius:0 0 24px 24px;
+  background:linear-gradient(to top, rgba(11,12,16,.92) 4%, transparent); }
 
 .rueda {
-  height:clamp(260px, 39vh, 420px);
+  height:clamp(300px, 44vh, 450px);
   /* overscroll auto a proposito: al llegar al extremo de la rueda el
      desplazamiento continua en la pagina en vez de quedarse atrapado */
   overflow-y:auto; overscroll-behavior:auto;
   scroll-snap-type:y proximity;
-  padding:22vh 0;                      /* para que el primero y el ultimo puedan centrarse */
+  padding:26% 1rem;    /* para que el primero y el ultimo puedan centrarse */
   scrollbar-width:none;
 }
 .rueda::-webkit-scrollbar { display:none; }
 
 .hito {
   scroll-snap-align:center;
-  display:grid; grid-template-columns:44px 1fr; gap:1rem; align-items:start;
+  display:grid; grid-template-columns:46px 1fr; gap:1rem; align-items:start;
   padding:.7rem 0;
   transform:scale(var(--k,.8)); opacity:var(--o,.3);
   transform-origin:left center;
   transition:transform .28s var(--suave), opacity .28s var(--suave);
 }
 .hito .escudo {
-  width:44px; height:44px; border-radius:12px; overflow:hidden;
-  background:var(--panel); border:1px solid var(--linea);
+  width:46px; height:46px; border-radius:14px; overflow:hidden;
+  background:rgba(255,255,255,.05); border:1px solid var(--linea);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
   display:flex; align-items:center; justify-content:center;
-  font-family:var(--mono); font-size:.52rem; font-weight:700; color:var(--debil);
+  font-family:var(--mono); font-size:.5rem; font-weight:700; color:var(--debil);
+  transition:border-color .4s, box-shadow .4s;
 }
-.hito .escudo img { width:100%; height:100%; object-fit:contain; padding:6px; }
-.hito .anio { font-family:var(--mono); font-size:.6rem; letter-spacing:.2em; color:var(--debil); }
-.hito h4 { font-size:1.05rem; font-weight:500; margin:.2rem 0 .25rem; letter-spacing:-.01em; }
-.hito p { font-size:.85rem; color:var(--tenue); margin:0; max-width:46ch; }
-.hito .marca-estado { font-family:var(--mono); font-size:.54rem; letter-spacing:.16em; text-transform:uppercase;
-  color:var(--n-200); background:rgba(250,250,250,.09); border-radius:6px; padding:.2rem .5rem; margin-left:.6rem;
+.hito .escudo img { width:100%; height:100%; object-fit:contain; padding:7px; }
+.hito .anio { font-family:var(--mono); font-size:.56rem; letter-spacing:.2em; color:var(--debil); }
+.hito h4 { font-size:1rem; font-weight:500; margin:.15rem 0 .2rem; letter-spacing:-.01em; line-height:1.25; }
+.hito p { font-size:.81rem; line-height:1.5; color:var(--tenue); margin:0; max-width:44ch; }
+.hito .marca-estado { font-family:var(--mono); font-size:.52rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--n-200); background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.08);
+  border-radius:999px; padding:.2rem .55rem; margin-left:.6rem;
   vertical-align:middle; white-space:nowrap; }
-/* El que esta en el centro se marca con un filo a la izquierda */
-.hito.foco .escudo { border-color:var(--linea-fuerte); }
-
-/* --- Herramientas --------------------------------------------- */
-/* Van siempre a color sobre una placa oscura propia. El gris que se
-   revelaba al pasar el cursor escondia justamente lo que hay que
-   mostrar: con que programas trabaja. */
-.herramientas { display:grid; grid-template-columns:repeat(auto-fill, minmax(92px,1fr));
-  gap:.5rem; margin-top:.9rem; }
-.util {
-  display:flex; flex-direction:column; align-items:center; gap:.5rem;
-  padding:.8rem .4rem .65rem; border-radius:12px;
-  background:var(--panel); border:1px solid var(--linea);
-  opacity:0; transform:translateY(18px);
-  transition:opacity .7s var(--suave), transform .8s var(--salida),
-             border-color .4s var(--suave), background .4s var(--suave);
-}
-.herramientas.visible .util { opacity:1; transform:none; }
-.util:hover { border-color:var(--linea-fuerte); background:var(--n-850); }
-.util .simbolo { width:30px; height:30px; display:flex; align-items:center; justify-content:center;
-  transition:transform .6s var(--salida); }
-.util:hover .simbolo { transform:translateY(-3px) scale(1.08); }
-.util img { width:100%; height:100%; object-fit:contain; }
-.util .nombre { font-family:var(--mono); font-size:.55rem; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--tenue); text-align:center; }
+.hito.foco .escudo { border-color:var(--linea-fuerte);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 10px 26px -12px rgba(0,0,0,.9); }
 
 /* ============ CONTACTO ======================================== */
-.contacto-cuerpo { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(2rem,5vw,5rem); align-items:end; }
-@media (max-width:860px){ .contacto-cuerpo { grid-template-columns:1fr; gap:2rem } }
-.contacto-cuerpo .apunte { color:var(--tenue); font-size:1rem; max-width:42ch; margin-bottom:1.6rem; }
-.acciones { display:flex; gap:.7rem; flex-wrap:wrap; }
-.boton { display:inline-flex; align-items:center; gap:.55rem; padding:.9rem 1.6rem; border-radius:12px;
-  font-size:.83rem; font-weight:500;
-  transition:opacity .3s var(--suave), background .3s var(--suave), border-color .3s var(--suave), transform .2s var(--suave); }
-.boton:active { transform:scale(.97); }
-.boton-primario { background:var(--tinta); color:var(--fondo); }
-.boton-primario:hover { opacity:.86; }
-.boton-secundario { border:1px solid var(--linea); color:var(--n-200); }
-.boton-secundario:hover { border-color:var(--linea-fuerte); background:rgba(250,250,250,.04); }
-.boton svg { flex:none; }
-.dato-directo { font-family:var(--mono); font-size:.66rem; letter-spacing:.14em; color:var(--debil); margin-top:1.4rem; }
-.dato-directo b { color:var(--tenue); font-weight:500; }
+.contacto-cuerpo { max-width:1180px; }
+.contacto-cuerpo .apunte { color:var(--n-200); font-size:clamp(1.05rem,1.8vw,1.5rem);
+  max-width:30ch; line-height:1.35; letter-spacing:-.02em; margin-bottom:2rem; font-weight:300; }
+.contacto-cuerpo .apunte b { font-weight:500; color:var(--tinta); }
 
-.pie { padding:1.5rem var(--margen); border-top:1px solid var(--linea);
+/* Cuatro accesos en vidrio. Se inclinan hacia el cursor: el reflejo
+   se mueve en sentido contrario, que es lo que da la sensacion de
+   espesor de cristal y no de tarjeta plana. */
+.enlaces { display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:.8rem; }
+.enlace { position:relative; display:flex; flex-direction:column; gap:1.6rem;
+  padding:1.3rem 1.4rem; border-radius:22px; overflow:hidden;
+  opacity:0; transform:translateY(26px);
+  transition:opacity .8s var(--suave), transform .9s var(--salida),
+             border-color .45s var(--suave), box-shadow .5s var(--suave); }
+.enlaces.visible .enlace { opacity:1; transform:none; }
+.enlace:hover { border-color:var(--linea-fuerte);
+  box-shadow:var(--v-filo), 0 30px 70px -28px rgba(0,0,0,.95); }
+.enlace .icono { width:38px; height:38px; border-radius:12px; display:grid; place-items:center;
+  background:rgba(255,255,255,.08); box-shadow:inset 0 1px 0 rgba(255,255,255,.2);
+  transition:transform .6s var(--resorte), background .4s; }
+.enlace:hover .icono { transform:translateY(-3px) scale(1.06); background:rgba(255,255,255,.14); }
+.enlace .rot { display:block; font-family:var(--mono); font-size:.55rem; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--debil); }
+.enlace .val { display:block; font-size:.98rem; font-weight:500; letter-spacing:-.01em; margin-top:.25rem;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.enlace .flecha { position:absolute; top:1.35rem; right:1.35rem; color:var(--debil);
+  transition:transform .5s var(--salida), color .4s; }
+.enlace:hover .flecha { transform:translate(3px,-3px); color:var(--tinta); }
+
+.pie { padding:2.2rem var(--margen); margin-top:clamp(2rem,6vh,4rem);
+  border-top:1px solid var(--linea);
   display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap;
-  font-family:var(--mono); font-size:.6rem; letter-spacing:.1em; color:var(--debil); }
+  font-family:var(--mono); font-size:.58rem; letter-spacing:.12em; color:var(--debil); }
 
 /* ============ FICHA DE PROYECTO =============================== */
-/* Por encima del indice: si queda por debajo, al abrir un proyecto
-   desde el indice la ficha se monta tapada y solo aparece cuando se
-   cierra el indice, que es justo lo que se veia como fallo. */
+/* Lleva su propio campo, teñido con el color dominante del proyecto
+   abierto, y es OPACA: translucida dejaba leer el texto de la pagina
+   por detras de los renders y el conjunto se ensuciaba. Por encima
+   del indice — si queda por debajo, al abrir un proyecto desde el
+   indice la ficha se monta tapada y solo aparece al cerrar el indice,
+   que es justo lo que se veia como fallo. */
 .ficha { position:fixed; inset:0; z-index:260;
-  background:hsl(var(--th), calc(var(--ts) * .35), 5%);
+  background:
+    radial-gradient(120% 68% at 12% 0%,   hsl(var(--th) var(--ts) 16% / .62), transparent 62%),
+    radial-gradient(110% 62% at 88% 100%, hsl(var(--th) var(--ts) 13% / .50), transparent 62%),
+    linear-gradient(180deg, #0d0e13 0%, #0a0b0f 55%, #07080b 100%);
   overflow-y:auto; overscroll-behavior:contain;
   opacity:0; visibility:hidden;
   transition:opacity .5s var(--suave), visibility .5s, background .9s var(--suave); }
 .ficha.abierta { opacity:1; visibility:visible; }
+/* El contenido entra escalonado MIENTRAS el clon todavia viaja: sin
+   esto, al aterrizar la ficha aparece de golpe ya montada y el cambio
+   se lee como un corte de plano. */
+.ficha .entra { opacity:0; transform:translateY(26px); filter:blur(6px); }
+.ficha.montada .entra { opacity:1; transform:none; filter:none;
+  transition:opacity .8s var(--suave), transform .95s var(--salida), filter .8s var(--suave); }
+.ficha.montada .entra:nth-of-type(2) { transition-delay:.06s }
+.ficha.montada .entra:nth-of-type(3) { transition-delay:.12s }
 
-.ficha-barra { position:sticky; top:0; z-index:10; height:var(--barra);
-  display:flex; align-items:center; justify-content:space-between; padding:0 var(--margen);
-  background:hsla(var(--th), calc(var(--ts) * .35), 5%, .8); backdrop-filter:blur(22px);
-  border-bottom:1px solid var(--linea); }
-.ficha-barra .nombre { font-family:var(--mono); font-size:.63rem; letter-spacing:.2em; text-transform:uppercase; }
-.ficha-cerrar { display:flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.6rem;
-  letter-spacing:.2em; text-transform:uppercase; color:var(--tenue); padding:.45rem .7rem; border-radius:10px;
-  transition:color .3s var(--suave), background .3s var(--suave); }
-.ficha-cerrar:hover { color:var(--tinta); background:rgba(250,250,250,.07); }
-.ficha-cerrar .aspa { position:relative; width:11px; height:11px; }
-.ficha-cerrar .aspa::before, .ficha-cerrar .aspa::after { content:''; position:absolute; top:50%; left:0; width:100%; height:1px; background:currentColor; }
+.ficha-barra { position:sticky; top:.7rem; z-index:10; height:52px;
+  width:calc(100% - 2 * var(--margen)); margin:.7rem auto -52px; border-radius:999px;
+  display:flex; align-items:center; justify-content:space-between; padding:0 .5rem 0 1.15rem;
+  opacity:0; transform:translateY(-14px);
+  transition:opacity .6s var(--suave) .1s, transform .7s var(--salida) .1s; }
+.ficha.montada .ficha-barra { opacity:1; transform:none; }
+.ficha-barra { background:linear-gradient(148deg, rgba(12,14,20,.62), rgba(12,14,20,.44) 44%, rgba(12,14,20,.58)); }
+.ficha-barra .nombre { font-family:var(--mono); font-size:.61rem; letter-spacing:.2em;
+  text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  text-shadow:0 1px 12px rgba(0,0,0,.8); }
+.ficha-cerrar { display:flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.58rem;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--tenue); padding:.5rem .95rem;
+  border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+  transition:color .3s var(--suave), background .3s var(--suave), border-color .3s; }
+.ficha-cerrar:hover { color:var(--tinta); background:rgba(255,255,255,.13); border-color:var(--linea-fuerte); }
+.ficha-cerrar .aspa { position:relative; width:10px; height:10px; }
+.ficha-cerrar .aspa::before, .ficha-cerrar .aspa::after { content:''; position:absolute; top:50%; left:0;
+  width:100%; height:1px; background:currentColor; }
 .ficha-cerrar .aspa::before { transform:rotate(45deg) } .ficha-cerrar .aspa::after { transform:rotate(-45deg) }
 
-/* Portada de la ficha: el nombre del proyecto va SOBRE el render, en
-   blanco, no debajo en una columna de texto. */
-.ficha-principal { position:relative; width:100%; height:clamp(440px,86vh,1040px); overflow:hidden; background:var(--n-850); }
+/* Portada de la ficha: el nombre del proyecto va SOBRE el render */
+.ficha-principal { position:relative; width:100%; height:clamp(440px,88vh,1060px); overflow:hidden; }
 .ficha-principal img { width:100%; height:116%; object-fit:cover; will-change:transform; }
 .ficha-principal::after { content:''; position:absolute; inset:0;
-  background:linear-gradient(to top, rgba(9,9,11,.92) 0%, rgba(9,9,11,.3) 40%, rgba(9,9,11,.05) 70%, rgba(9,9,11,.4) 100%); }
+  background:linear-gradient(to top, hsl(var(--th) 20% 5% / .94) 0%, rgba(11,12,16,.28) 42%,
+             rgba(11,12,16,.04) 72%, rgba(11,12,16,.42) 100%); }
 .ficha-portada-texto { position:absolute; left:0; right:0; bottom:0; z-index:2;
   padding:clamp(1.8rem,4vw,3.6rem) var(--margen); color:#fff; }
-.ficha-portada-texto .tipo { font-family:var(--mono); font-size:.62rem; letter-spacing:.26em; text-transform:uppercase;
-  opacity:.72; margin-bottom:.7rem; }
-.ficha-portada-texto h2 { font-size:clamp(2rem,6vw,4.6rem); font-weight:600; letter-spacing:-.04em; line-height:1;
-  overflow:hidden; }
-.ficha-portada-texto h2 span { display:block; transform:translateY(110%); animation:emerger 1.1s var(--salida) .18s forwards; }
+.ficha-portada-texto .tipo { font-family:var(--mono); font-size:.6rem; letter-spacing:.26em;
+  text-transform:uppercase; opacity:0; margin-bottom:.75rem;
+  transition:opacity .7s var(--suave) .34s; }
+.ficha-portada-texto h2 { font-size:clamp(2rem,6vw,4.6rem); font-weight:600; letter-spacing:-.045em;
+  line-height:1; overflow:hidden; padding-bottom:.06em; margin-bottom:-.06em; }
+.ficha-portada-texto h2 span { display:block; transform:translateY(112%);
+  transition:transform 1.05s var(--salida) .26s; }
+.ficha.montada .ficha-portada-texto .tipo { opacity:.75; }
+.ficha.montada .ficha-portada-texto h2 span { transform:translateY(0); }
 
-/* Solo el texto se encolumna; nunca las imagenes */
-.columna { max-width:1080px; margin:0 auto; padding:clamp(2.6rem,7vh,4.5rem) var(--margen); }
-.ficha-texto { display:grid; grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr); gap:clamp(1.5rem,4vw,4rem); align-items:start; }
-@media (max-width:860px){ .ficha-texto { grid-template-columns:1fr; gap:1.2rem } }
-.ficha-texto .rotulo { font-family:var(--mono); font-size:.6rem; letter-spacing:.24em; text-transform:uppercase; color:var(--debil); }
-.ficha-texto p { color:var(--tenue); font-size:1rem; }
-.ficha-datos { display:flex; flex-wrap:wrap; gap:1.6rem 2.6rem; margin-top:1.8rem;
-  padding-top:1.3rem; border-top:1px solid var(--linea); }
-.ficha-datos div span { display:block; font-family:var(--mono); font-size:.55rem; letter-spacing:.2em;
-  text-transform:uppercase; color:var(--debil); margin-bottom:.25rem; }
-.ficha-datos div b { font-weight:500; font-size:.9rem; }
+/* --- Barra de datos: globo + contador ------------------------- */
+/* Sin parrafo. El titulo ya esta arriba; aqui solo queda DONDE y
+   CUANTO, y el donde se responde girando el planeta. */
+.datos-cinta { max-width:1180px; margin:0 auto;
+  padding:clamp(2.2rem,6vh,3.6rem) var(--margen) clamp(1.4rem,3vh,2.2rem); }
+.datos-caja { display:flex; align-items:center; justify-content:space-between; gap:clamp(1.2rem,4vw,3rem);
+  padding:clamp(1rem,2vw,1.5rem) clamp(1.2rem,2.4vw,2rem); border-radius:26px; flex-wrap:wrap; }
+.lugar-bloque { display:flex; align-items:center; gap:clamp(1rem,2.4vw,1.8rem); min-width:0; }
+.globo-marco { position:relative; flex:none;
+  width:clamp(96px,13vw,132px); height:clamp(96px,13vw,132px); }
+.globo-marco canvas { width:100%; height:100%; display:block; }
+.globo-marco .halo { position:absolute; inset:-14%; border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle, hsl(var(--th) 70% 60% / .22), transparent 62%);
+  filter:blur(14px); }
+.lugar-texto .rot { font-family:var(--mono); font-size:.55rem; letter-spacing:.24em;
+  text-transform:uppercase; color:var(--debil); }
+.lugar-texto b { display:block; font-size:clamp(1.05rem,2.1vw,1.5rem); font-weight:500;
+  letter-spacing:-.02em; margin-top:.3rem; line-height:1.2; }
+.lugar-texto .coord { font-family:var(--mono); font-size:.55rem; letter-spacing:.14em;
+  color:var(--debil); margin-top:.4rem; opacity:0; transition:opacity .8s var(--suave); }
+.lugar-texto .coord.viva { opacity:.85; }
 
-/* Galeria ordenada: parejas de piezas iguales con una pieza ancha
-   cada tres. Tiene ritmo pero se lee como una retícula, no como un
-   monton de imagenes de tamanos arbitrarios. */
-.galeria { display:grid; grid-template-columns:repeat(6,1fr); gap:clamp(.5rem,1vw,.9rem); padding:0 clamp(.5rem,1vw,.9rem); }
-.galeria figure { position:relative; overflow:hidden; background:var(--n-850); cursor:pointer;
-  grid-column:span 3; height:clamp(280px,44vh,540px);
-  clip-path:inset(12% 0 12% 0); opacity:0;
-  transition:clip-path 1.1s var(--salida), opacity .8s var(--suave); }
-.galeria figure.dentro { clip-path:inset(0 0 0 0); opacity:1; }
-.galeria figure:nth-child(3n+3) { grid-column:span 6; height:clamp(360px,68vh,860px); }
-.galeria img { width:100%; height:110%; object-fit:cover; transition:transform 1.3s var(--salida); will-change:transform; }
-.galeria figure:hover img { transform:scale(1.04); }
-.galeria figcaption { position:absolute; left:0; bottom:0; padding:1rem 1.2rem; z-index:2;
-  font-family:var(--mono); font-size:.56rem; letter-spacing:.2em; text-transform:uppercase; color:#fff;
-  opacity:0; transform:translateY(8px); transition:opacity .4s var(--suave), transform .5s var(--salida);
-  text-shadow:0 2px 12px rgba(0,0,0,.8); }
-.galeria figure:hover figcaption { opacity:.9; transform:none; }
-@media (max-width:860px){
-  .galeria figure, .galeria figure:nth-child(n) { grid-column:span 6; height:42vh; }
+/* El contador de imagenes: un anillo que se llena con el avance de la
+   galeria y una cifra que cuenta hasta el total al entrar. Sustituye
+   al dato suelto en una fila de etiquetas. */
+.conteo { display:flex; align-items:center; gap:.9rem; }
+.conteo .aro { position:relative; width:60px; height:60px; flex:none; }
+.conteo .aro svg { width:100%; height:100%; transform:rotate(-90deg); }
+.conteo .aro circle { fill:none; stroke-width:1.5; }
+.conteo .aro .pista { stroke:rgba(255,255,255,.1); }
+.conteo .aro .arco  { stroke:var(--tinta); stroke-linecap:round;
+  transition:stroke-dashoffset .35s var(--suave); }
+.conteo .cifra { position:absolute; inset:0; display:grid; place-items:center;
+  font-family:var(--mono); font-size:.82rem; font-weight:600; letter-spacing:.02em; }
+.conteo .rot { font-family:var(--mono); font-size:.55rem; letter-spacing:.24em;
+  text-transform:uppercase; color:var(--debil); line-height:1.6; }
+@media (max-width:640px){
+  .datos-caja { flex-direction:column; align-items:flex-start; }
+  .conteo { align-self:stretch; justify-content:space-between; }
 }
 
-/* Material adicional: renders del mismo proyecto que no entran en la
-   seleccion pero acompanan al que quiera ver mas */
-.extra-cabeza { max-width:1080px; margin:0 auto; padding:clamp(2.6rem,6vh,4rem) var(--margen) 1.2rem; }
-.extra-cabeza .rotulo { font-family:var(--mono); font-size:.6rem; letter-spacing:.24em; text-transform:uppercase; color:var(--debil); }
-.extra-cabeza p { color:var(--tenue); font-size:.9rem; margin-top:.5rem; }
-.tira-extra { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:clamp(.5rem,1vw,.9rem);
+/* --- Galeria -------------------------------------------------- */
+/* El reparto de filas lo calcula el JS: nunca queda un hueco al final
+   porque ninguna fila se deja a medias — si sobra una pieza, esa
+   pieza ocupa la fila entera. */
+.galeria { display:flex; flex-direction:column; gap:clamp(.5rem,1vw,.9rem);
   padding:0 clamp(.5rem,1vw,.9rem); }
-.tira-extra figure { position:relative; overflow:hidden; background:var(--n-850); cursor:pointer;
-  aspect-ratio:16/10; opacity:.72; transition:opacity .5s var(--suave); }
-.tira-extra figure:hover { opacity:1; }
+.galeria .fila { display:flex; gap:clamp(.5rem,1vw,.9rem); }
+.galeria figure { position:relative; overflow:hidden; cursor:pointer; flex:1 1 0; min-width:0;
+  border-radius:4px; background:rgba(255,255,255,.03);
+  clip-path:inset(12% 0 12% 0); opacity:0;
+  transition:clip-path 1.15s var(--salida), opacity .8s var(--suave); }
+.galeria .fila.doble figure { height:clamp(260px,42vh,520px); }
+.galeria .fila.unica figure { height:clamp(340px,66vh,840px); }
+.galeria figure.dentro { clip-path:inset(0 0 0 0); opacity:1; }
+.galeria img { width:100%; height:110%; object-fit:cover; transition:transform 1.3s var(--salida); will-change:transform; }
+.galeria figure:hover img { transform:scale(1.045); }
+.galeria figcaption { position:absolute; left:0; bottom:0; padding:1rem 1.2rem; z-index:2;
+  font-family:var(--mono); font-size:.55rem; letter-spacing:.2em; text-transform:uppercase; color:#fff;
+  opacity:0; transform:translateY(8px); transition:opacity .4s var(--suave), transform .5s var(--salida);
+  text-shadow:0 2px 12px rgba(0,0,0,.85); }
+.galeria figure:hover figcaption { opacity:.9; transform:none; }
+@media (max-width:860px){
+  .galeria .fila { flex-direction:column; }
+  .galeria .fila.doble figure, .galeria .fila.unica figure { height:42vh; }
+}
+
+/* --- Mas de este proyecto ------------------------------------- */
+/* Sin parrafo explicativo: un filo que se dibuja solo al entrar en
+   pantalla y una cifra. Las piezas suben en cascada detras. */
+.mas-filo { max-width:1180px; margin:0 auto;
+  padding:clamp(2.6rem,7vh,4.4rem) var(--margen) clamp(1.2rem,3vh,1.8rem);
+  display:flex; align-items:center; gap:1.1rem; }
+.mas-filo .raya { flex:1; height:1px; background:linear-gradient(to right, transparent, var(--linea-fuerte));
+  transform:scaleX(0); transform-origin:right; transition:transform 1.3s var(--salida); }
+.mas-filo .raya.der { background:linear-gradient(to left, transparent, var(--linea-fuerte)); transform-origin:left; }
+.mas-filo.visible .raya { transform:scaleX(1); }
+.mas-filo .marca-mas { display:flex; align-items:center; gap:.55rem; flex:none;
+  font-family:var(--mono); font-size:.58rem; letter-spacing:.22em; color:var(--tenue);
+  opacity:0; transform:translateY(8px); transition:opacity .7s var(--suave) .35s, transform .8s var(--salida) .35s; }
+.mas-filo.visible .marca-mas { opacity:1; transform:none; }
+.mas-filo .marca-mas .cruz { width:9px; height:9px; position:relative; }
+.mas-filo .marca-mas .cruz::before, .mas-filo .marca-mas .cruz::after {
+  content:''; position:absolute; background:currentColor; }
+.mas-filo .marca-mas .cruz::before { left:50%; top:0; width:1px; height:100%; transform:translateX(-50%) }
+.mas-filo .marca-mas .cruz::after  { top:50%; left:0; height:1px; width:100%; transform:translateY(-50%) }
+
+.tira-extra { display:flex; flex-wrap:wrap; gap:clamp(.5rem,1vw,.9rem);
+  padding:0 clamp(.5rem,1vw,.9rem); }
+/* flex-grow reparte el sobrante entre las piezas de la ultima fila:
+   por definicion no puede quedar un hueco al final */
+.tira-extra figure { position:relative; overflow:hidden; cursor:pointer; border-radius:4px;
+  flex:1 1 clamp(180px,22vw,300px); aspect-ratio:16/10;
+  background:rgba(255,255,255,.03);
+  opacity:0; transform:translateY(26px) scale(.97);
+  transition:opacity .8s var(--suave), transform .9s var(--salida), filter .5s var(--suave);
+  filter:saturate(.7) brightness(.78); }
+.tira-extra.visible figure { opacity:1; transform:none; }
+.tira-extra figure:hover { filter:saturate(1) brightness(1); }
 .tira-extra img { width:100%; height:100%; object-fit:cover; transition:transform 1.1s var(--salida); }
 .tira-extra figure:hover img { transform:scale(1.05); }
 
-/* Recorrido: va al final de la ficha y se muestra completo, sin
-   recortar. Los seis archivos son 1280x720, asi que el marco 16:9 los
-   encaja exactos. */
+/* --- Recorrido ------------------------------------------------ */
 .ficha-recorrido { max-width:1400px; margin:0 auto; padding:clamp(2.6rem,6vh,4.5rem) var(--margen) 0; }
-.ficha-recorrido .rotulo { font-family:var(--mono); font-size:.6rem; letter-spacing:.24em; text-transform:uppercase;
+.ficha-recorrido .rotulo { font-family:var(--mono); font-size:.58rem; letter-spacing:.24em; text-transform:uppercase;
   color:var(--debil); margin-bottom:1rem; display:flex; align-items:center; gap:.8rem; }
 .ficha-recorrido .rotulo::after { content:''; flex:1; height:1px; background:var(--linea); }
-.ficha-recorrido .marco { width:100%; aspect-ratio:16/9; background:#000; overflow:hidden; border-radius:6px; }
+.ficha-recorrido .marco { width:100%; aspect-ratio:16/9; overflow:hidden; border-radius:18px;
+  background:rgba(0,0,0,.5); }
 .ficha-recorrido video { width:100%; height:100%; object-fit:contain; background:#000; }
 
-.ficha-navegar { display:flex; justify-content:space-between; align-items:center; gap:1rem;
-  max-width:1080px; margin:0 auto; padding:2.5rem var(--margen) clamp(4rem,9vh,6rem); }
-.ficha-navegar button { font-family:var(--mono); font-size:.61rem; letter-spacing:.18em; text-transform:uppercase;
-  color:var(--tenue); padding:.5rem .8rem; border-radius:10px; transition:color .3s var(--suave), background .3s var(--suave); }
-.ficha-navegar button:hover { color:var(--tinta); background:rgba(250,250,250,.07); }
+.ficha-navegar { display:flex; justify-content:space-between; align-items:stretch; gap:.8rem;
+  max-width:1180px; margin:0 auto; padding:clamp(2.5rem,6vh,3.6rem) var(--margen) clamp(4rem,9vh,6rem); }
+.salto { flex:1 1 0; min-width:0; padding:1.1rem 1.3rem; border-radius:20px; text-align:left;
+  display:flex; flex-direction:column; gap:.3rem;
+  transition:border-color .4s, box-shadow .45s var(--suave), transform .5s var(--salida); }
+.salto.der { text-align:right; align-items:flex-end; }
+.salto:hover { border-color:var(--linea-fuerte); box-shadow:var(--v-filo), 0 24px 56px -26px rgba(0,0,0,.9); }
+.salto:hover.izq { transform:translateX(-4px); }
+.salto:hover.der { transform:translateX(4px); }
+.salto .rot { font-family:var(--mono); font-size:.55rem; letter-spacing:.22em; text-transform:uppercase; color:var(--debil); }
+.salto .nom { font-size:.95rem; font-weight:500; letter-spacing:-.01em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
 
-.viajero { position:fixed; z-index:280; overflow:hidden; pointer-events:none; }
+/* El clon que viaja entre la rejilla y la ficha */
+.viajero { position:fixed; z-index:280; overflow:hidden; pointer-events:none;
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.9); }
 .viajero img { width:100%; height:100%; object-fit:cover; }
 
 /* ============ Índice de todos los proyectos =================== */
-.indice-capa { position:fixed; inset:0; z-index:210; background:var(--fondo);
+.indice-capa { position:fixed; inset:0; z-index:210;
+  background:linear-gradient(180deg, rgba(16,18,25,.94), rgba(8,9,13,.97));
   overflow-y:auto; overscroll-behavior:contain;
   opacity:0; visibility:hidden; transition:opacity .45s var(--suave), visibility .45s; }
 .indice-capa.abierta { opacity:1; visibility:visible; }
 
-.filtros { display:flex; flex-wrap:wrap; gap:.45rem; padding:clamp(1.4rem,4vh,2.4rem) var(--margen) 1.2rem; }
-.filtro { font-family:var(--mono); font-size:.6rem; letter-spacing:.16em; text-transform:uppercase;
-  color:var(--debil); padding:.5rem .95rem; border-radius:999px; border:1px solid var(--linea);
+.filtros { display:flex; flex-wrap:wrap; gap:.45rem; padding:clamp(1.2rem,3.5vh,2rem) var(--margen) 1.2rem; }
+.filtro { font-family:var(--mono); font-size:.58rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--debil); padding:.55rem 1.05rem; border-radius:999px;
+  background:rgba(255,255,255,.04); border:1px solid var(--linea);
   transition:color .3s var(--suave), border-color .3s var(--suave), background .3s var(--suave); }
-.filtro:hover { color:var(--tenue); border-color:var(--linea-fuerte); }
-.filtro.activo { color:var(--fondo); background:var(--tinta); border-color:var(--tinta); }
+.filtro:hover { color:var(--tenue); border-color:var(--linea-fuerte); background:rgba(255,255,255,.08); }
+.filtro.activo { color:var(--base); background:var(--tinta); border-color:var(--tinta); }
 .filtro .n { opacity:.5; margin-left:.45rem; }
 
 .rejilla-todos { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
@@ -545,57 +770,85 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 .rejilla-todos.visible .tarjeta { opacity:1; transform:none; }
 .tarjeta.oculta { display:none; }
 
-.tarjeta-marco { position:relative; aspect-ratio:16/10; overflow:hidden; border-radius:12px; background:var(--n-850); }
+.tarjeta-marco { position:relative; aspect-ratio:16/10; overflow:hidden; border-radius:16px;
+  background:rgba(255,255,255,.03); border:1px solid var(--linea);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1); }
 .tarjeta-marco img { width:100%; height:106%; object-fit:cover;
-  transition:transform 1.2s var(--salida), filter .6s var(--suave); filter:brightness(.78) saturate(.9); }
+  transition:transform 1.2s var(--salida), filter .6s var(--suave); filter:brightness(.76) saturate(.88); }
 .tarjeta:hover .tarjeta-marco img { transform:scale(1.05); filter:brightness(1) saturate(1); }
-.tarjeta-pie { position:absolute; left:0; right:0; bottom:0; z-index:2; padding:1rem 1.2rem; color:#fff; overflow:hidden;
-  background:linear-gradient(to top, rgba(9,9,11,.85), transparent); }
+.tarjeta-pie { position:absolute; left:0; right:0; bottom:0; z-index:2; padding:1rem 1.2rem; color:#fff;
+  overflow:hidden; background:linear-gradient(to top, rgba(11,12,16,.88), transparent); }
 .tarjeta-pie h4 { font-size:1rem; font-weight:500; }
-.tarjeta-pie .tipo { font-family:var(--mono); font-size:.55rem; letter-spacing:.18em; text-transform:uppercase; opacity:.78; margin-top:.15rem; }
+.tarjeta-pie .tipo { font-family:var(--mono); font-size:.54rem; letter-spacing:.18em;
+  text-transform:uppercase; opacity:.76; margin-top:.15rem; }
 .tarjeta .sello { position:absolute; top:.8rem; right:.8rem; z-index:2;
   font-family:var(--mono); font-size:.5rem; letter-spacing:.16em; text-transform:uppercase;
-  background:rgba(9,9,11,.7); backdrop-filter:blur(8px); border:1px solid var(--linea);
-  color:#fff; padding:.25rem .55rem; border-radius:999px; }
+  background:rgba(11,12,16,.55); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.14);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+  color:#fff; padding:.28rem .6rem; border-radius:999px; }
 
 /* ============ Visor ========================================== */
-.visor { position:fixed; inset:0; z-index:300; background:rgba(9,9,11,.97);
+.visor { position:fixed; inset:0; z-index:300;
+  background:rgba(8,9,13,.92); backdrop-filter:blur(28px) saturate(140%);
   display:flex; align-items:center; justify-content:center; padding:clamp(1rem,4vh,3rem);
   opacity:0; visibility:hidden; transition:opacity .45s var(--suave), visibility .45s; }
 .visor.abierto { opacity:1; visibility:visible; }
-.visor img { max-width:100%; max-height:100%; object-fit:contain; transform:scale(.97); transition:transform .5s var(--salida); }
-.visor.abierto img { transform:scale(1); }
-.visor-cerrar, .visor-nav { position:absolute; color:var(--tenue); padding:1rem; font-size:1.6rem; line-height:1; transition:color .3s; }
-.visor-cerrar:hover, .visor-nav:hover { color:var(--tinta); }
-.visor-cerrar { top:.8rem; right:1rem; }
-.visor-nav.prev { left:.4rem; top:50%; transform:translateY(-50%); }
-.visor-nav.sig  { right:.4rem; top:50%; transform:translateY(-50%); }
-.visor-pie { position:absolute; bottom:1.1rem; left:50%; transform:translateX(-50%); font-family:var(--mono);
-  font-size:.6rem; letter-spacing:.18em; color:var(--debil); text-transform:uppercase; }
+/* Dos capas: la que sale se va hacia un lado con desenfoque mientras
+   la que entra llega desde el contrario. Sin esto el cambio de imagen
+   era un salto de src. */
+.visor-escena { position:relative; width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center; }
+.visor-capa { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+.visor-capa img { max-width:100%; max-height:100%; object-fit:contain;
+  border-radius:6px; box-shadow:0 40px 100px -30px rgba(0,0,0,.9); }
+.visor-cerrar, .visor-nav { position:absolute; z-index:5; color:var(--tenue);
+  width:46px; height:46px; border-radius:50%; display:grid; place-items:center;
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16); backdrop-filter:blur(14px);
+  font-size:1.4rem; line-height:1;
+  transition:color .3s, background .3s, transform .4s var(--resorte); }
+.visor-cerrar:hover, .visor-nav:hover { color:var(--tinta); background:rgba(255,255,255,.13); transform:scale(1.08); }
+.visor-cerrar { top:1rem; right:1rem; }
+.visor-nav.prev { left:1rem; top:50%; margin-top:-23px; }
+.visor-nav.sig  { right:1rem; top:50%; margin-top:-23px; }
+.visor-pie { position:absolute; bottom:1.2rem; left:50%; transform:translateX(-50%); z-index:5;
+  font-family:var(--mono); font-size:.58rem; letter-spacing:.18em; color:var(--tenue);
+  text-transform:uppercase; padding:.5rem 1.1rem; border-radius:999px;
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(14px); }
 
 @media (prefers-reduced-motion:reduce){
   *, *::before, *::after { animation:none !important; transition:none !important; }
   .mascara-marca { display:none }
   .lamina img { opacity:1; transform:none }
-  .bloque > *, .revelar > *, .util { opacity:1 !important; transform:none !important; }
-  .palabras span i, .hoja-abierta > * > * { transform:none }
-  .inicio-aparte, .baja { opacity:1 }
-  .cortina, .galeria figure, .hoja { clip-path:none !important; opacity:1 !important; }
-  .ficha-portada-texto h2 span { transform:none }
+  .titular .letra, .subtitular span, .revelar > *, .enlace { opacity:1 !important; transform:none !important; }
+  .inicio-aparte, .baja, .orbital, .mas-filo .marca-mas { opacity:1 }
+  .mas-filo .raya { transform:none }
+  .galeria figure, .hoja, .tira-extra figure { clip-path:none !important; opacity:1 !important; transform:none !important; }
+  .ficha-portada-texto h2 span, .ficha .entra { transform:none; opacity:1; filter:none }
   .hito { transform:none !important; opacity:1 !important; }
 }
 </style>
 </head>
 <body>
 
+<div class="campo" aria-hidden="true">
+  <div class="masa m1"></div>
+  <div class="masa m2"></div>
+  <div class="masa m3"></div>
+  <div class="masa m4"></div>
+  <div class="grano"></div>
+</div>
+
 <div class="avance" id="avance"></div>
 
-<header class="barra">
+<header class="barra vidrio" id="barra">
   <a href="#inicio" class="marca" data-reiniciar>
     <span class="punto"></span>
-    <span>STICK INDUSTRIES</span>
+    <span class="rotulo">KEVIN GIL</span>
   </a>
   <nav class="menu" id="menu">
+    <span class="gota" id="gota"></span>
     <a href="#inicio" data-reiniciar>Inicio</a>
     <a href="#proyectos">Proyectos</a>
     <a href="#sobre">Sobre mí</a>
@@ -608,6 +861,8 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   <div class="regla-marca"></div>
 </div>
 
+<div class="lienzo">
+
 <!-- ===================== INICIO ===================== -->
 <section class="inicio" id="inicio">
   <div class="lamina">
@@ -616,13 +871,19 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
          sizes="100vw" alt="Render de fachada" fetchpriority="high">
   </div>
   <div class="inicio-texto">
-    <h1>
-      <span class="bloque"><span class="t1 suave">Antes de construirlo,</span></span>
-      <span class="bloque"><span class="t2">véalo terminado.</span></span>
-    </h1>
+    <div>
+      <h1 class="titular" id="titular"></h1>
+      <div class="subtitular"><span>Ingeniero civil · Visualización arquitectónica</span></div>
+    </div>
     <div class="inicio-aparte">
-      <p>Ingeniero civil y visualizador arquitectónico. Modelado, iluminación y recorridos 3D.</p>
-      <div class="dato mono">Kevin Gil · Bucaramanga, Colombia</div>
+      <p>Levanto el proyecto en modelo antes de que exista en obra: los espesores,
+         los apoyos y la luz que va a tener de verdad. De ahí salen las imágenes,
+         los recorridos y los planos con que se coordina.</p>
+      <div class="dato mono">
+        <span>Kevin Gil</span><span class="sep"></span>
+        <span>Bucaramanga, Colombia</span><span class="sep"></span>
+        <span>Visual 3D Studio</span>
+      </div>
     </div>
   </div>
   <div class="baja"><span>Desplace</span><span class="hilo"></span></div>
@@ -639,14 +900,19 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
     </div>
     <div class="vitrina" id="vitrina"></div>
     <div class="ver-todos">
-      <button class="btn-todos" data-ver-todos><span>Ver todos los proyectos</span><span class="cuenta" id="cuenta-todos"></span><span class="flecha"></span></button>
+      <button class="btn-todos vidrio" data-ver-todos>
+        <span>Ver todo el archivo</span>
+        <span class="cuenta" id="cuenta-todos"></span>
+        <span class="disco"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </button>
     </div>
   </div>
 </section>
 
 <div class="indice-capa" id="indice-capa" role="dialog" aria-modal="true" aria-label="Todos los proyectos">
-  <div class="ficha-barra">
-    <span class="nombre mono">Todos los proyectos</span>
+  <div class="ficha-barra vidrio" style="opacity:1; transform:none">
+    <span class="nombre mono">Archivo completo</span>
     <button class="ficha-cerrar" id="indice-cerrar"><span class="aspa"></span> Cerrar</button>
   </div>
   <div class="filtros" id="filtros"></div>
@@ -655,44 +921,40 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 
 <!-- ===================== SOBRE MÍ ===================== -->
 <section class="seccion" id="sobre">
-  <div class="seccion-cuerpo acolchado">
-    <div class="cabeza">
-      <div>
-        <div class="etiqueta revelar"><span>Quién</span></div>
-        <h2 class="palabras" data-texto="Ingeniero civil y visualizador."></h2>
+  <div class="seccion-cuerpo acolchado sobre-marco">
+
+    <div class="orbital" id="orbital" aria-hidden="true"><div class="nucleo"></div></div>
+
+    <div class="sobre-contenido">
+      <div class="cabeza">
+        <div>
+          <div class="etiqueta revelar"><span>Quién</span></div>
+          <h2 class="palabras" data-texto="Ingeniero civil y visualizador."></h2>
+        </div>
       </div>
-    </div>
 
-    <div class="bio">
-      <div>
-        <p class="destacado">No llego al render desde la imagen: llego desde el modelo. Cuando levanto
-           un proyecto en Revit, los espesores, las luces y los apoyos son los que se van a construir.</p>
-        <p><strong>Kevin Stick Gil Arévalo.</strong> Estudiante de ingeniería civil en la Universidad
-           Pontificia Bolivariana, seccional Bucaramanga, con nueve semestres culminados. En 2026 fundé
-           <strong>VISUAL 3D STUDIO</strong>, un estudio de representación del diseño: modelos digitales
-           coherentes con criterios constructivos y planos técnicos que sirven para coordinar la obra.</p>
-        <p>Subo a obra varias veces por semana. Esa distancia entre lo que se dibuja y lo que se levanta
-           es la que corrijo antes de que llegue al concreto, y es lo que separa una imagen bonita de una
-           imagen que se puede construir.</p>
-
-        <div class="cifras revelar">
-          <div class="cifra"><b>10</b><span>Proyectos</span></div>
-          <div class="cifra"><b>4.2</b><span>Promedio / 5</span></div>
-          <div class="cifra"><b>B2</b><span>Inglés IELTS</span></div>
-          <div class="cifra"><b>2026</b><span>V3S fundado</span></div>
+      <div class="bio">
+        <div>
+          <p class="destacado">No llego al render desde la imagen: llego desde el modelo. Cuando levanto
+             un proyecto en Revit, los espesores, las luces y los apoyos son los que se van a construir.</p>
+          <p><strong>Kevin Stick Gil Arévalo.</strong> Estudiante de ingeniería civil en la Universidad
+             Pontificia Bolivariana, seccional Bucaramanga, con nueve semestres culminados. En 2026 fundé
+             <strong>VISUAL 3D STUDIO</strong>, un estudio de representación del diseño: modelos digitales
+             coherentes con criterios constructivos y planos técnicos que sirven para coordinar la obra.</p>
+          <p>Subo a obra varias veces por semana. Esa distancia entre lo que se dibuja y lo que se levanta
+             es la que corrijo antes de que llegue al concreto, y es lo que separa una imagen bonita de una
+             imagen que se puede construir.</p>
         </div>
 
-        <div class="etiqueta">Herramientas</div>
-        <div class="herramientas" id="herramientas"></div>
-      </div>
-
-      <div class="bio-trayecto">
-        <div class="etiqueta">Trayecto</div>
-        <div class="rueda-marco">
-          <div class="rueda" id="rueda"></div>
+        <div class="bio-trayecto">
+          <div class="etiqueta">Trayecto</div>
+          <div class="rueda-marco vidrio">
+            <div class="rueda" id="rueda"></div>
+          </div>
         </div>
       </div>
     </div>
+
   </div>
 </section>
 
@@ -707,23 +969,24 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
     </div>
     <div class="contacto-cuerpo">
       <div class="revelar">
-        <p class="apunte">Cuénteme qué va a construir y le digo cómo se vería. Respondo por WhatsApp
-           el mismo día.</p>
-        <div class="acciones" id="acciones"></div>
-        <div class="dato-directo" id="dato-directo"></div>
+        <p class="apunte">Este es el trabajo. Si quiere ver algo con más detalle,
+           saber <b>cómo se resolvió</b> o simplemente saludar, aquí estoy.</p>
       </div>
+      <div class="enlaces" id="enlaces"></div>
     </div>
   </div>
 </section>
 
 <div class="pie">
   <span>KEVIN GIL · BUCARAMANGA, COLOMBIA</span>
-  <span>STICK INDUSTRIES</span>
+  <span>VISUAL 3D STUDIO</span>
 </div>
+
+</div><!-- /lienzo -->
 
 <!-- ===================== FICHA ===================== -->
 <div class="ficha" id="ficha" role="dialog" aria-modal="true" aria-label="Proyecto">
-  <div class="ficha-barra">
+  <div class="ficha-barra vidrio">
     <span class="nombre mono" id="ficha-nombre"></span>
     <button class="ficha-cerrar" id="ficha-cerrar"><span class="aspa"></span> Cerrar</button>
   </div>
@@ -733,7 +996,7 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 <div class="visor" id="visor" role="dialog" aria-modal="true" aria-label="Imagen ampliada">
   <button class="visor-cerrar" id="visor-cerrar" aria-label="Cerrar">&times;</button>
   <button class="visor-nav prev" id="visor-prev" aria-label="Anterior">&#8249;</button>
-  <img id="visor-img" src="" alt="">
+  <div class="visor-escena" id="visor-escena"></div>
   <button class="visor-nav sig" id="visor-sig" aria-label="Siguiente">&#8250;</button>
   <div class="visor-pie mono" id="visor-pie"></div>
 </div>
@@ -745,7 +1008,7 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 const CONTACTO = {
   whatsapp:  '573156307424',
   telefono:  '315 630 7424',
-  mensaje:   'Hola Kevin, vi tu portafolio y quiero hablar de un proyecto.',
+  mensaje:   'Hola Kevin, vi tu portafolio.',
   correo:    'kevingilarevalo10@gmail.com',
   instagram: 'kevingilarevalo',
   igEstudio: 'visual_3dstudio'
@@ -763,57 +1026,69 @@ const CONTACTO = {
            entrada del proyecto
    piezas  seleccion curada, en orden de lectura
    extra   renders del mismo proyecto fuera de la seleccion
+   coord   [lat, lon] APROXIMADAS, a nivel de municipio: es lo que
+           gira el globo. No son las del lote.
    ================================================================= */
 const PRINCIPALES = [
   { slug:'cazadores', arch:'cazadores', titulo:'Lote 1 · Cazadores Resort', tipo:'Vivienda unifamiliar',
     grupo:'vivienda', lugar:'Condominio Cazadores Resort', anio:'2026', estado:'En curso',
+    coord:[7.02,-73.09],
     portada:9, piezas:[9,7,8,10,13,11,12,6,5,4,3,1,2,14], extra:[], video:'cazadores',
     texto:'Vivienda de dos plantas sobre ladera, resuelta con piedra, madera y grandes paños de vidrio. El encargo pedía verificar cómo se comporta la fachada contra la pendiente del lote, así que la serie recorre el volumen completo antes de entrar a los espacios interiores.' },
 
   { slug:'cantabria-1', arch:'cantabria-1', titulo:'Lote 1 · Villas de Cantabria', tipo:'Vivienda unifamiliar',
     grupo:'vivienda', lugar:'Villas de Cantabria', anio:'2026', estado:'En curso',
+    coord:[7.055,-73.085],
     portada:7, piezas:[7,12,14,13,3,10], extra:[1,2,4,5,6,8,9,11], video:'cantabria-1',
     texto:'La casa se organiza alrededor de una sala a doble altura que conecta visualmente los dos niveles. El acristalamiento continuo obligó a cuidar los reflejos: en visualización, un vidrio mal resuelto delata el render antes que cualquier otro material.' },
 
   { slug:'cantabria-23', arch:'cantabria-23', titulo:'Lote 23 · Villas de Cantabria', tipo:'Vivienda unifamiliar',
     grupo:'vivienda', lugar:'Villas de Cantabria', anio:'2026', estado:'En curso',
+    coord:[7.055,-73.085],
     portada:9, piezas:[9,13,3,10,11], extra:[1,2,4,5,6,7,8,12], video:'cantabria-23',
     texto:'Fachada de líneas rectas con patio interior y piscina. La cocina abierta y la escalera funcionan como pieza central del primer nivel, y el recorrido se armó para leer esa continuidad de un espacio al siguiente.' },
 
   { slug:'punta', arch:'punta', titulo:'Punta Ruitoque', tipo:'Vivienda de lujo',
     grupo:'vivienda', lugar:'Ruitoque', anio:'2025', estado:'Terminado',
+    coord:[7.005,-73.12],
     portada:7, piezas:[7,18,12,13], extra:[1,2,3,4,5,6,8,9,10,11,14,15,16,17,19,20,21,22], video:'punta',
     texto:'El proyecto más extenso del archivo: se modelaron y ambientaron todos los espacios de la casa, desde el teatro hasta cada alcoba. La selección muestra la fachada y tres habitaciones; el resto del material queda más abajo.' }
 ];
 
 const SECUNDARIOS = [
   { slug:'coincafex', arch:'coincafex', titulo:'Coincafex', tipo:'Sede corporativa',
-    grupo:'corporativo', lugar:'Zona industrial', anio:'2025', estado:'Terminado',
+    grupo:'corporativo', lugar:'Girón, zona industrial', anio:'2025', estado:'Terminado',
+    coord:[7.07,-73.17],
     portada:3, piezas:[3,8,10,5,6,2,4], extra:[1,9], video:'coincafex',
     texto:'La intervención envuelve una bodega existente con una piel metálica microperforada que unifica el volumen y oculta la cubierta. Adentro, las oficinas se resolvieron con luz cálida rasante y madera para que el interior no leyera como industrial.' },
 
   { slug:'casa-campo', arch:'casa-will', titulo:'Casa Campo', tipo:'Vivienda campestre',
     grupo:'vivienda', lugar:'Santander', anio:'2025', estado:'Terminado',
+    coord:[7.00,-73.20],
     portada:1, piezas:[1,2,3], extra:[],
     texto:'Una casa de una sola planta que se abre por completo al jardín. El encargo pedía mostrar cómo el alero protege la fachada acristalada sin cerrar la vista, así que los tres encuadres trabajan la misma hora del día y la misma altura de cámara.' },
 
   { slug:'ruitoque-34', arch:'ruitoque', titulo:'Casa 34 · Ruitoque', tipo:'Vivienda urbana',
     grupo:'vivienda', lugar:'Ruitoque', anio:'2025', estado:'Terminado',
+    coord:[7.02,-73.13],
     portada:1, piezas:[1,2], extra:[], video:'ruitoque',
     texto:'La misma fachada resuelta de día y de noche, para mostrar cómo cambia el proyecto cuando entra la iluminación exterior.' },
 
   { slug:'closets-lebrija', arch:'lebrija', titulo:'Closets Lebrija', tipo:'Carpintería a medida',
     grupo:'carpinteria', lugar:'Lebrija', anio:'2025', estado:'Terminado',
+    coord:[7.11,-73.37],
     portada:2, piezas:[2,4,8], extra:[6,7,9,10,11,12],
     texto:'Vestieres y closets representados con el material y la herrajería reales. La imagen sirve para aprobar en obra: si el render miente en un espesor o en una luz, el mueble llega distinto.' },
 
   { slug:'cocina-lebrija', arch:'lebrija', titulo:'Cocina Lebrija', tipo:'Carpintería a medida',
     grupo:'carpinteria', lugar:'Lebrija', anio:'2025', estado:'Terminado',
+    coord:[7.11,-73.37],
     portada:16, piezas:[16,1,3], extra:[5,13,14,15,17],
     texto:'Cocina con isla en superficie de mármol y muebles en dos tonos. Se representaron los electrodomésticos y la iluminación bajo mueble tal como se instalaron.' },
 
   { slug:'mediterranea', arch:'mediterranea', titulo:'Cocina Mediterráneo', tipo:'Carpintería a medida',
     grupo:'carpinteria', lugar:'Bucaramanga', anio:'2026', estado:'Terminado',
+    coord:[7.12,-73.12],
     portada:1, piezas:[1,2,3], extra:[],
     texto:'Cocina oscura con listones verticales en madera y encimera clara. El estudio buscaba controlar el contraste: mucho mueble negro exige que la luz de trabajo quede exactamente donde se va a instalar.' }
 ];
@@ -847,11 +1122,15 @@ const HITOS = [
 
   { anio:'2023', escudo:null, sigla:'OBRA',
     titulo:'Ayudante de obra', estado:null,
-    detalle:'Proyectos de construcción y obra civil. El primer contacto con lo que se levanta.' },
+    detalle:'Replanteo, control de material y acompañamiento de cuadrilla en obra civil. Ahí se aprende lo que el plano no alcanza a decir.' },
 
   { anio:'2025', escudo:null, sigla:'SSI',
     titulo:'Congreso XOpen Internacional', estado:null,
     detalle:'Sociedad Santandereana de Ingeniería. Participación y competencia de puentes.' },
+
+  { anio:'2025', escudo:'assets/logos/upb.webp', sigla:'UPB',
+    titulo:'Representante estudiantil', estado:'Facultad',
+    detalle:'Vocería de los estudiantes de Ingeniería Civil ante la Facultad, UPB Bucaramanga.' },
 
   { anio:'2025', escudo:'assets/logos/uis.webp', sigla:'UIS',
     titulo:'Modelado BIM y gestión de la construcción', estado:null,
@@ -870,32 +1149,40 @@ const HITOS = [
     detalle:'Siguiente paso en la formación.' }
 ];
 
+/* Los logos ya no van en rejilla: orbitan detras del texto como parte
+   del campo. anillo 0 = interior, anillo 1 = exterior. */
 const UTILES = [
-  { nombre:'Revit',       logo:'assets/logos/revit.webp' },
-  { nombre:'AutoCAD',     logo:'assets/logos/autocad.webp' },
-  { nombre:'Civil 3D',    logo:'assets/logos/civil3d.webp' },
-  { nombre:'SketchUp',    logo:'assets/logos/sketchup.webp' },
-  { nombre:'D5 Render',   logo:'assets/logos/d5.webp' },
-  { nombre:'Twinmotion',  logo:'assets/logos/twinmotion.webp' },
-  { nombre:'Claude Code', logo:'assets/logos/claudecode.webp' },
-  { nombre:'ChatGPT',     logo:'assets/logos/chatgpt.webp' },
-  { nombre:'Canva',       logo:'assets/logos/canva.webp' },
-  { nombre:'Excel',       logo:'assets/logos/excel.webp' }
+  { nombre:'Revit',       logo:'assets/logos/revit.webp',      anillo:0 },
+  { nombre:'AutoCAD',     logo:'assets/logos/autocad.webp',    anillo:0 },
+  { nombre:'Civil 3D',    logo:'assets/logos/civil3d.webp',    anillo:0 },
+  { nombre:'SketchUp',    logo:'assets/logos/sketchup.webp',   anillo:0 },
+  { nombre:'D5 Render',   logo:'assets/logos/d5.webp',         anillo:1 },
+  { nombre:'Twinmotion',  logo:'assets/logos/twinmotion.webp', anillo:1 },
+  { nombre:'Claude Code', logo:'assets/logos/claudecode.webp', anillo:1 },
+  { nombre:'ChatGPT',     logo:'assets/logos/chatgpt.webp',    anillo:1 },
+  { nombre:'Canva',       logo:'assets/logos/canva.webp',      anillo:1 },
+  { nombre:'Excel',       logo:'assets/logos/excel.webp',      anillo:1 }
 ];
 
 let PALETAS = {};
 fetch('assets/paletas.json').then(r => r.json()).then(p => { PALETAS = p; }).catch(() => {});
 
+/* Silueta de continentes para el globo. Se pide una sola vez y en
+   paralelo: si no llega, el globo dibuja solo la retícula. */
+let TIERRA = null;
+fetch('assets/datos/tierra.json').then(r => r.json()).then(t => { TIERRA = t; }).catch(() => {});
+
 const ruta   = (a, i) => `assets/renders/${a}-${String(i).padStart(2,'0')}.webp`;
 const ruta2x = (a, i) => `assets/renders/${a}-${String(i).padStart(2,'0')}@2x.webp`;
 const juego  = (a, i) => `${ruta(a,i)} 1600w, ${ruta2x(a,i)} 2560w`;
+const quieto = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* =================================================================
    ENTRADA
    ================================================================= */
-function repartir(el, texto, retraso) {
+function repartir(el, texto, retraso, paso = .045) {
   el.innerHTML = [...texto].map((c, i) =>
-    `<span class="letra" style="animation-delay:${(retraso + i * .045).toFixed(3)}s">${c === ' ' ? '&nbsp;' : c}</span>`
+    `<span class="letra" style="animation-delay:${(retraso + i * paso).toFixed(3)}s">${c === ' ' ? '&nbsp;' : c}</span>`
   ).join('');
 }
 function marcarEntrada(raiz) {
@@ -904,10 +1191,25 @@ function marcarEntrada(raiz) {
 }
 marcarEntrada(document);
 
+/* El titular de la portada usa el mismo recorte: las letras de
+   PORTAFOLIO dejan ver el render que tienen detras. */
+repartir(document.getElementById('titular'), 'PORTAFOLIO', 3.05, .06);
+
 document.querySelectorAll('.palabras').forEach(t => {
   t.innerHTML = t.dataset.texto.split(' ').map((p, i) =>
     `<span><i style="transition-delay:${(i * .07).toFixed(3)}s">${p}</i></span>`).join(' ');
 });
+
+/* =================================================================
+   VIDRIO — el reflejo sigue al cursor
+   ================================================================= */
+addEventListener('pointermove', e => {
+  const v = e.target.closest && e.target.closest('.vidrio, .enlace, .salto, .tarjeta-marco');
+  if (!v) return;
+  const c = v.getBoundingClientRect();
+  v.style.setProperty('--mx', `${((e.clientX - c.left) / c.width * 100).toFixed(1)}%`);
+  v.style.setProperty('--my', `${((e.clientY - c.top) / c.height * 100).toFixed(1)}%`);
+}, { passive:true });
 
 /* =================================================================
    VITRINA
@@ -1027,33 +1329,200 @@ rueda.addEventListener('scroll', pedirGiro, { passive:true });
 addEventListener('resize', pedirGiro);
 girarRueda();
 
-document.getElementById('herramientas').innerHTML = UTILES.map((u, i) => `
-  <div class="util" style="transition-delay:${(i * .04).toFixed(2)}s">
-    <div class="simbolo"><img src="${u.logo}" alt="${u.nombre}" loading="lazy"></div>
-    <div class="nombre">${u.nombre}</div>
-  </div>`).join('');
+/* --- Sistema orbital de herramientas -------------------------- */
+/* Dos anillos girando en sentidos opuestos. Cada satelite compensa el
+   giro de su anillo con una animacion inversa de la misma duracion,
+   asi el logo nunca se ve cabeza abajo. */
+(function montarOrbital() {
+  const orbital = document.getElementById('orbital');
+  const capas = [
+    { radio:'33%', dur:'96s',  clase:'',        tam:'clamp(44px,4.6vw,60px)' },
+    { radio:'46%', dur:'140s', clase:'inverso', tam:'clamp(40px,4.2vw,54px)' }
+  ];
+  capas.forEach((capa, ci) => {
+    const dentro = UTILES.filter(u => u.anillo === ci);
+    if (!dentro.length) return;
+    const anillo = document.createElement('div');
+    anillo.className = `anillo ${capa.clase}`;
+    anillo.style.setProperty('--t', capa.dur);
+    anillo.style.setProperty('--r', capa.radio);
+    anillo.innerHTML = dentro.map((u, i) => {
+      const a = (360 / dentro.length) * i + ci * 18;
+      return `<span class="satelite" style="--a:${a}deg; --r:${capa.radio}; --t:${capa.dur}; --s:${capa.tam}">
+                <span class="orbe"><span class="contra">
+                  <span class="cara"><img src="${u.logo}" alt="${u.nombre}" loading="lazy"></span>
+                  <span class="nombre">${u.nombre}</span>
+                </span></span>
+              </span>`;
+    }).join('');
+    orbital.appendChild(anillo);
+  });
+})();
 
 /* =================================================================
    CONTACTO
    ================================================================= */
-const IG_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>';
-const WA_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 01-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.2 8.2 0 015.83 2.42 8.18 8.18 0 012.41 5.82c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.43.06-.65.31-.22.25-.85.83-.85 2.03s.87 2.35.99 2.51c.12.17 1.71 2.61 4.15 3.66.58.25 1.03.4 1.39.51.58.19 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29z"/></svg>';
-const MAIL_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="M3 7l9 6 9-6"/></svg>';
+const IG_SVG = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>';
+const WA_SVG = '<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 01-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.2 8.2 0 015.83 2.42 8.18 8.18 0 012.41 5.82c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.43.06-.65.31-.22.25-.85.83-.85 2.03s.87 2.35.99 2.51c.12.17 1.71 2.61 4.15 3.66.58.25 1.03.4 1.39.51.58.19 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29z"/></svg>';
+const MAIL_SVG = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="M3 7l9 6 9-6"/></svg>';
+const FLECHA_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17L17 7M9 7h8v8"/></svg>';
 
 /* El correo abre la ventana de redaccion de Gmail en el navegador, no
    el cliente de correo del sistema: en un equipo sin cliente
    configurado, un enlace mailto no hace nada visible. */
 const GMAIL = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(CONTACTO.correo)}` +
-              `&su=${encodeURIComponent('Proyecto de visualización')}`;
+              `&su=${encodeURIComponent('Sobre tu portafolio')}`;
 
-document.getElementById('acciones').innerHTML = `
-  <a class="boton boton-primario" href="https://wa.me/${CONTACTO.whatsapp}?text=${encodeURIComponent(CONTACTO.mensaje)}" target="_blank" rel="noopener">${WA_SVG} WhatsApp</a>
-  <a class="boton boton-secundario" href="${GMAIL}" target="_blank" rel="noopener">${MAIL_SVG} Correo</a>
-  <a class="boton boton-secundario" href="https://www.instagram.com/${CONTACTO.instagram}" target="_blank" rel="noopener">${IG_SVG} Instagram</a>
-  <a class="boton boton-secundario" href="https://www.instagram.com/${CONTACTO.igEstudio}" target="_blank" rel="noopener">${IG_SVG} Visual 3D Studio</a>`;
+const ENLACES = [
+  { rot:'WhatsApp',  val:CONTACTO.telefono,   icono:WA_SVG,
+    url:`https://wa.me/${CONTACTO.whatsapp}?text=${encodeURIComponent(CONTACTO.mensaje)}` },
+  { rot:'Correo',    val:'kevingilarevalo10', icono:MAIL_SVG, url:GMAIL },
+  { rot:'Instagram', val:'@' + CONTACTO.instagram, icono:IG_SVG,
+    url:`https://www.instagram.com/${CONTACTO.instagram}` },
+  { rot:'El estudio', val:'@' + CONTACTO.igEstudio, icono:IG_SVG,
+    url:`https://www.instagram.com/${CONTACTO.igEstudio}` }
+];
 
-document.getElementById('dato-directo').innerHTML =
-  `<b>${CONTACTO.telefono}</b> · ${CONTACTO.correo}`;
+document.getElementById('enlaces').innerHTML = ENLACES.map((e, i) => `
+  <a class="enlace vidrio" href="${e.url}" target="_blank" rel="noopener"
+     style="transition-delay:${(i * .08).toFixed(2)}s">
+    <span class="icono">${e.icono}</span>
+    <span>
+      <span class="rot">${e.rot}</span>
+      <span class="val">${e.val}</span>
+    </span>
+    <span class="flecha">${FLECHA_SVG}</span>
+  </a>`).join('');
+
+/* =================================================================
+   GLOBO — canvas 2D, proyeccion ortografica
+   El planeta arranca girado y se orienta hacia las coordenadas del
+   proyecto conforme la barra de datos sube por la pantalla. Al quedar
+   centrado, el marcador late.
+   ================================================================= */
+function crearGlobo(lienzo, coord) {
+  const ctx = lienzo.getContext('2d');
+  const [latDest, lonDest] = coord;
+  // Punto de partida: media vuelta de distancia, para que el giro se
+  // lea como un planeta que rota, no como un salto de camara.
+  const lonIni = lonDest + 168, latIni = latDest + 34;
+  let p = 0, pDibujado = -1;
+
+  function medir() {
+    const d = Math.min(lienzo.clientWidth, lienzo.clientHeight) || 120;
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    lienzo.width = lienzo.height = Math.round(d * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return d;
+  }
+  let lado = medir();
+
+  const rad = g => g * Math.PI / 180;
+  const suavizar = t => 1 - Math.pow(1 - t, 3);
+
+  function proyectar(lon, lat, lon0, lat0, R, cx, cy) {
+    const dl = rad(lon - lon0), la = rad(lat), la0 = rad(lat0);
+    const cosc = Math.sin(la0) * Math.sin(la) + Math.cos(la0) * Math.cos(la) * Math.cos(dl);
+    if (cosc < 0) return null;                       // cara oculta
+    return [ cx + R * Math.cos(la) * Math.sin(dl),
+             cy - R * (Math.cos(la0) * Math.sin(la) - Math.sin(la0) * Math.cos(la) * Math.cos(dl)),
+             cosc ];
+  }
+
+  function pintar() {
+    const t   = suavizar(p);
+    const lon0 = lonIni + (lonDest - lonIni) * t;
+    const lat0 = latIni + (latDest - latIni) * t;
+    const cx = lado / 2, cy = lado / 2, R = lado * .40;
+
+    ctx.clearRect(0, 0, lado, lado);
+
+    // Oceano: esfera con la luz entrando por arriba a la izquierda
+    const oc = ctx.createRadialGradient(cx - R * .38, cy - R * .42, R * .06, cx, cy, R);
+    oc.addColorStop(0,   'rgba(150,180,230,.26)');
+    oc.addColorStop(.55, 'rgba(60,84,130,.16)');
+    oc.addColorStop(1,   'rgba(10,14,26,.30)');
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, 7); ctx.fillStyle = oc; ctx.fill();
+
+    // Retícula
+    ctx.lineWidth = .6;
+    for (let lat = -60; lat <= 60; lat += 30) {
+      ctx.beginPath(); let roto = true;
+      for (let lon = -180; lon <= 180; lon += 4) {
+        const q = proyectar(lon, lat, lon0, lat0, R, cx, cy);
+        if (!q) { roto = true; continue; }
+        roto ? (ctx.moveTo(q[0], q[1]), roto = false) : ctx.lineTo(q[0], q[1]);
+      }
+      ctx.strokeStyle = 'rgba(255,255,255,.09)'; ctx.stroke();
+    }
+    for (let lon = -180; lon < 180; lon += 30) {
+      ctx.beginPath(); let roto = true;
+      for (let lat = -88; lat <= 88; lat += 4) {
+        const q = proyectar(lon, lat, lon0, lat0, R, cx, cy);
+        if (!q) { roto = true; continue; }
+        roto ? (ctx.moveTo(q[0], q[1]), roto = false) : ctx.lineTo(q[0], q[1]);
+      }
+      ctx.strokeStyle = 'rgba(255,255,255,.07)'; ctx.stroke();
+    }
+
+    // Continentes
+    if (TIERRA) {
+      ctx.lineWidth = .9;
+      TIERRA.forEach(anillo => {
+        ctx.beginPath();
+        let roto = true, visibles = 0;
+        for (let i = 0; i < anillo.length; i += 2) {
+          const q = proyectar(anillo[i], anillo[i + 1], lon0, lat0, R, cx, cy);
+          if (!q) { roto = true; continue; }
+          visibles++;
+          roto ? (ctx.moveTo(q[0], q[1]), roto = false) : ctx.lineTo(q[0], q[1]);
+        }
+        if (!visibles) return;
+        ctx.fillStyle   = 'rgba(226,232,245,.13)';
+        ctx.strokeStyle = 'rgba(226,232,245,.42)';
+        ctx.fill(); ctx.stroke();
+      });
+    }
+
+    // Filo de la esfera
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, 7);
+    ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,.22)'; ctx.stroke();
+
+    // Marcador
+    const m = proyectar(lonDest, latDest, lon0, lat0, R, cx, cy);
+    if (m) {
+      const vivo = Math.min(1, Math.max(0, (p - .55) / .45));
+      const pulso = quieto() ? 0 : (performance.now() % 2200) / 2200;
+      if (vivo > 0) {
+        ctx.beginPath();
+        ctx.arc(m[0], m[1], 3 + pulso * 13, 0, 7);
+        ctx.strokeStyle = `rgba(255,255,255,${(.5 * (1 - pulso) * vivo).toFixed(3)})`;
+        ctx.lineWidth = 1.2; ctx.stroke();
+      }
+      ctx.beginPath(); ctx.arc(m[0], m[1], 3.1, 0, 7);
+      ctx.fillStyle = `rgba(255,255,255,${(.35 + .65 * vivo).toFixed(2)})`; ctx.fill();
+      ctx.beginPath(); ctx.arc(m[0], m[1], 6.5, 0, 7);
+      ctx.strokeStyle = `rgba(255,255,255,${(.35 * vivo).toFixed(2)})`; ctx.lineWidth = 1; ctx.stroke();
+    }
+    pDibujado = p;
+  }
+
+  let vivo = false, pedido = false;
+  function bucle() {
+    pedido = false;
+    pintar();
+    if (vivo && p > .55 && !quieto()) { pedido = true; requestAnimationFrame(bucle); }
+  }
+  return {
+    avance(v) {
+      p = Math.min(1, Math.max(0, v));
+      if (!pedido) { pedido = true; requestAnimationFrame(bucle); }
+    },
+    encender(v) { vivo = v; if (v && !pedido) { pedido = true; requestAnimationFrame(bucle); } },
+    remedir() { lado = medir(); pintar(); },
+    listo() { return p >= .999; }
+  };
+}
 
 /* =================================================================
    FICHA DE PROYECTO
@@ -1061,12 +1530,28 @@ document.getElementById('dato-directo').innerHTML =
 const ficha       = document.getElementById('ficha');
 const contenido   = document.getElementById('ficha-contenido');
 const fichaNombre = document.getElementById('ficha-nombre');
-let proyectoActual = null, hojaOrigen = null;
+let proyectoActual = null, hojaOrigen = null, globoActual = null;
 
 function aplicarTinte(slug) {
   const p = PALETAS[slug];
-  document.documentElement.style.setProperty('--th', p ? p.h : 0);
-  document.documentElement.style.setProperty('--ts', p ? p.s + '%' : '0%');
+  document.documentElement.style.setProperty('--th', p ? p.h : 210);
+  document.documentElement.style.setProperty('--ts', p ? p.s + '%' : '16%');
+}
+
+/* Reparte las piezas en filas COMPLETAS: dos iguales o una a lo ancho.
+   Se alterna para que la lectura tenga ritmo, y lo que sobre al final
+   ocupa su fila entera — asi no queda nunca un hueco al lado. */
+function repartirFilas(n) {
+  const filas = [];
+  let resto = n, doble = true;
+  while (resto > 0) {
+    if (resto === 1) { filas.push(1); break; }
+    if (resto === 2) { filas.push(2); break; }
+    filas.push(doble ? 2 : 1);
+    resto -= doble ? 2 : 1;
+    doble = !doble;
+  }
+  return filas;
 }
 
 function pintarFicha(p) {
@@ -1075,9 +1560,27 @@ function pintarFicha(p) {
   const sigue  = TODOS[(i + 1) % TODOS.length];
   const resto  = p.piezas.filter(n => n !== p.portada);
   const extra  = p.extra || [];
+  const total  = p.piezas.length + extra.length;
 
   fichaNombre.textContent = p.titulo;
   aplicarTinte(p.slug);
+
+  // Galeria por filas completas
+  let k = 0;
+  const filas = repartirFilas(resto.length).map(tam => {
+    const trozo = resto.slice(k, k + tam);
+    const html = trozo.map(n => {
+      const idx = k++;
+      return `<figure data-k="${idx}">
+                <img src="${ruta(p.arch, n)}" srcset="${juego(p.arch, n)}"
+                     sizes="${tam === 1 ? '100vw' : '50vw'}"
+                     alt="${p.titulo} — imagen ${idx + 1}" loading="lazy" decoding="async"
+                     data-parallax="0.05">
+                <figcaption>${String(idx + 2).padStart(2,'0')} / ${String(p.piezas.length).padStart(2,'0')}</figcaption>
+              </figure>`;
+    }).join('');
+    return `<div class="fila ${tam === 1 ? 'unica' : 'doble'}">${html}</div>`;
+  }).join('');
 
   contenido.innerHTML = `
     <div class="ficha-principal">
@@ -1089,40 +1592,49 @@ function pintarFicha(p) {
       </div>
     </div>
 
-    <div class="columna">
-      <div class="ficha-texto">
-        <div class="rotulo">El proyecto</div>
-        <div>
-          <p>${p.texto}</p>
-          <div class="ficha-datos">
-            <div><span>Lugar</span><b>${p.lugar}</b></div>
-            <div><span>Año</span><b>${p.anio}</b></div>
-            <div><span>Estado</span><b>${p.estado}</b></div>
-            <div><span>Imágenes</span><b>${p.piezas.length + extra.length}</b></div>
+    <div class="datos-cinta entra">
+      <div class="datos-caja vidrio">
+        <div class="lugar-bloque">
+          <div class="globo-marco">
+            <div class="halo"></div>
+            <canvas id="globo" aria-hidden="true"></canvas>
           </div>
+          <div class="lugar-texto">
+            <div class="rot">Dónde</div>
+            <b>${p.lugar}</b>
+            <div class="coord mono" id="globo-coord">
+              ${Math.abs(p.coord[0]).toFixed(3)}° ${p.coord[0] >= 0 ? 'N' : 'S'} ·
+              ${Math.abs(p.coord[1]).toFixed(3)}° ${p.coord[1] >= 0 ? 'E' : 'O'}
+            </div>
+          </div>
+        </div>
+        <div class="conteo">
+          <div class="aro">
+            <svg viewBox="0 0 60 60">
+              <circle class="pista" cx="30" cy="30" r="27"></circle>
+              <circle class="arco"  cx="30" cy="30" r="27"
+                      stroke-dasharray="169.6" stroke-dashoffset="169.6" id="aro-arco"></circle>
+            </svg>
+            <div class="cifra mono" id="aro-cifra">00</div>
+          </div>
+          <div class="rot">Imágenes<br>del proyecto</div>
         </div>
       </div>
     </div>
 
-    <div class="galeria" id="galeria">
-      ${resto.map((n, k) => `
-        <figure data-k="${k}">
-          <img src="${ruta(p.arch, n)}" srcset="${juego(p.arch, n)}" sizes="100vw"
-               alt="${p.titulo} — imagen ${k+1}" loading="lazy" decoding="async" data-parallax="0.05">
-          <figcaption>${String(k + 2).padStart(2,'0')} / ${String(p.piezas.length).padStart(2,'0')}</figcaption>
-        </figure>`).join('')}
-    </div>
+    <div class="galeria" id="galeria">${filas}</div>
 
     ${extra.length ? `
-      <div class="extra-cabeza">
-        <div class="rotulo">Material adicional</div>
-        <p>Otros ${extra.length} renders del mismo proyecto, fuera de la selección.</p>
+      <div class="mas-filo" id="mas-filo">
+        <span class="raya"></span>
+        <span class="marca-mas mono"><span class="cruz"></span>${String(extra.length).padStart(2,'0')}</span>
+        <span class="raya der"></span>
       </div>
       <div class="tira-extra" id="tira-extra">
-        ${extra.map((n, k) => `
-          <figure data-k="${k}">
+        ${extra.map((n, j) => `
+          <figure data-k="${j}" style="transition-delay:${(Math.min(j,8) * .06).toFixed(2)}s">
             <img src="${ruta(p.arch, n)}" srcset="${juego(p.arch, n)}" sizes="30vw"
-                 alt="${p.titulo} — adicional ${k+1}" loading="lazy" decoding="async">
+                 alt="${p.titulo} — adicional ${j + 1}" loading="lazy" decoding="async">
           </figure>`).join('')}
       </div>` : ''}
 
@@ -1137,31 +1649,86 @@ function pintarFicha(p) {
       </div>` : ''}
 
     <div class="ficha-navegar">
-      <button data-proyecto="${previo.slug}">← ${previo.titulo}</button>
-      <button data-proyecto="${sigue.slug}">${sigue.titulo} →</button>
+      <button class="salto izq vidrio" data-proyecto="${previo.slug}">
+        <span class="rot">← Anterior</span><span class="nom">${previo.titulo}</span></button>
+      <button class="salto der vidrio" data-proyecto="${sigue.slug}">
+        <span class="rot">Siguiente →</span><span class="nom">${sigue.titulo}</span></button>
     </div>`;
 
   contenido.querySelector('#galeria').dataset.orden = JSON.stringify(resto.map(n => ruta2x(p.arch, n)));
   const tira = contenido.querySelector('#tira-extra');
   if (tira) tira.dataset.orden = JSON.stringify(extra.map(n => ruta2x(p.arch, n)));
 
+  /* --- Globo --- */
+  globoActual = crearGlobo(contenido.querySelector('#globo'), p.coord);
+  globoActual.encender(true);
+
+  /* --- Contador: cuenta hasta el total al entrar en pantalla --- */
+  const cifra = contenido.querySelector('#aro-cifra');
+  const arco  = contenido.querySelector('#aro-arco');
+  let contado = false;
+  function contar() {
+    if (contado) return; contado = true;
+    if (quieto()) { cifra.textContent = String(total).padStart(2,'0'); return; }
+    const t0 = performance.now(), dur = 1100;
+    const paso = a => {
+      const t = Math.min(1, (a - t0) / dur);
+      cifra.textContent = String(Math.round(total * (1 - Math.pow(1 - t, 3)))).padStart(2,'0');
+      if (t < 1) requestAnimationFrame(paso);
+    };
+    requestAnimationFrame(paso);
+  }
+
+  /* --- Revelados dentro de la ficha --- */
   const obs = new IntersectionObserver(en => {
     en.forEach(e => {
       if (!e.isIntersecting) return;
-      e.target.classList.add('dentro');
+      e.target.classList.add('dentro', 'visible');
       obs.unobserve(e.target);
     });
   }, { root: ficha, threshold: .1 });
   contenido.querySelectorAll('.galeria figure').forEach(f => obs.observe(f));
+  const filo = contenido.querySelector('#mas-filo');
+  if (filo) obs.observe(filo);
+  if (tira) obs.observe(tira);
 
+  const obsCinta = new IntersectionObserver(en => {
+    en.forEach(e => { if (e.isIntersecting) { contar(); obsCinta.unobserve(e.target); } });
+  }, { root: ficha, threshold: .35 });
+  obsCinta.observe(contenido.querySelector('.datos-cinta'));
+
+  ficha.dataset.total = total;
   proyectoActual = p;
+  actualizarGlobo();
+}
+
+/* El giro del planeta y el anillo de progreso se recalculan con el
+   desplazamiento de la ficha. */
+function actualizarGlobo() {
+  if (!globoActual) return;
+  const caja = contenido.querySelector('.datos-caja');
+  if (!caja) return;
+  const c = caja.getBoundingClientRect();
+  // 0 cuando la caja asoma por abajo, 1 cuando llega al tercio superior
+  const v = 1 - (c.top - innerHeight * .28) / (innerHeight * .72);
+  globoActual.avance(v);
+  const coord = contenido.querySelector('#globo-coord');
+  if (coord) coord.classList.toggle('viva', v > .85);
+
+  const arco = contenido.querySelector('#aro-arco');
+  const gal  = contenido.querySelector('#galeria');
+  if (arco && gal) {
+    const g = gal.getBoundingClientRect();
+    const avanceGal = Math.min(1, Math.max(0, (innerHeight - g.top) / (g.height + innerHeight * .2)));
+    arco.style.strokeDashoffset = (169.6 * (1 - avanceGal)).toFixed(1);
+  }
 }
 
 function abrirFicha(slug, hoja) {
   const p = TODOS.find(x => x.slug === slug);
   if (!p) return;
 
-  const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const parado = quieto();
   const origen = hoja && hoja.querySelector('img');
   hojaOrigen = hoja || null;
 
@@ -1169,7 +1736,11 @@ function abrirFicha(slug, hoja) {
   document.body.classList.add('bloqueado');
   history.replaceState(null, '', '#' + slug);
 
-  if (!origen || quieto) { ficha.classList.add('abierta'); ficha.scrollTop = 0; return; }
+  if (!origen || parado) {
+    ficha.classList.add('abierta', 'montada');
+    ficha.scrollTop = 0;
+    return;
+  }
 
   const desde = origen.getBoundingClientRect();
   const viajero = document.createElement('div');
@@ -1187,38 +1758,51 @@ function abrirFicha(slug, hoja) {
   // espera al aterrizaje, durante todo el vuelo se ve la pagina anterior
   // por detras del clon y el movimiento se lee sucio.
   ficha.animate([{ opacity:0 }, { opacity:1 }],
-    { duration: 420, delay: 220, easing: 'ease-out', fill: 'forwards' });
+    { duration: 420, delay: 180, easing: 'ease-out', fill: 'forwards' });
 
-  viajero.animate([
+  // Y el contenido de la ficha arranca su entrada a mitad del vuelo:
+  // cuando el clon aterriza, el titulo ya viene subiendo. Sin esto, el
+  // aterrizaje era un corte — la pagina del proyecto aparecia montada
+  // y quieta justo en el fotograma en que el clon desaparecia.
+  setTimeout(() => ficha.classList.add('montada'), 340);
+
+  const vuelo = viajero.animate([
     { left:`${desde.left}px`, top:`${desde.top}px`, width:`${desde.width}px`, height:`${desde.height}px` },
     { left:`${hasta.left}px`, top:`${hasta.top}px`, width:`${hasta.width}px`, height:`${hasta.height}px` }
-  ], { duration: 800, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' })
-   .onfinish = () => {
-      ficha.classList.add('abierta');
-      ficha.getAnimations().forEach(a => a.cancel());
-      ficha.style.opacity = '';
-      ficha.style.visibility = '';
-      setTimeout(() => viajero.remove(), 120);
-   };
+  ], { duration: 820, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' });
+
+  vuelo.onfinish = () => {
+    ficha.classList.add('abierta');
+    ficha.getAnimations().forEach(a => a.cancel());
+    ficha.style.opacity = '';
+    ficha.style.visibility = '';
+    // El clon no se quita de golpe: se funde sobre la imagen real, que
+    // ya esta debajo en la misma posicion. Eso borra el ultimo corte.
+    viajero.animate([{ opacity:1 }, { opacity:0 }],
+      { duration: 320, easing:'ease-out', fill:'forwards' })
+      .onfinish = () => viajero.remove();
+  };
 }
 
 function cerrarFicha() {
   history.replaceState(null, '', location.pathname);
   contenido.querySelectorAll('video').forEach(v => v.pause());
+  if (globoActual) globoActual.encender(false);
 
   // Si se entro desde el indice, el indice sigue montado detras: el
   // desplazamiento del cuerpo solo se libera cuando tampoco queda el.
   const indiceVivo = capaIndice.classList.contains('abierta');
   if (!indiceVivo) document.body.classList.remove('bloqueado');
 
-  const quieto  = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const princ   = contenido.querySelector('.ficha-principal');
   const destino = hojaOrigen && hojaOrigen.querySelector('img');
   const caja    = destino && destino.getBoundingClientRect();
 
-  const puedeVolver = princ && destino && !quieto && ficha.scrollTop < 40 &&
+  const puedeVolver = princ && destino && !quieto() && ficha.scrollTop < 40 &&
                       document.body.contains(hojaOrigen) &&
                       caja.width > 0 && caja.bottom > 0 && caja.top < innerHeight;
+
+  ficha.classList.remove('montada');
 
   if (!puedeVolver) { ficha.classList.remove('abierta'); hojaOrigen = null; return; }
 
@@ -1234,8 +1818,12 @@ function cerrarFicha() {
   viajero.animate([
     { left:`${desde.left}px`, top:`${desde.top}px`, width:`${desde.width}px`, height:`${desde.height}px` },
     { left:`${caja.left}px`,  top:`${caja.top}px`,  width:`${caja.width}px`,  height:`${caja.height}px` }
-  ], { duration: 680, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' })
-   .onfinish = () => { viajero.remove(); hojaOrigen = null; };
+  ], { duration: 700, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' })
+   .onfinish = () => {
+      viajero.animate([{ opacity:1 }, { opacity:0 }],
+        { duration: 240, easing:'ease-out', fill:'forwards' })
+        .onfinish = () => { viajero.remove(); hojaOrigen = null; };
+   };
 }
 document.getElementById('ficha-cerrar').addEventListener('click', cerrarFicha);
 
@@ -1243,14 +1831,22 @@ function mudarProyecto(slug) {
   const p = TODOS.find(x => x.slug === slug);
   if (!p) return;
   hojaOrigen = null;
-  contenido.style.transition = 'opacity .3s';
+  contenido.style.transition = 'opacity .34s var(--suave), filter .34s var(--suave), transform .34s var(--suave)';
   contenido.style.opacity = '0';
+  contenido.style.filter = 'blur(8px)';
+  contenido.style.transform = 'translateY(16px)';
+  ficha.classList.remove('montada');
   setTimeout(() => {
     pintarFicha(p);
     ficha.scrollTop = 0;
     history.replaceState(null, '', '#' + slug);
-    requestAnimationFrame(() => { contenido.style.opacity = '1'; });
-  }, 310);
+    requestAnimationFrame(() => {
+      contenido.style.opacity = '1';
+      contenido.style.filter = '';
+      contenido.style.transform = '';
+      ficha.classList.add('montada');
+    });
+  }, 350);
 }
 
 /* =================================================================
@@ -1306,18 +1902,20 @@ function volverAlInicio() {
     img.src    = `assets/renders/${nombre}.webp`;
     img.srcset = `assets/renders/${nombre}.webp 1600w, assets/renders/${nombre}@2x.webp 2560w`;
   }
-  // Las letras de la entrada se recortan sobre el mismo render
+  // Las letras de la entrada y del titular se recortan sobre el mismo render
   document.documentElement.style.setProperty('--render-marca', `url('assets/renders/${nombre}.webp')`);
 
   // Una animacion CSS ya consumida no se rebobina: hay que reemplazar
   // el nodo para que vuelva a correr desde el principio.
   const mascara = document.querySelector('.mascara-marca');
   const lamina  = document.querySelector('.lamina img');
+  const titular = document.getElementById('titular');
   if (mascara) {
     const copia = mascara.cloneNode(true);
     mascara.replaceWith(copia);
     marcarEntrada(copia);
   }
+  if (titular) repartir(titular, 'PORTAFOLIO', 3.05, .06);
   if (lamina) {
     lamina.style.animation = 'none';
     void lamina.offsetWidth;
@@ -1357,37 +1955,70 @@ document.addEventListener('keydown', e => {
 });
 
 /* =================================================================
-   VISOR
+   VISOR — cambio de imagen con dos capas
    ================================================================= */
 const visor    = document.getElementById('visor');
-const visorImg = document.getElementById('visor-img');
+const escena   = document.getElementById('visor-escena');
 const visorPie = document.getElementById('visor-pie');
-let galeria = [], indiceVisor = 0;
+let galeria = [], indiceVisor = 0, capaViva = null;
 
-function mostrar(i) {
+function mostrar(i, dir = 1) {
+  if (!galeria.length) return;
   indiceVisor = (i + galeria.length) % galeria.length;
-  visorImg.src = galeria[indiceVisor];
   visorPie.textContent = `${proyectoActual ? proyectoActual.titulo : ''} — ${indiceVisor + 1} / ${galeria.length}`;
+
+  const capa = document.createElement('div');
+  capa.className = 'visor-capa';
+  capa.innerHTML = `<img src="${galeria[indiceVisor]}" alt="">`;
+  escena.appendChild(capa);
+
+  const parado = quieto();
+  const saliente = capaViva;
+  capaViva = capa;
+
+  if (parado) { if (saliente) saliente.remove(); return; }
+
+  capa.animate([
+    { opacity:0, transform:`translateX(${dir * 7}%) scale(.965)`, filter:'blur(14px)' },
+    { opacity:1, transform:'none', filter:'blur(0)' }
+  ], { duration:640, easing:'cubic-bezier(.16,1,.3,1)', fill:'both' });
+
+  if (saliente) {
+    saliente.animate([
+      { opacity:1, transform:'none', filter:'blur(0)' },
+      { opacity:0, transform:`translateX(${-dir * 7}%) scale(.965)`, filter:'blur(14px)' }
+    ], { duration:520, easing:'cubic-bezier(.4,0,.2,1)', fill:'both' })
+      .onfinish = () => saliente.remove();
+  }
+
+  // Precarga de la vecina, para que el salto siguiente no espere red
+  const sig = new Image(); sig.src = galeria[(indiceVisor + 1) % galeria.length];
 }
+
 contenido.addEventListener('click', e => {
   const pieza = e.target.closest('.galeria figure, .tira-extra figure');
   if (!pieza) return;
-  galeria = JSON.parse(pieza.parentElement.dataset.orden || '[]');
+  const caja = pieza.closest('.galeria, .tira-extra');
+  galeria = JSON.parse(caja.dataset.orden || '[]');
   if (!galeria.length) return;
+  escena.innerHTML = ''; capaViva = null;
   visor.classList.add('abierto');
   mostrar(Number(pieza.dataset.k));
 });
-function cerrarVisor() { visor.classList.remove('abierto'); }
+function cerrarVisor() {
+  visor.classList.remove('abierto');
+  setTimeout(() => { if (!visor.classList.contains('abierto')) { escena.innerHTML = ''; capaViva = null; } }, 500);
+}
 document.getElementById('visor-cerrar').addEventListener('click', cerrarVisor);
-document.getElementById('visor-prev').addEventListener('click', e => { e.stopPropagation(); mostrar(indiceVisor - 1); });
-document.getElementById('visor-sig').addEventListener('click',  e => { e.stopPropagation(); mostrar(indiceVisor + 1); });
-visor.addEventListener('click', e => { if (e.target === visor) cerrarVisor(); });
+document.getElementById('visor-prev').addEventListener('click', e => { e.stopPropagation(); mostrar(indiceVisor - 1, -1); });
+document.getElementById('visor-sig').addEventListener('click',  e => { e.stopPropagation(); mostrar(indiceVisor + 1,  1); });
+visor.addEventListener('click', e => { if (e.target === visor || e.target === escena) cerrarVisor(); });
 
 document.addEventListener('keydown', e => {
   if (visor.classList.contains('abierto')) {
     if (e.key === 'Escape')     cerrarVisor();
-    if (e.key === 'ArrowLeft')  mostrar(indiceVisor - 1);
-    if (e.key === 'ArrowRight') mostrar(indiceVisor + 1);
+    if (e.key === 'ArrowLeft')  mostrar(indiceVisor - 1, -1);
+    if (e.key === 'ArrowRight') mostrar(indiceVisor + 1,  1);
     return;
   }
   if (e.key === 'Escape') {
@@ -1401,7 +2032,7 @@ visor.addEventListener('touchstart', e => { tactilX = e.changedTouches[0].client
 visor.addEventListener('touchend', e => {
   if (tactilX === null) return;
   const salto = e.changedTouches[0].clientX - tactilX;
-  if (Math.abs(salto) > 55) mostrar(indiceVisor + (salto < 0 ? 1 : -1));
+  if (Math.abs(salto) > 55) mostrar(indiceVisor + (salto < 0 ? 1 : -1), salto < 0 ? 1 : -1);
   tactilX = null;
 }, { passive:true });
 
@@ -1409,9 +2040,24 @@ visor.addEventListener('touchend', e => {
    DESPLAZAMIENTO
    ================================================================= */
 const avance    = document.getElementById('avance');
+const barra     = document.getElementById('barra');
+const menu      = document.getElementById('menu');
+const gota      = document.getElementById('gota');
+const campo     = document.querySelector('.campo');
 const secciones = [...document.querySelectorAll('#proyectos, #sobre, #contacto')];
-const enlaces   = [...document.querySelectorAll('.menu a')];
+const enlacesMenu = [...document.querySelectorAll('.menu a')];
 const laminaImg = document.getElementById('render-inicio');
+
+/* El indicador liquido se coloca bajo el enlace activo */
+function moverGota(a) {
+  if (!a) { menu.classList.remove('viva'); return; }
+  const c = a.getBoundingClientRect(), m = menu.getBoundingClientRect();
+  gota.style.width = `${c.width}px`;
+  gota.style.transform = `translateX(${c.left - m.left}px)`;
+  menu.classList.add('viva');
+}
+enlacesMenu.forEach(a => a.addEventListener('pointerenter', () => moverGota(a)));
+menu.addEventListener('pointerleave', () => moverGota(document.querySelector('.menu a.activo')));
 
 function moverParallax(raiz, alto) {
   raiz.querySelectorAll('[data-parallax]').forEach(el => {
@@ -1423,7 +2069,7 @@ function moverParallax(raiz, alto) {
   });
 }
 
-let tickScroll = false;
+let tickScroll = false, ultimaY = 0;
 addEventListener('scroll', () => {
   if (tickScroll) return;
   tickScroll = true;
@@ -1432,31 +2078,43 @@ addEventListener('scroll', () => {
     const alto = document.documentElement.scrollHeight - innerHeight;
     avance.style.transform = `scaleX(${alto > 0 ? y / alto : 0})`;
 
+    // El campo del fondo se desplaza con la pagina, mas lento
+    campo.style.setProperty('--y', `${(y * .08).toFixed(1)}px`);
+
+    // La barra se esconde al bajar y vuelve al subir
+    barra.classList.toggle('oculta', y > ultimaY + 4 && y > innerHeight * .7);
+    ultimaY = y;
+
     // La portada se hunde un poco mas lento que la pagina
     if (laminaImg && y < innerHeight * 1.2) {
-      laminaImg.style.setProperty('--desvio', `${(y * .18).toFixed(1)}px`);
       laminaImg.style.translate = `0 ${(y * .18).toFixed(1)}px`;
     }
 
     let activa = '';
     secciones.forEach(s => { if (s.getBoundingClientRect().top <= innerHeight * .4) activa = s.id; });
-    enlaces.forEach(a => a.classList.toggle('activo', a.getAttribute('href') === '#' + activa));
+    enlacesMenu.forEach(a => a.classList.toggle('activo', a.getAttribute('href') === '#' + activa));
+    moverGota(document.querySelector('.menu a.activo'));
 
     pedirGiro();
     tickScroll = false;
   });
 }, { passive:true });
 
-ficha.addEventListener('scroll', () => moverParallax(contenido, innerHeight), { passive:true });
+ficha.addEventListener('scroll', () => {
+  moverParallax(contenido, innerHeight);
+  actualizarGlobo();
+}, { passive:true });
+addEventListener('resize', () => { if (globoActual) globoActual.remedir(); });
 
 const observador = new IntersectionObserver(en => {
   en.forEach(e => {
     if (!e.isIntersecting) return;
-    e.target.classList.add('visible');
+    e.target.classList.add('visible', 'viva');
     observador.unobserve(e.target);
   });
 }, { threshold:.12, rootMargin:'0px 0px -60px 0px' });
-document.querySelectorAll('.revelar, .palabras, .herramientas, .cortina, .vitrina').forEach(el => observador.observe(el));
+document.querySelectorAll('.revelar, .palabras, .vitrina, .enlaces, .orbital')
+  .forEach(el => observador.observe(el));
 
 /* Enlace directo a un proyecto */
 function desdeDireccion() {
