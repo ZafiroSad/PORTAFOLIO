@@ -149,6 +149,18 @@ técnico, un solo CTA por bloque, bordes con opacidad y radios.
 - **En móvil las piezas de la galería llevan `flex:none`.** Al apilar, el eje
   principal pasa a ser el vertical y `flex:1 1 0` mandaba sobre `height`: las
   imágenes colapsaban a cero y la galería era un hueco vacío.
+- **Con `prefers-reduced-motion` hay que devolver el `filter`, no solo la
+  opacidad.** Las letras del titular arrancan en `blur(16px)`; al matar las
+  animaciones se quedaban borrosas aunque fueran opacas.
+
+## Medido
+
+Carga inicial **2.26 MB** en escritorio, de los que 2.15 MB son renders
+(portada + las cuatro hojas de la vitrina). Solo existen dos tamaños por
+imagen, 1600 y 2560 px, así que la vitrina descarga 1600 px por hoja aunque
+en reposo cada una ocupe un cuarto de pantalla. **Generar una tercera talla
+de ~800 px para la vitrina bajaría la carga inicial a menos de la mitad**;
+está sin hacer porque toca la calidad de imagen y eso lo decide Kevin.
 
 ## Decisiones abiertas
 

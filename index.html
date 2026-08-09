@@ -835,7 +835,10 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   *, *::before, *::after { animation:none !important; transition:none !important; }
   .mascara-marca { display:none }
   .lamina img { opacity:1; transform:none }
-  .titular .letra, .subtitular span, .revelar > *, .enlace { opacity:1 !important; transform:none !important; }
+  /* Las letras arrancan con blur(16px): sin animacion que lo retire,
+     el titular se quedaba borroso. No basta con devolver la opacidad. */
+  .titular .letra, .letra { opacity:1 !important; filter:none !important; }
+  .subtitular span, .revelar > *, .enlace { opacity:1 !important; transform:none !important; }
   .inicio-aparte, .baja, .orbital, .mas-filo .marca-mas { opacity:1 }
   .mas-filo .raya { transform:none }
   .galeria figure, .hoja, .tira-extra figure { clip-path:none !important; opacity:1 !important; transform:none !important; }
