@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>PORTAFOLIO · KEVIN GIL</title>
 <meta name="description" content="Portafolio de Kevin Gil. Ingeniero civil y visualizador arquitectónico. Modelo, imagen y recorrido de proyectos construibles. Bucaramanga, Colombia.">
 <link rel="icon" href="assets/marca/favicon.png">
@@ -72,6 +72,13 @@
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
+/* `manipulation` retira el zoom por doble toque —el que se dispara sin
+   querer al pulsar y deja la pagina torcida— y de paso los 300 ms que
+   el navegador espera por si llega el segundo toque. El pellizco para
+   ampliar SIGUE funcionando: bloquearlo del todo deja fuera a quien
+   necesita acercarse para leer. */
+a, button, .hoja, .tarjeta, .galeria figure, .tira-extra figure,
+.filtro, .util, .enlace, .salto, .fase, .menu a { touch-action:manipulation; }
 /* El desplazamiento suave se anima por JS, no con scroll-behavior: el
    scroll suave nativo no llega a ejecutarse en esta pagina y los saltos
    del menu se quedaban quietos. Animarlo a mano ademas permite elegir
@@ -866,8 +873,8 @@ body.bloqueado .masa { animation-play-state:paused; }
 
 /* El clon que viaja entre la rejilla y la ficha */
 .viajero { position:fixed; z-index:280; overflow:hidden; pointer-events:none;
-  box-shadow:0 40px 90px -30px rgba(0,0,0,.9); }
-.viajero img { width:100%; height:100%; object-fit:cover; }
+  will-change:transform; box-shadow:0 40px 90px -30px rgba(0,0,0,.9); }
+.viajero img { width:100%; height:100%; object-fit:cover; will-change:transform; }
 
 /* ============ Índice de todos los proyectos =================== */
 /* Mismo campo que el resto del sitio — piedra y luz de tarde, sin
@@ -1558,7 +1565,7 @@ document.getElementById('fases').innerHTML = FASES.map(f => `
   const ANCHO_FUENTE = talla === 'p' ? 1080 : talla === 'g' ? 1920 : 2560;
 
   const cuadros = new Array(TOTAL);
-  let listos = 0, ultimo = -1, avance = 0;
+  let listos = 0, ultimoDibujado = -1, avance = 0;
 
   const cargar = (i, prisa) => {
     if (cuadros[i]) return;
@@ -1569,7 +1576,8 @@ document.getElementById('fases').innerHTML = FASES.map(f => `
     im.onload = () => { listos++; if (i === indice()) pintar(); };
     cuadros[i] = im;
   };
-  const indice = () => Math.min(TOTAL - 1, Math.round(avance * (TOTAL - 1)));
+  const exacto = () => avance * (TOTAL - 1);
+  const indice = () => Math.min(TOTAL - 1, Math.round(exacto()));
 
   /* Primero un puñado repartido para tener el recorrido entero cuanto
      antes, y el relleno despues y en segunda fila: asi nunca se ve un
@@ -1607,18 +1615,26 @@ document.getElementById('fases').innerHTML = FASES.map(f => `
     ctx.imageSmoothingQuality = 'high';
   }
 
-  function pintar() {
-    const i = indice();
-    // Si el que toca aun no ha llegado, se usa el mas cercano que si
-    let im = cuadros[i];
-    if (!im || !im.complete || !im.naturalWidth) {
-      for (let d = 1; d < TOTAL; d++) {
-        const a = cuadros[i-d], b = cuadros[i+d];
-        if (a && a.complete && a.naturalWidth) { im = a; break; }
-        if (b && b.complete && b.naturalWidth) { im = b; break; }
-      }
+  const util = i => {
+    const im = cuadros[i];
+    return (im && im.complete && im.naturalWidth) ? im : null;
+  };
+  // El que toca, o el mas cercano que ya haya llegado
+  const cercano = i => {
+    if (util(i)) return cuadros[i];
+    for (let d = 1; d < TOTAL; d++) {
+      if (util(i - d)) return cuadros[i - d];
+      if (util(i + d)) return cuadros[i + d];
     }
-    if (!im || !im.complete || !im.naturalWidth) return;
+    return null;
+  };
+
+  function pintar() {
+    const e = exacto();
+    const i = Math.min(TOTAL - 1, Math.floor(e));
+    const fraccion = e - i;                  // 0..1 entre este cuadro y el siguiente
+    const im = cercano(i);
+    if (!im) return;
 
     const W = lienzo.width, H = lienzo.height;
     ctx.fillStyle = '#0c0d10';
@@ -1640,7 +1656,19 @@ document.getElementById('fases').innerHTML = FASES.map(f => `
       y = (H - im.naturalHeight * escala) * .5;
     }
     ctx.drawImage(im, x, y, im.naturalWidth * escala, im.naturalHeight * escala);
-    ultimo = i;
+
+    /* Los ochenta cuadros reparten el recorrido a un cuadro cada 38 px
+       de desplazamiento: yendo despacio se veian los saltos. Aqui se
+       funde el siguiente encima segun la fraccion, asi que entre dos
+       cuadros hay transicion y no escalon. Cuesta un `drawImage` mas y
+       evita triplicar el peso de la secuencia. */
+    const sig = util(i + 1);
+    if (sig && fraccion > 0.01) {
+      ctx.globalAlpha = fraccion;
+      ctx.drawImage(sig, x, y, sig.naturalWidth * escala, sig.naturalHeight * escala);
+      ctx.globalAlpha = 1;
+    }
+    ultimoDibujado = e;
   }
 
   const fases = [...document.querySelectorAll('.fase')];
@@ -1656,7 +1684,8 @@ document.getElementById('fases').innerHTML = FASES.map(f => `
       avance = recorrido > 0 ? Math.min(1, Math.max(0, -caja.top / recorrido)) : 0;
       regla.style.height = (avance * 100).toFixed(1) + '%';
       fases.forEach(f => f.classList.toggle('viva', avance >= Number(f.dataset.desde)));
-      if (indice() !== ultimo) pintar();
+      // con fundido, el umbral es la fraccion, no el indice entero
+      if (Math.abs(exacto() - ultimoDibujado) > 0.02) pintar();
     });
   }
 
@@ -1668,7 +1697,7 @@ document.getElementById('fases').innerHTML = FASES.map(f => `
   }, { rootMargin: '250px' }).observe(seccion);
 
   addEventListener('scroll', () => { if (aLaVista) recalcular(); }, { passive: true });
-  addEventListener('resize', () => { medir(); ultimo = -1; recalcular(); });
+  addEventListener('resize', () => { medir(); ultimoDibujado = -1; recalcular(); });
   medir();
 })();
 
@@ -2098,7 +2127,6 @@ function abrirFicha(slug, hoja) {
   const desde = origen.getBoundingClientRect();
   const viajero = document.createElement('div');
   viajero.className = 'viajero';
-  viajero.style.cssText = `left:${desde.left}px; top:${desde.top}px; width:${desde.width}px; height:${desde.height}px;`;
   viajero.innerHTML = `<img src="${origen.currentSrc || origen.src}" alt="">`;
   document.body.appendChild(viajero);
 
@@ -2106,6 +2134,20 @@ function abrirFicha(slug, hoja) {
   ficha.style.opacity = '0';
   ficha.scrollTop = 0;
   const hasta = contenido.querySelector('.ficha-principal').getBoundingClientRect();
+
+  /* El clon se monta YA en su tamaño final y viaja con `transform`.
+     Antes se animaban left/top/width/height, que rehacen la geometria
+     de la pagina en cada cuadro: por eso el vuelo se veia a tirones.
+     Con transform el trabajo se va al compositor y va suelto.
+     La imagen de dentro lleva la escala inversa para no deformarse
+     mientras el marco cambia de proporcion. */
+  const dx = desde.left - hasta.left, dy = desde.top - hasta.top;
+  const sx = desde.width / hasta.width, sy = desde.height / hasta.height;
+  viajero.style.cssText = `left:${hasta.left}px; top:${hasta.top}px;` +
+    `width:${hasta.width}px; height:${hasta.height}px; transform-origin:0 0;`;
+  const cara = viajero.firstElementChild;
+  cara.style.transformOrigin = '0 0';
+  const curva = { duration: 780, easing: 'cubic-bezier(.22,1,.28,1)', fill: 'forwards' };
 
   // La ficha se vuelve opaca MIENTRAS el clon viaja, no al final: si se
   // espera al aterrizaje, durante todo el vuelo se ve la pagina anterior
@@ -2117,12 +2159,14 @@ function abrirFicha(slug, hoja) {
   // cuando el clon aterriza, el titulo ya viene subiendo. Sin esto, el
   // aterrizaje era un corte — la pagina del proyecto aparecia montada
   // y quieta justo en el fotograma en que el clon desaparecia.
-  setTimeout(() => ficha.classList.add('montada'), 340);
+  setTimeout(() => ficha.classList.add('montada'), 300);
 
+  cara.animate([{ transform:`scale(${(1/sx).toFixed(4)}, ${(1/sy).toFixed(4)})` },
+                { transform:'none' }], curva);
   const vuelo = viajero.animate([
-    { left:`${desde.left}px`, top:`${desde.top}px`, width:`${desde.width}px`, height:`${desde.height}px` },
-    { left:`${hasta.left}px`, top:`${hasta.top}px`, width:`${hasta.width}px`, height:`${hasta.height}px` }
-  ], { duration: 820, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' });
+    { transform:`translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})` },
+    { transform:'none' }
+  ], curva);
 
   vuelo.onfinish = () => {
     ficha.classList.add('abierta');
@@ -2161,16 +2205,26 @@ function cerrarFicha() {
   const desde = princ.getBoundingClientRect();
   const viajero = document.createElement('div');
   viajero.className = 'viajero';
-  viajero.style.cssText = `left:${desde.left}px; top:${desde.top}px; width:${desde.width}px; height:${desde.height}px;`;
   viajero.innerHTML = `<img src="${destino.currentSrc || destino.src}" alt="">`;
   document.body.appendChild(viajero);
 
+  // Mismo FLIP que a la ida, en sentido contrario
+  const sx = caja.width / desde.width, sy = caja.height / desde.height;
+  const dx = caja.left - desde.left,   dy = caja.top - desde.top;
+  viajero.style.cssText = `left:${desde.left}px; top:${desde.top}px;` +
+    `width:${desde.width}px; height:${desde.height}px; transform-origin:0 0;`;
+  const cara = viajero.firstElementChild;
+  cara.style.transformOrigin = '0 0';
+  const curva = { duration: 660, easing: 'cubic-bezier(.22,1,.28,1)', fill: 'forwards' };
+
   ficha.classList.remove('abierta');
 
+  cara.animate([{ transform:'none' },
+                { transform:`scale(${(1/sx).toFixed(4)}, ${(1/sy).toFixed(4)})` }], curva);
   viajero.animate([
-    { left:`${desde.left}px`, top:`${desde.top}px`, width:`${desde.width}px`, height:`${desde.height}px` },
-    { left:`${caja.left}px`,  top:`${caja.top}px`,  width:`${caja.width}px`,  height:`${caja.height}px` }
-  ], { duration: 700, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' })
+    { transform:'none' },
+    { transform:`translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})` }
+  ], curva)
    .onfinish = () => {
       viajero.animate([{ opacity:1 }, { opacity:0 }],
         { duration: 240, easing:'ease-out', fill:'forwards' })
