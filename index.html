@@ -352,8 +352,8 @@ body.bloqueado .masa { animation-play-state:paused; }
   background:linear-gradient(100deg, rgba(21,22,27,.92) 0%, rgba(21,22,27,.70) 24%,
              rgba(21,22,27,.14) 48%, rgba(21,22,27,0) 66%); }
 @media (max-width:860px){
-  .proceso-velo { background:linear-gradient(to top, rgba(21,22,27,.96) 12%,
-                  rgba(21,22,27,.55) 42%, rgba(21,22,27,0) 72%); }
+  .proceso-velo { background:linear-gradient(to top, rgba(21,22,27,.985) 32%,
+                  rgba(21,22,27,.88) 46%, rgba(21,22,27,.15) 66%, rgba(21,22,27,0) 78%); }
 }
 /* El final de la escena abre a cielo claro: el texto necesita su
    propia sombra, que cuesta menos que apagar el render entero. */
@@ -1474,11 +1474,25 @@ document.getElementById('fases').innerHTML = FASES.map(f => `
     if (!im || !im.complete || !im.naturalWidth) return;
 
     const W = lienzo.width, H = lienzo.height;
-    const escala = Math.max(W / im.naturalWidth, H / im.naturalHeight);
-    const w = im.naturalWidth * escala, h = im.naturalHeight * escala;
     ctx.fillStyle = '#0c0d10';
     ctx.fillRect(0, 0, W, H);
-    ctx.drawImage(im, (W - w) * .62, (H - h) * .5, w, h);
+
+    /* En apaisado la escena cubre el hueco y se descentra a la derecha
+       para dejarle sitio al texto. En vertical eso recortaria la casa
+       hasta dejar un fragmento: ahi se ajusta al ancho y se sube, y el
+       texto vive debajo. */
+    const relLienzo = W / H, relImg = im.naturalWidth / im.naturalHeight;
+    let escala, x, y;
+    if (relLienzo < relImg * .72) {
+      escala = W / im.naturalWidth;
+      x = 0;
+      y = H * .30 - (im.naturalHeight * escala) * .5;
+    } else {
+      escala = Math.max(W / im.naturalWidth, H / im.naturalHeight);
+      x = (W - im.naturalWidth  * escala) * .62;
+      y = (H - im.naturalHeight * escala) * .5;
+    }
+    ctx.drawImage(im, x, y, im.naturalWidth * escala, im.naturalHeight * escala);
     ultimo = i;
   }
 
