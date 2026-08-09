@@ -975,17 +975,25 @@ body.bloqueado .masa { animation-play-state:paused; }
 @media (max-width:760px){
 
   /* --- Barra: cabe de una línea o no cabe --- */
-  .barra { height:52px; padding:0 .5rem 0 .95rem;
+  .barra { height:58px; padding:0 .5rem 0 .95rem;
            width:calc(100% - 1.4rem); }
   .marca { gap:.45rem; padding:.3rem .1rem; }
   .marca span.rotulo { font-size:.52rem; letter-spacing:.12em; white-space:nowrap; }
   .marca .punto { width:5px; height:5px; }
   .menu { padding:.2rem; gap:0; }
-  .menu a { font-size:.5rem; letter-spacing:.06em; padding:.5rem .42rem; white-space:nowrap; }
-  .barra.compacta { --k:.9; opacity:.95; }
+  /* Zona tocable de 42 px de alto: a 32 px se falla el toque. El texto
+     sigue igual de pequeño; lo que crece es el area, no la letra. */
+  .menu a { font-size:.5rem; letter-spacing:.06em; padding:1rem .46rem;
+            white-space:nowrap; display:flex; align-items:center; }
+  /* Poco encogimiento: la barra ya es pequeña, y cada punto que se
+     reduce se lo quita al area que hay que acertar con el dedo. */
+  .barra.compacta { --k:.94; opacity:.95; }
 
   /* --- Las secciones respiran según su contenido, no a 100svh --- */
   .seccion { min-height:auto; padding-top:calc(var(--barra) + .5rem); }
+  /* La ultima sí necesita altura: sin ella no queda recorrido debajo y
+     el salto del menu a Contacto se quedaba 170 px corto. */
+  #contacto { min-height:calc(100svh - var(--barra)); }
   /* padding-block, no el abreviado: el abreviado borra el margen
      lateral que pone .acolchado y el texto se pega al borde. */
   .seccion-cuerpo { justify-content:flex-start;
@@ -1041,6 +1049,7 @@ body.bloqueado .masa { animation-play-state:paused; }
   .pie { padding:1.6rem var(--margen); font-size:.54rem; gap:.4rem; }
 
   /* --- Ficha --- */
+  .ficha-cerrar { padding:.7rem 1rem; }
   .ficha-principal { height:clamp(360px,62vh,560px); }
   .ficha-portada-texto { padding:1.4rem var(--margen) 1.6rem; }
   .ficha-portada-texto h2 { font-size:clamp(1.6rem,7.4vw,2.4rem); }
@@ -1052,8 +1061,8 @@ body.bloqueado .masa { animation-play-state:paused; }
   .salto .rot { font-size:.46rem; letter-spacing:.16em; }
 
   /* --- Archivo --- */
-  .filtros { gap:.35rem; padding-top:calc(52px + 1.4rem); }
-  .filtro { font-size:.53rem; padding:.45rem .8rem; }
+  .filtros { gap:.4rem; padding-top:calc(58px + 1.4rem); }
+  .filtro { font-size:.53rem; padding:.72rem .95rem; }
   .rejilla-todos { gap:.7rem; }
   .tarjeta-pie { padding:.8rem .9rem; }
   .tarjeta-pie h4 { font-size:.92rem; }
@@ -1071,7 +1080,9 @@ body.bloqueado .masa { animation-play-state:paused; }
 @media (max-width:400px){
   .barra { justify-content:center; padding:0 .4rem; }
   .marca { display:none; }
-  .menu a { font-size:.54rem; padding:.55rem .58rem; }
+  /* Solo se ajusta el ancho: el alto tocable se hereda del bloque de
+     arriba. Rebajarlo aqui era lo que dejaba los enlaces en 32 px. */
+  .menu a { font-size:.54rem; padding-left:.6rem; padding-right:.6rem; }
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -1184,15 +1195,14 @@ body.bloqueado .masa { animation-play-state:paused; }
 
       <div class="bio">
         <div class="asoma">
-          <p class="destacado">No llego al render desde la imagen: llego desde el modelo. Cuando levanto
-             un proyecto en Revit, los espesores, las luces y los apoyos son los que se van a construir.</p>
-          <p><strong>Kevin Stick Gil Arévalo.</strong> Estudiante de ingeniería civil en la Universidad
-             Pontificia Bolivariana, seccional Bucaramanga, con nueve semestres culminados. En 2026 fundé
-             <strong>VISUAL 3D STUDIO</strong>, un estudio de representación del diseño: modelos digitales
-             coherentes con criterios constructivos y planos técnicos que sirven para coordinar la obra.</p>
-          <p>Subo a obra varias veces por semana. Esa distancia entre lo que se dibuja y lo que se levanta
-             es la que corrijo antes de que llegue al concreto, y es lo que separa una imagen bonita de una
-             imagen que se puede construir.</p>
+          <p class="destacado">Un render no empieza en la imagen: empieza en el modelo. Los espesores,
+             los apoyos y la luz que se ven en pantalla son los mismos que después se replantean en obra.</p>
+          <p><strong>Kevin Stick Gil Arévalo.</strong> Ingeniería civil en la Universidad Pontificia
+             Bolivariana, seccional Bucaramanga, con nueve semestres culminados. En 2026 fundé
+             <strong>VISUAL 3D STUDIO</strong>, un estudio de representación del diseño: modelos con
+             criterio constructivo y planos que sirven para coordinar la obra.</p>
+          <p>Varias visitas a obra por semana. Ahí aparece la distancia entre lo que está dibujado y lo
+             que termina construido, y ahí es donde se corrige — antes de que llegue al concreto.</p>
         </div>
 
         <div class="bio-trayecto asoma" style="--r:.12s">
