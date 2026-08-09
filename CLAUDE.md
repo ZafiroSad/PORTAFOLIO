@@ -138,6 +138,17 @@ técnico, un solo CTA por bloque, bordes con opacidad y radios.
 - **Los bloques con `overflow:hidden` que animan texto llevan
   `padding-bottom` compensado con margen negativo**: sin eso el recorte corta
   los trazos que bajan de la línea base (la g de «Ingeniero»).
+- **Las capas modales van FUERA de `.lienzo`.** Dentro, su `z-index` se mide
+  contra el del lienzo y la barra fija del sitio se dibujaba encima del
+  archivo. Ficha, índice y visor son hermanos del lienzo, no hijos.
+- **El índice también es opaco**, por la misma razón que la ficha.
+- **Las columnas del archivo las fija el JS** (`ajustarRejilla`): elige el
+  número que deje la última fila llena, y cuando el filtro deja menos
+  proyectos que columnas los acota a 420 px y centra la fila, en vez de
+  estirarlos de borde a borde.
+- **En móvil las piezas de la galería llevan `flex:none`.** Al apilar, el eje
+  principal pasa a ser el vertical y `flex:1 1 0` mandaba sobre `height`: las
+  imágenes colapsaban a cero y la galería era un hueco vacío.
 
 ## Decisiones abiertas
 

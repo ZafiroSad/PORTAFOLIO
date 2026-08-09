@@ -655,8 +655,9 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 .conteo .rot { font-family:var(--mono); font-size:.55rem; letter-spacing:.24em;
   text-transform:uppercase; color:var(--debil); line-height:1.6; }
 @media (max-width:640px){
-  .datos-caja { flex-direction:column; align-items:flex-start; }
-  .conteo { align-self:stretch; justify-content:space-between; }
+  .datos-caja { flex-direction:column; align-items:flex-start; gap:1.4rem; }
+  .datos-caja::before { content:''; order:1; width:100%; height:1px; background:var(--linea); }
+  .conteo { order:2; }
 }
 
 /* --- Galeria -------------------------------------------------- */
@@ -681,7 +682,11 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   text-shadow:0 2px 12px rgba(0,0,0,.85); }
 .galeria figure:hover figcaption { opacity:.9; transform:none; }
 @media (max-width:860px){
+  /* Al apilar, el eje principal pasa a ser el vertical y `flex:1 1 0`
+     manda sobre `height`: las piezas colapsaban a cero y la galeria
+     quedaba como un hueco vacio entre la cinta y el resto. */
   .galeria .fila { flex-direction:column; }
+  .galeria .fila figure { flex:none; }
   .galeria .fila.doble figure, .galeria .fila.unica figure { height:42vh; }
 }
 
@@ -748,13 +753,20 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 .viajero img { width:100%; height:100%; object-fit:cover; }
 
 /* ============ Índice de todos los proyectos =================== */
+/* Opaca, como la ficha: translucida dejaba leer el texto de Contacto
+   por detras de las tarjetas. */
 .indice-capa { position:fixed; inset:0; z-index:210;
-  background:linear-gradient(180deg, rgba(16,18,25,.94), rgba(8,9,13,.97));
+  background:
+    radial-gradient(120% 62% at 18% 0%,   rgba(58,74,110,.30), transparent 62%),
+    radial-gradient(110% 58% at 86% 100%, rgba(72,58,110,.26), transparent 62%),
+    linear-gradient(180deg, #0d0e13 0%, #0a0b0f 55%, #07080b 100%);
   overflow-y:auto; overscroll-behavior:contain;
   opacity:0; visibility:hidden; transition:opacity .45s var(--suave), visibility .45s; }
 .indice-capa.abierta { opacity:1; visibility:visible; }
 
-.filtros { display:flex; flex-wrap:wrap; gap:.45rem; padding:clamp(1.2rem,3.5vh,2rem) var(--margen) 1.2rem; }
+/* Deja pasar la barra flotante, que va montada con margen negativo */
+.filtros { display:flex; flex-wrap:wrap; gap:.45rem;
+  padding:calc(52px + clamp(1.4rem,4vh,2.4rem)) var(--margen) 1.2rem; }
 .filtro { font-family:var(--mono); font-size:.58rem; letter-spacing:.16em; text-transform:uppercase;
   color:var(--debil); padding:.55rem 1.05rem; border-radius:999px;
   background:rgba(255,255,255,.04); border:1px solid var(--linea);
@@ -763,7 +775,9 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 .filtro.activo { color:var(--base); background:var(--tinta); border-color:var(--tinta); }
 .filtro .n { opacity:.5; margin-left:.45rem; }
 
-.rejilla-todos { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+/* El numero de columnas lo fija el JS para que la ultima fila no quede
+   coja; el auto-fill es solo el punto de partida si el JS no corre. */
+.rejilla-todos { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
   gap:clamp(.8rem,1.6vw,1.4rem); padding:.6rem var(--margen) clamp(4rem,9vh,6rem); }
 .tarjeta { position:relative; cursor:pointer; opacity:0; transform:translateY(22px);
   transition:opacity .7s var(--suave), transform .8s var(--salida); }
@@ -910,15 +924,6 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   </div>
 </section>
 
-<div class="indice-capa" id="indice-capa" role="dialog" aria-modal="true" aria-label="Todos los proyectos">
-  <div class="ficha-barra vidrio" style="opacity:1; transform:none">
-    <span class="nombre mono">Archivo completo</span>
-    <button class="ficha-cerrar" id="indice-cerrar"><span class="aspa"></span> Cerrar</button>
-  </div>
-  <div class="filtros" id="filtros"></div>
-  <div class="rejilla-todos" id="rejilla-todos"></div>
-</div>
-
 <!-- ===================== SOBRE MÍ ===================== -->
 <section class="seccion" id="sobre">
   <div class="seccion-cuerpo acolchado sobre-marco">
@@ -983,6 +988,17 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 </div>
 
 </div><!-- /lienzo -->
+
+<!-- Las capas van FUERA de .lienzo: dentro, su z-index se mide contra
+     el del lienzo y la barra fija del sitio les quedaba por encima. -->
+<div class="indice-capa" id="indice-capa" role="dialog" aria-modal="true" aria-label="Todos los proyectos">
+  <div class="ficha-barra vidrio" style="opacity:1; transform:none">
+    <span class="nombre mono">Archivo completo</span>
+    <button class="ficha-cerrar" id="indice-cerrar"><span class="aspa"></span> Cerrar</button>
+  </div>
+  <div class="filtros" id="filtros"></div>
+  <div class="rejilla-todos" id="rejilla-todos"></div>
+</div>
 
 <!-- ===================== FICHA ===================== -->
 <div class="ficha" id="ficha" role="dialog" aria-modal="true" aria-label="Proyecto">
@@ -1258,6 +1274,36 @@ document.getElementById('filtros').innerHTML = GRUPOS.map(g => {
             ${g.nombre}<span class="n mono">${String(n).padStart(2,'0')}</span></button>`;
 }).join('');
 
+/* Reparte las tarjetas en el numero de columnas que deje la ultima
+   fila lo mas llena posible. Con auto-fill a secas, diez proyectos en
+   cuatro columnas dejaban dos huecos al final. */
+function ajustarRejilla() {
+  const visibles = [...rejilla.querySelectorAll('.tarjeta')].filter(t => !t.classList.contains('oculta')).length;
+  if (!visibles) return;
+  const hueco = parseFloat(getComputedStyle(rejilla).columnGap) || 16;
+  const util  = rejilla.clientWidth
+              - parseFloat(getComputedStyle(rejilla).paddingLeft)
+              - parseFloat(getComputedStyle(rejilla).paddingRight);
+  const MIN = 250;
+  const maxCols = Math.max(1, Math.floor((util + hueco) / (MIN + hueco)));
+
+  // Un filtro con menos proyectos que columnas no estira las tarjetas
+  // a lo ancho de la pantalla: las acota y centra la fila, que se lee
+  // como composicion y no como una fila coja.
+  if (visibles < maxCols) {
+    rejilla.style.gridTemplateColumns = `repeat(${visibles}, minmax(0, 420px))`;
+    rejilla.style.justifyContent = 'center';
+    return;
+  }
+  rejilla.style.justifyContent = '';
+
+  let cols = maxCols;
+  // Bajar una sola columna vale la pena unicamente si con ella la
+  // ultima fila queda exacta; mas alla se pierde demasiada densidad.
+  if (cols > 1 && visibles % cols !== 0 && visibles % (cols - 1) === 0) cols -= 1;
+  rejilla.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+}
+
 document.getElementById('filtros').addEventListener('click', e => {
   const b = e.target.closest('.filtro');
   if (!b) return;
@@ -1266,11 +1312,13 @@ document.getElementById('filtros').addEventListener('click', e => {
   rejilla.querySelectorAll('.tarjeta').forEach(t => {
     t.classList.toggle('oculta', g !== 'todos' && t.dataset.grupo !== g);
   });
+  ajustarRejilla();
 });
 
 function abrirIndice() {
   capaIndice.classList.add('abierta');
   document.body.classList.add('bloqueado');
+  ajustarRejilla();
   requestAnimationFrame(() => rejilla.classList.add('visible'));
 }
 function cerrarIndice() {
@@ -2104,7 +2152,10 @@ ficha.addEventListener('scroll', () => {
   moverParallax(contenido, innerHeight);
   actualizarGlobo();
 }, { passive:true });
-addEventListener('resize', () => { if (globoActual) globoActual.remedir(); });
+addEventListener('resize', () => {
+  if (globoActual) globoActual.remedir();
+  if (capaIndice.classList.contains('abierta')) ajustarRejilla();
+});
 
 const observador = new IntersectionObserver(en => {
   en.forEach(e => {
