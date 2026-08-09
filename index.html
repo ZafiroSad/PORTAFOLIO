@@ -94,7 +94,8 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 /* =================================================================
    EL CAMPO — lo que sustituye al fondo plano
    ================================================================= */
-.campo { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+.campo { position:fixed; inset:-420px 0; z-index:0; pointer-events:none; overflow:hidden;
+  will-change:transform;
   background:
     radial-gradient(130% 85% at 50% -12%, rgba(196,204,220,.07), transparent 62%),
     linear-gradient(180deg, var(--base-2) 0%, var(--base) 48%, #101116 100%); }
@@ -117,19 +118,19 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
       background:radial-gradient(circle, hsl(196 18% 60% / .18), transparent 66%);
       animation:derivaB 58s var(--suave) infinite reverse; }
 @keyframes derivaA {
-  0%,100% { transform:translate3d(0, calc(var(--y,0px) * .22), 0) }
-  50%     { transform:translate3d(9vmax, calc(var(--y,0px) * .22 + 7vmax), 0) } }
+  0%,100% { transform:translate3d(0,0,0) }
+  50%     { transform:translate3d(9vmax, 7vmax, 0) } }
 @keyframes derivaB {
-  0%,100% { transform:translate3d(0, calc(var(--y,0px) * .32), 0) }
-  50%     { transform:translate3d(-11vmax, calc(var(--y,0px) * .32 + 9vmax), 0) } }
+  0%,100% { transform:translate3d(0,0,0) }
+  50%     { transform:translate3d(-11vmax, 9vmax, 0) } }
 @keyframes derivaC {
-  0%,100% { transform:translate3d(0, calc(var(--y,0px) * -.18), 0) }
-  50%     { transform:translate3d(8vmax, calc(var(--y,0px) * -.18 - 8vmax), 0) } }
+  0%,100% { transform:translate3d(0,0,0) }
+  50%     { transform:translate3d(8vmax, -8vmax, 0) } }
 
 /* Grano: quita el bandeado de los degradados y da textura de pelicula.
    Sin mix-blend-mode y sin desbordar la ventana: mezclar una capa del
    quintuple del area en cada cuadro costaba mas que todo lo demas. */
-.grano { position:absolute; inset:0; opacity:.045; will-change:opacity;
+.grano { position:absolute; inset:0; opacity:.045;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E"); }
 
 /* Con una capa encima el campo no se ve: no hay por que seguir
@@ -488,12 +489,19 @@ body.bloqueado .masa { animation-play-state:paused; }
 .flujo.visible .etapa:nth-child(3) { transition-delay:.20s }
 .etapa .n { font-family:var(--mono); font-size:.55rem; letter-spacing:.22em; color:var(--debil); }
 .etapa h4 { font-size:.98rem; font-weight:500; letter-spacing:-.015em; margin:.25rem 0 .3rem; }
-.etapa p { font-size:.82rem; line-height:1.5; color:var(--tenue); max-width:30ch; margin-bottom:1.1rem; }
-.utiles { display:flex; gap:clamp(.9rem,2vw,1.5rem); flex-wrap:wrap; align-items:flex-end; }
-.util { display:flex; flex-direction:column; align-items:center; gap:.5rem; }
-.util img { width:clamp(34px,3.4vw,44px); height:clamp(34px,3.4vw,44px); object-fit:contain;
+.utiles { display:flex; gap:clamp(1rem,2.2vw,1.7rem); flex-wrap:wrap; align-items:flex-end;
+  margin-top:1rem; }
+.util { display:flex; flex-direction:column; align-items:center; gap:.55rem; }
+/* Cada icono respira a su ritmo: sin esto la fila se lee como una
+   captura de pantalla. El desfase se reparte para que nunca coincidan. */
+.util img { width:clamp(36px,3.6vw,48px); height:clamp(36px,3.6vw,48px); object-fit:contain;
   filter:drop-shadow(0 0 9px rgba(var(--c),.5)) drop-shadow(0 0 22px rgba(var(--c),.22));
-  transition:filter .5s var(--suave), transform .55s var(--resorte); }
+  transition:filter .5s var(--suave), transform .55s var(--resorte);
+  animation:respiraUtil var(--f,5s) var(--suave) infinite alternate;
+  animation-delay:var(--d,0s); }
+@keyframes respiraUtil {
+  from { transform:translateY(0) }
+  to   { transform:translateY(-7px) } }
 .util.negativo img { filter:invert(1) brightness(1.1) drop-shadow(0 0 10px rgba(255,255,255,.26)); }
 .util b { font-family:var(--mono); font-size:.5rem; letter-spacing:.14em; text-transform:uppercase;
   color:var(--debil); font-weight:400; transition:color .4s var(--suave); }
@@ -527,7 +535,7 @@ body.bloqueado .masa { animation-play-state:paused; }
   -webkit-mask-image:linear-gradient(to bottom, transparent, #000 24%, #000 76%, transparent);
           mask-image:linear-gradient(to bottom, transparent, #000 24%, #000 76%, transparent); }
 /* El eje sobre el que van ensartados los hitos */
-.rueda-eje { position:absolute; left:32px; top:0; bottom:0; width:1px; z-index:0;
+.rueda-eje { position:absolute; left:46px; top:0; bottom:0; width:1px; z-index:0;
   background:linear-gradient(to bottom, transparent, var(--linea) 22%, var(--linea) 78%, transparent); }
 
 .rueda {
@@ -537,7 +545,8 @@ body.bloqueado .masa { animation-play-state:paused; }
   overflow-y:auto; overscroll-behavior:auto;
   position:relative; z-index:1;
   scroll-snap-type:y proximity;
-  padding:26% 0;       /* para que el primero y el ultimo puedan centrarse */
+  padding:26% 0 26% 14px;   /* el margen izquierdo evita que el halo del
+                               escudo quede cortado contra el borde */
   scrollbar-width:none;
 }
 .rueda::-webkit-scrollbar { display:none; }
@@ -548,7 +557,7 @@ body.bloqueado .masa { animation-play-state:paused; }
   padding:.7rem 0;
   transform:scale(var(--k,.8)); opacity:var(--o,.3);
   transform-origin:left center;
-  transition:transform .28s var(--suave), opacity .28s var(--suave);
+  will-change:transform, opacity;
 }
 /* Sin burbuja: el escudo va desnudo y grande. Encerrarlo en un circulo
    lo encogia justo donde hay que leerlo. El eje se corta con una
@@ -699,20 +708,25 @@ body.bloqueado .masa { animation-play-state:paused; }
 .ficha.montada .ficha-portada-texto .tipo { opacity:.75; }
 .ficha.montada .ficha-portada-texto h2 span { transform:translateY(0); }
 
-/* --- Barra de datos: globo + contador ------------------------- */
+/* --- Cinta de datos: lugar + contador ------------------------- */
 /* Sin parrafo. El titulo ya esta arriba; aqui solo queda DONDE y
-   CUANTO, y el donde se responde girando el planeta. */
+   CUANTAS. El globo giratorio se retiro: con todos los proyectos en
+   el mismo punto de Colombia, contaba diez veces lo mismo. */
 .datos-cinta { max-width:1180px; margin:0 auto;
   padding:clamp(2.2rem,6vh,3.6rem) var(--margen) clamp(1.4rem,3vh,2.2rem); }
 .datos-caja { display:flex; align-items:center; justify-content:space-between; gap:clamp(1.2rem,4vw,3rem);
   padding:clamp(1rem,2vw,1.5rem) clamp(1.2rem,2.4vw,2rem); border-radius:26px; flex-wrap:wrap; }
 .lugar-bloque { display:flex; align-items:center; gap:clamp(1rem,2.4vw,1.8rem); min-width:0; }
-.globo-marco { position:relative; flex:none;
-  width:clamp(96px,13vw,132px); height:clamp(96px,13vw,132px); }
-.globo-marco canvas { width:100%; height:100%; display:block; }
-.globo-marco .halo { position:absolute; inset:-14%; border-radius:50%; pointer-events:none;
-  background:radial-gradient(circle, rgba(214,224,244,.16), transparent 62%);
-  filter:blur(14px); }
+/* Un punto que late, en lugar del planeta */
+.pin { position:relative; flex:none; width:11px; height:11px; border-radius:50%;
+  background:var(--tinta); box-shadow:0 0 14px rgba(255,255,255,.55); }
+.pin::after { content:''; position:absolute; inset:0; border-radius:50%;
+  border:1px solid rgba(255,255,255,.5); animation:latidoPin 2.6s var(--suave) infinite; }
+@keyframes latidoPin {
+  0%   { transform:scale(1);   opacity:.65 }
+  70%  { transform:scale(3.4); opacity:0 }
+  100% { transform:scale(3.4); opacity:0 } }
+
 .lugar-texto .rot { font-family:var(--mono); font-size:.55rem; letter-spacing:.24em;
   text-transform:uppercase; color:var(--debil); }
 .lugar-texto b { display:block; font-size:clamp(1.05rem,2.1vw,1.5rem); font-weight:500;
@@ -913,6 +927,21 @@ body.bloqueado .masa { animation-play-state:paused; }
   background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
   backdrop-filter:blur(14px); }
 
+/* En pantallas pequeñas el desenfoque de fondo se sustituye por un
+   vidrio pintado: en gama media, cada `backdrop-filter` obliga a
+   recomponer lo que hay debajo en cada cuadro del desplazamiento. */
+@media (max-width:900px){
+  .vidrio, .barra, .ficha-barra, .visor-cerrar, .visor-nav, .visor-pie, .tarjeta .sello {
+    backdrop-filter:none !important; -webkit-backdrop-filter:none !important;
+  }
+  .vidrio { background:linear-gradient(148deg, rgba(38,40,49,.86), rgba(28,30,38,.82) 44%, rgba(34,36,45,.86)); }
+  .barra  { background:rgba(24,26,33,.90); }
+  .ficha-barra { background:rgba(20,22,28,.88); }
+  .visor-cerrar, .visor-nav, .visor-pie { background:rgba(30,32,40,.9); }
+  .tarjeta .sello { background:rgba(16,17,22,.88); }
+  .masa { filter:blur(56px); }
+}
+
 @media (prefers-reduced-motion:reduce){
   *, *::before, *::after { animation:none !important; transition:none !important; }
   .mascara-marca { display:none }
@@ -998,8 +1027,8 @@ body.bloqueado .masa { animation-play-state:paused; }
     <div class="proceso-texto">
       <div class="etiqueta revelar"><span>Proceso</span></div>
       <h2 class="palabras" data-texto="Del modelo a la imagen."></h2>
-      <p class="proceso-apunte">La imagen no se dibuja: se levanta. Cada render sale de
-         un modelo que ya tiene los espesores, los apoyos y las cotas con que se construye.</p>
+      <p class="proceso-apunte">El render es la última capa de un modelo ya resuelto.
+         Los espesores, los apoyos y las cotas son los que llegan a obra.</p>
       <div class="fases" id="fases"></div>
     </div>
     <div class="proceso-regla"><span id="proceso-avance"></span></div>
@@ -1142,8 +1171,6 @@ const CONTACTO = {
            entrada del proyecto
    piezas  seleccion curada, en orden de lectura
    extra   renders del mismo proyecto fuera de la seleccion
-   coord   [lat, lon] APROXIMADAS, a nivel de municipio: es lo que
-           gira el globo. No son las del lote.
    ================================================================= */
 const PRINCIPALES = [
   { slug:'cazadores', arch:'cazadores', titulo:'Lote 1 · Cazadores Resort', tipo:'Vivienda unifamiliar',
@@ -1165,7 +1192,7 @@ const PRINCIPALES = [
     texto:'Fachada de líneas rectas con patio interior y piscina. La cocina abierta y la escalera funcionan como pieza central del primer nivel, y el recorrido se armó para leer esa continuidad de un espacio al siguiente.' },
 
   { slug:'punta', arch:'punta', titulo:'Punta Ruitoque', tipo:'Vivienda de lujo',
-    grupo:'vivienda', lugar:'Ruitoque', anio:'2025', estado:'Terminado',
+    grupo:'vivienda', lugar:'Ruitoque', anio:'2026', estado:'Terminado',
     coord:[7.005,-73.12],
     portada:7, piezas:[7,18,12,13], extra:[1,2,3,4,5,6,8,9,10,11,14,15,16,17,19,20,21,22], video:'punta',
     texto:'El proyecto más extenso del archivo: se modelaron y ambientaron todos los espacios de la casa, desde el teatro hasta cada alcoba. La selección muestra la fachada y tres habitaciones; el resto del material queda más abajo.' }
@@ -1173,13 +1200,13 @@ const PRINCIPALES = [
 
 const SECUNDARIOS = [
   { slug:'coincafex', arch:'coincafex', titulo:'Coincafex', tipo:'Sede corporativa',
-    grupo:'corporativo', lugar:'Girón, zona industrial', anio:'2025', estado:'Terminado',
+    grupo:'corporativo', lugar:'Girón, zona industrial', anio:'2026', estado:'Terminado',
     coord:[7.07,-73.17],
     portada:3, piezas:[3,8,10,5,6,2,4], extra:[1,9], video:'coincafex',
     texto:'La intervención envuelve una bodega existente con una piel metálica microperforada que unifica el volumen y oculta la cubierta. Adentro, las oficinas se resolvieron con luz cálida rasante y madera para que el interior no leyera como industrial.' },
 
   { slug:'casa-campo', arch:'casa-will', titulo:'Casa Campo', tipo:'Vivienda campestre',
-    grupo:'vivienda', lugar:'Santander', anio:'2025', estado:'Terminado',
+    grupo:'vivienda', lugar:'Santander', anio:'2026', estado:'Terminado',
     coord:[7.00,-73.20],
     portada:1, piezas:[1,2,3], extra:[],
     texto:'Una casa de una sola planta que se abre por completo al jardín. El encargo pedía mostrar cómo el alero protege la fachada acristalada sin cerrar la vista, así que los tres encuadres trabajan la misma hora del día y la misma altura de cámara.' },
@@ -1191,13 +1218,13 @@ const SECUNDARIOS = [
     texto:'La misma fachada resuelta de día y de noche, para mostrar cómo cambia el proyecto cuando entra la iluminación exterior.' },
 
   { slug:'closets-lebrija', arch:'lebrija', titulo:'Closets Lebrija', tipo:'Carpintería a medida',
-    grupo:'carpinteria', lugar:'Lebrija', anio:'2025', estado:'Terminado',
+    grupo:'carpinteria', lugar:'Lebrija', anio:'2026', estado:'Terminado',
     coord:[7.11,-73.37],
     portada:2, piezas:[2,4,8], extra:[6,7,9,10,11,12],
     texto:'Vestieres y closets representados con el material y la herrajería reales. La imagen sirve para aprobar en obra: si el render miente en un espesor o en una luz, el mueble llega distinto.' },
 
   { slug:'cocina-lebrija', arch:'lebrija', titulo:'Cocina Lebrija', tipo:'Carpintería a medida',
-    grupo:'carpinteria', lugar:'Lebrija', anio:'2025', estado:'Terminado',
+    grupo:'carpinteria', lugar:'Lebrija', anio:'2026', estado:'Terminado',
     coord:[7.11,-73.37],
     portada:16, piezas:[16,1,3], extra:[5,13,14,15,17],
     texto:'Cocina con isla en superficie de mármol y muebles en dos tonos. Se representaron los electrodomésticos y la iluminación bajo mueble tal como se instalaron.' },
@@ -1240,15 +1267,15 @@ const HITOS = [
     titulo:'Ayudante de obra', estado:null,
     detalle:'Replanteo, control de material y acompañamiento de cuadrilla en obra civil. Ahí se aprende lo que el plano no alcanza a decir.' },
 
-  { anio:'2025', escudo:null, sigla:'SSI',
+  { anio:'2026', escudo:null, sigla:'SSI',
     titulo:'Congreso XOpen Internacional', estado:null,
     detalle:'Sociedad Santandereana de Ingeniería. Participación y competencia de puentes.' },
 
-  { anio:'2025', escudo:'assets/logos/upb.webp', sigla:'UPB',
+  { anio:'2026', escudo:'assets/logos/upb.webp', sigla:'UPB',
     titulo:'Representante estudiantil', estado:'Facultad',
     detalle:'Vocería de los estudiantes de Ingeniería Civil ante la Facultad, UPB Bucaramanga.' },
 
-  { anio:'2025', escudo:'assets/logos/uis.webp', sigla:'UIS',
+  { anio:'2026', escudo:'assets/logos/uis.webp', sigla:'UIS',
     titulo:'Modelado BIM y gestión de la construcción', estado:null,
     detalle:'Curso con Autodesk Revit. Asociación Centro de Estudios de Ingeniería Civil, UIS.' },
 
@@ -1288,11 +1315,6 @@ const ETAPAS = [
 
 let PALETAS = {};
 fetch('assets/paletas.json').then(r => r.json()).then(p => { PALETAS = p; }).catch(() => {});
-
-/* Silueta de continentes para el globo. Se pide una sola vez y en
-   paralelo: si no llega, el globo dibuja solo la retícula. */
-let TIERRA = null;
-fetch('assets/datos/tierra.json').then(r => r.json()).then(t => { TIERRA = t; }).catch(() => {});
 
 const ruta   = (a, i) => `assets/renders/${a}-${String(i).padStart(2,'0')}.webp`;
 const ruta2x = (a, i) => `assets/renders/${a}-${String(i).padStart(2,'0')}@2x.webp`;
@@ -1369,10 +1391,24 @@ document.getElementById('fases').innerHTML = FASES.map(f => `
      el video se quedaba clavado con `seeking` en true para siempre.
      Dibujar la imagen que toca no depende del decodificador, se puede
      precargar y va igual de fino en movil. */
-  const angosto = innerWidth < 900 ||
-                  (navigator.connection && /2g|3g/.test(navigator.connection.effectiveType || ''));
-  const CARPETA = angosto ? 'assets/proceso/p/' : 'assets/proceso/g/';
-  const TOTAL   = angosto ? 60 : 80;
+  /* Tres tallas. Se elige por los pixeles REALES que va a ocupar la
+     escena —ancho de ventana por densidad de pantalla—, no por el
+     ancho a secas: un movil de 412 px con densidad 3 pinta 1236, y un
+     portatil de 1440 con densidad 1 pinta 1440. Servirle 2560 al
+     primero seria tirar datos; servirle 1080 al segundo, emborronar.
+     Con la conexion lenta declarada se baja un escalon. */
+  const dprReal = Math.min(devicePixelRatio || 1, 2.5);
+  const lenta   = navigator.connection && /^(slow-)?2g$|^3g$/.test(navigator.connection.effectiveType || '');
+  const pixeles = innerWidth * dprReal;
+
+  let talla;
+  if (lenta || innerWidth < 700)   talla = 'p';
+  else if (pixeles > 2100)         talla = 'xl';
+  else                             talla = 'g';
+
+  const CARPETA = 'assets/proceso/' + talla + '/';
+  const TOTAL   = talla === 'p' ? 60 : 80;
+  const ANCHO_FUENTE = talla === 'p' ? 1080 : talla === 'g' ? 1920 : 2560;
 
   const cuadros = new Array(TOTAL);
   let listos = 0, ultimo = -1, avance = 0;
@@ -1414,10 +1450,8 @@ document.getElementById('fases').innerHTML = FASES.map(f => `
   }
 
   function medir() {
-    /* La fuente mide 1920 px de ancho. Pedirle al lienzo el doble de
-       pixeles solo consigue que la imagen se estire y se vea blanda:
-       se limita al ancho real de la secuencia. */
-    const ANCHO_FUENTE = angosto ? 1080 : 1920;
+    /* Pedirle al lienzo mas pixeles de los que la fuente puede dar
+       solo consigue estirar la imagen y que se vea blanda. */
     const dpr = Math.min(devicePixelRatio || 1, 2,
                          ANCHO_FUENTE / Math.max(1, lienzo.clientWidth));
     lienzo.width  = Math.round(lienzo.clientWidth  * Math.max(1, dpr));
@@ -1599,27 +1633,43 @@ rueda.innerHTML = HITOS.map(h => `
 
 /* El tamano de cada hito depende de su distancia al centro de la
    rueda: el del medio va entero, y los de arriba y abajo se reducen
-   de forma continua conforme se alejan. */
+   de forma continua conforme se alejan.
+
+   Las posiciones se miden UNA vez y se guardan. Antes se pedia el
+   rectangulo de los nueve hitos en cada cuadro del desplazamiento —
+   nueve calculos de maquetacion por fotograma— y el giro se sentia
+   pastoso. Con `offsetTop` cacheado y `scrollTop` no se toca el
+   layout: solo aritmetica. */
+let sitiosHito = null;
+function medirHitos() {
+  sitiosHito = [...rueda.querySelectorAll('.hito')].map(h => ({
+    el: h, centro: h.offsetTop + h.offsetHeight / 2
+  }));
+}
 function girarRueda() {
-  const caja   = rueda.getBoundingClientRect();
-  const centro = caja.top + caja.height / 2;
-  const radio  = caja.height / 2;
+  if (!sitiosHito || !sitiosHito.length) medirHitos();
+  if (!sitiosHito.length) return;
+  const alto   = rueda.clientHeight;
+  const centro = rueda.scrollTop + alto / 2;
+  const radio  = alto / 2 || 1;
   let masCerca = null, minD = Infinity;
 
-  rueda.querySelectorAll('.hito').forEach(h => {
-    const c = h.getBoundingClientRect();
-    const d = Math.abs((c.top + c.height / 2) - centro) / radio;   // 0 en el centro
-    const k = Math.min(d, 1.5);
-    h.style.setProperty('--k', (1 - k * 0.30).toFixed(3));
-    h.style.setProperty('--o', Math.max(.18, 1 - k * 0.85).toFixed(3));
-    if (d < minD) { minD = d; masCerca = h; }
-    h.classList.remove('foco');
-  });
-  if (masCerca) masCerca.classList.add('foco');
+  for (const s of sitiosHito) {
+    const d = Math.abs(s.centro - centro) / radio;   // 0 en el centro
+    const k = d < 1.5 ? d : 1.5;
+    s.el.style.setProperty('--k', (1 - k * 0.30).toFixed(3));
+    s.el.style.setProperty('--o', (k > .96 ? .18 : 1 - k * 0.85).toFixed(3));
+    if (d < minD) { minD = d; masCerca = s.el; }
+  }
+  if (masCerca !== ruedaFoco) {
+    if (ruedaFoco) ruedaFoco.classList.remove('foco');
+    if (masCerca)  masCerca.classList.add('foco');
+    ruedaFoco = masCerca;
+  }
 }
-/* La rueda solo se recalcula cuando esta en pantalla. Medir nueve
-   hitos en cada cuadro del scroll de la pagina forzaba diez calculos
-   de maquetacion por fotograma — era el mayor lastre de fluidez. */
+let ruedaFoco = null;
+
+/* La rueda solo se recalcula cuando esta en pantalla. */
 let ruedaPendiente = false, ruedaALaVista = false;
 function pedirGiro() {
   if (ruedaPendiente || !ruedaALaVista) return;
@@ -1628,10 +1678,10 @@ function pedirGiro() {
 }
 new IntersectionObserver(en => {
   ruedaALaVista = en[0].isIntersecting;
-  if (ruedaALaVista) pedirGiro();
-}, { rootMargin:'120px' }).observe(rueda);
+  if (ruedaALaVista) { medirHitos(); pedirGiro(); }
+}, { rootMargin:'160px' }).observe(rueda);
 rueda.addEventListener('scroll', () => { ruedaALaVista = true; pedirGiro(); }, { passive:true });
-addEventListener('resize', pedirGiro);
+addEventListener('resize', () => { sitiosHito = null; pedirGiro(); });
 girarRueda();
 
 /* --- Herramientas por etapa ----------------------------------- */
@@ -1639,10 +1689,11 @@ document.getElementById('flujo').innerHTML = ETAPAS.map((e, k) => `
   <div class="etapa">
     <span class="n mono">${e.n}</span>
     <h4>${e.t}</h4>
-    <p>${e.d}</p>
     <div class="utiles">
-      ${UTILES.filter(u => u.etapa === k).map(u => `
-        <span class="util${u.negativo ? ' negativo' : ''}" style="--c:${u.color}">
+      ${UTILES.filter(u => u.etapa === k).map((u, i) => `
+        <span class="util${u.negativo ? ' negativo' : ''}"
+              style="--c:${u.color}; --f:${(4.2 + (k * 3 + i) % 5 * .6).toFixed(1)}s;
+                     --d:${((k * 3 + i) * .42).toFixed(2)}s">
           <img src="${u.logo}" alt="${u.nombre}" loading="lazy"><b>${u.nombre}</b>
         </span>`).join('')}
     </div>
@@ -1686,142 +1737,12 @@ document.getElementById('enlaces').innerHTML = ENLACES.map((e, i) => `
   </a>`).join('');
 
 /* =================================================================
-   GLOBO — canvas 2D, proyeccion ortografica
-   El planeta arranca girado y se orienta hacia las coordenadas del
-   proyecto conforme la barra de datos sube por la pantalla. Al quedar
-   centrado, el marcador late.
-   ================================================================= */
-function crearGlobo(lienzo, coord) {
-  const ctx = lienzo.getContext('2d');
-  const [latDest, lonDest] = coord;
-  // Punto de partida: media vuelta de distancia, para que el giro se
-  // lea como un planeta que rota, no como un salto de camara.
-  const lonIni = lonDest + 168, latIni = latDest + 34;
-  let p = 0, pDibujado = -1;
-
-  function medir() {
-    const d = Math.min(lienzo.clientWidth, lienzo.clientHeight) || 120;
-    const dpr = Math.min(devicePixelRatio || 1, 2);
-    lienzo.width = lienzo.height = Math.round(d * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    return d;
-  }
-  let lado = medir();
-
-  const rad = g => g * Math.PI / 180;
-  const suavizar = t => 1 - Math.pow(1 - t, 3);
-
-  function proyectar(lon, lat, lon0, lat0, R, cx, cy) {
-    const dl = rad(lon - lon0), la = rad(lat), la0 = rad(lat0);
-    const cosc = Math.sin(la0) * Math.sin(la) + Math.cos(la0) * Math.cos(la) * Math.cos(dl);
-    if (cosc < 0) return null;                       // cara oculta
-    return [ cx + R * Math.cos(la) * Math.sin(dl),
-             cy - R * (Math.cos(la0) * Math.sin(la) - Math.sin(la0) * Math.cos(la) * Math.cos(dl)),
-             cosc ];
-  }
-
-  function pintar() {
-    const t   = suavizar(p);
-    const lon0 = lonIni + (lonDest - lonIni) * t;
-    const lat0 = latIni + (latDest - latIni) * t;
-    const cx = lado / 2, cy = lado / 2, R = lado * .40;
-
-    ctx.clearRect(0, 0, lado, lado);
-
-    // Oceano: esfera con la luz entrando por arriba a la izquierda
-    const oc = ctx.createRadialGradient(cx - R * .38, cy - R * .42, R * .06, cx, cy, R);
-    oc.addColorStop(0,   'rgba(150,180,230,.26)');
-    oc.addColorStop(.55, 'rgba(60,84,130,.16)');
-    oc.addColorStop(1,   'rgba(10,14,26,.30)');
-    ctx.beginPath(); ctx.arc(cx, cy, R, 0, 7); ctx.fillStyle = oc; ctx.fill();
-
-    // Retícula
-    ctx.lineWidth = .6;
-    for (let lat = -60; lat <= 60; lat += 30) {
-      ctx.beginPath(); let roto = true;
-      for (let lon = -180; lon <= 180; lon += 4) {
-        const q = proyectar(lon, lat, lon0, lat0, R, cx, cy);
-        if (!q) { roto = true; continue; }
-        roto ? (ctx.moveTo(q[0], q[1]), roto = false) : ctx.lineTo(q[0], q[1]);
-      }
-      ctx.strokeStyle = 'rgba(255,255,255,.09)'; ctx.stroke();
-    }
-    for (let lon = -180; lon < 180; lon += 30) {
-      ctx.beginPath(); let roto = true;
-      for (let lat = -88; lat <= 88; lat += 4) {
-        const q = proyectar(lon, lat, lon0, lat0, R, cx, cy);
-        if (!q) { roto = true; continue; }
-        roto ? (ctx.moveTo(q[0], q[1]), roto = false) : ctx.lineTo(q[0], q[1]);
-      }
-      ctx.strokeStyle = 'rgba(255,255,255,.07)'; ctx.stroke();
-    }
-
-    // Continentes
-    if (TIERRA) {
-      ctx.lineWidth = .9;
-      TIERRA.forEach(anillo => {
-        ctx.beginPath();
-        let roto = true, visibles = 0;
-        for (let i = 0; i < anillo.length; i += 2) {
-          const q = proyectar(anillo[i], anillo[i + 1], lon0, lat0, R, cx, cy);
-          if (!q) { roto = true; continue; }
-          visibles++;
-          roto ? (ctx.moveTo(q[0], q[1]), roto = false) : ctx.lineTo(q[0], q[1]);
-        }
-        if (!visibles) return;
-        ctx.fillStyle   = 'rgba(226,232,245,.13)';
-        ctx.strokeStyle = 'rgba(226,232,245,.42)';
-        ctx.fill(); ctx.stroke();
-      });
-    }
-
-    // Filo de la esfera
-    ctx.beginPath(); ctx.arc(cx, cy, R, 0, 7);
-    ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,.22)'; ctx.stroke();
-
-    // Marcador
-    const m = proyectar(lonDest, latDest, lon0, lat0, R, cx, cy);
-    if (m) {
-      const vivo = Math.min(1, Math.max(0, (p - .55) / .45));
-      const pulso = quieto() ? 0 : (performance.now() % 2200) / 2200;
-      if (vivo > 0) {
-        ctx.beginPath();
-        ctx.arc(m[0], m[1], 3 + pulso * 13, 0, 7);
-        ctx.strokeStyle = `rgba(255,255,255,${(.5 * (1 - pulso) * vivo).toFixed(3)})`;
-        ctx.lineWidth = 1.2; ctx.stroke();
-      }
-      ctx.beginPath(); ctx.arc(m[0], m[1], 3.1, 0, 7);
-      ctx.fillStyle = `rgba(255,255,255,${(.35 + .65 * vivo).toFixed(2)})`; ctx.fill();
-      ctx.beginPath(); ctx.arc(m[0], m[1], 6.5, 0, 7);
-      ctx.strokeStyle = `rgba(255,255,255,${(.35 * vivo).toFixed(2)})`; ctx.lineWidth = 1; ctx.stroke();
-    }
-    pDibujado = p;
-  }
-
-  let vivo = false, pedido = false;
-  function bucle() {
-    pedido = false;
-    pintar();
-    if (vivo && p > .55 && !quieto()) { pedido = true; requestAnimationFrame(bucle); }
-  }
-  return {
-    avance(v) {
-      p = Math.min(1, Math.max(0, v));
-      if (!pedido) { pedido = true; requestAnimationFrame(bucle); }
-    },
-    encender(v) { vivo = v; if (v && !pedido) { pedido = true; requestAnimationFrame(bucle); } },
-    remedir() { lado = medir(); pintar(); },
-    listo() { return p >= .999; }
-  };
-}
-
-/* =================================================================
    FICHA DE PROYECTO
    ================================================================= */
 const ficha       = document.getElementById('ficha');
 const contenido   = document.getElementById('ficha-contenido');
 const fichaNombre = document.getElementById('ficha-nombre');
-let proyectoActual = null, hojaOrigen = null, globoActual = null;
+let proyectoActual = null, hojaOrigen = null;
 
 /* El fondo ya no se tiñe con el color del proyecto: todo el sitio
    comparte el mismo campo de piedra. Se conservan las paletas por si
@@ -1885,17 +1806,10 @@ function pintarFicha(p) {
     <div class="datos-cinta entra">
       <div class="datos-caja vidrio">
         <div class="lugar-bloque">
-          <div class="globo-marco">
-            <div class="halo"></div>
-            <canvas id="globo" aria-hidden="true"></canvas>
-          </div>
+          <span class="pin" aria-hidden="true"></span>
           <div class="lugar-texto">
             <div class="rot">Dónde</div>
             <b>${p.lugar}</b>
-            <div class="coord mono" id="globo-coord">
-              ${Math.abs(p.coord[0]).toFixed(3)}° ${p.coord[0] >= 0 ? 'N' : 'S'} ·
-              ${Math.abs(p.coord[1]).toFixed(3)}° ${p.coord[1] >= 0 ? 'E' : 'O'}
-            </div>
           </div>
         </div>
         <div class="conteo">
@@ -1949,10 +1863,6 @@ function pintarFicha(p) {
   const tira = contenido.querySelector('#tira-extra');
   if (tira) tira.dataset.orden = JSON.stringify(extra.map(n => ruta2x(p.arch, n)));
 
-  /* --- Globo --- */
-  globoActual = crearGlobo(contenido.querySelector('#globo'), p.coord);
-  globoActual.encender(true);
-
   /* --- Contador: cuenta hasta el total al entrar en pantalla --- */
   const cifra = contenido.querySelector('#aro-cifra');
   const arco  = contenido.querySelector('#aro-arco');
@@ -1992,26 +1902,14 @@ function pintarFicha(p) {
   actualizarGlobo();
 }
 
-/* El giro del planeta y el anillo de progreso se recalculan con el
-   desplazamiento de la ficha. */
+/* El anillo de progreso sigue al avance de la galeria. */
 function actualizarGlobo() {
-  if (!globoActual) return;
-  const caja = contenido.querySelector('.datos-caja');
-  if (!caja) return;
-  const c = caja.getBoundingClientRect();
-  // 0 cuando la caja asoma por abajo, 1 cuando llega al tercio superior
-  const v = 1 - (c.top - innerHeight * .28) / (innerHeight * .72);
-  globoActual.avance(v);
-  const coord = contenido.querySelector('#globo-coord');
-  if (coord) coord.classList.toggle('viva', v > .85);
-
   const arco = contenido.querySelector('#aro-arco');
   const gal  = contenido.querySelector('#galeria');
-  if (arco && gal) {
-    const g = gal.getBoundingClientRect();
-    const avanceGal = Math.min(1, Math.max(0, (innerHeight - g.top) / (g.height + innerHeight * .2)));
-    arco.style.strokeDashoffset = (169.6 * (1 - avanceGal)).toFixed(1);
-  }
+  if (!arco || !gal) return;
+  const g = gal.getBoundingClientRect();
+  const avanceGal = Math.min(1, Math.max(0, (innerHeight - g.top) / (g.height + innerHeight * .2)));
+  arco.style.strokeDashoffset = (169.6 * (1 - avanceGal)).toFixed(1);
 }
 
 function abrirFicha(slug, hoja) {
@@ -2077,7 +1975,6 @@ function abrirFicha(slug, hoja) {
 function cerrarFicha() {
   history.replaceState(null, '', location.pathname);
   contenido.querySelectorAll('video').forEach(v => v.pause());
-  if (globoActual) globoActual.encender(false);
 
   // Si se entro desde el indice, el indice sigue montado detras: el
   // desplazamiento del cuerpo solo se libera cuando tampoco queda el.
@@ -2371,8 +2268,11 @@ addEventListener('scroll', () => {
     const alto = document.documentElement.scrollHeight - innerHeight;
     avance.style.transform = `scaleX(${alto > 0 ? y / alto : 0})`;
 
-    // El campo del fondo se desplaza con la pagina, mas lento
-    campo.style.setProperty('--y', `${(y * .08).toFixed(1)}px`);
+    // El campo se desplaza con la pagina, mas lento. Se mueve el
+    // contenedor —una sola capa ya rasterizada— y no cada masa: tocar
+    // las masas obligaba a rehacer cuatro desenfoques de 72 px por
+    // cuadro, que era el mayor tiron que quedaba.
+    campo.style.transform = `translate3d(0, ${Math.min(y * .06, 380).toFixed(1)}px, 0)`;
 
     // La barra se encoge en cuanto se deja atras la portada
     barra.classList.toggle('compacta', y > innerHeight * .6);
@@ -2402,7 +2302,6 @@ ficha.addEventListener('scroll', () => {
   actualizarGlobo();
 }, { passive:true });
 addEventListener('resize', () => {
-  if (globoActual) globoActual.remedir();
   if (capaIndice.classList.contains('abierta')) ajustarRejilla();
 });
 
