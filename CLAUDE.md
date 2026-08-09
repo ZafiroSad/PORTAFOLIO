@@ -125,13 +125,16 @@ técnico, un solo CTA por bloque, bordes con opacidad y radios.
   entrar en pantalla y la cifra. Las piezas suben en cascada detrás.
 - **El visor cambia de imagen con dos capas**, no cambiando el `src`: la que
   sale se va con desenfoque hacia un lado y la que entra llega del contrario.
-- **Los logos de software orbitan como parte del campo**, sin placa ni
-  recuadro y en gris al 20 %: solo al señalarlos recuperan color y vidrio.
-  La rejilla de fichas de la v8 se leía cuadriculada y comía una columna.
-- **Cada transformación va en su propio nodo** en el orbital. Una animación
-  de `transform` reemplaza el transform completo del elemento: con la
-  contrarrotación y el centrado en el mismo nodo, los diez logos se apilaban
-  en el centro.
+- **Los logos de software forman una CONSTELACIÓN**, no una rejilla ni una
+  órbita: sueltos, sin caja, unidos por hilos que se dibujan al entrar y
+  flotando cada uno a su ritmo. El resplandor sale de `drop-shadow` sobre el
+  PNG, así que toma la silueta del logo y no la de un contenedor — era lo
+  único que funcionaba de la versión en monedas.
+  Las posiciones van a mano en las dos franjas que ningún texto ocupa
+  (arriba del título y bajo la bio): los anillos giratorios pasaban por
+  encima del texto y no había radio que lo evitara.
+- **Canva y Excel quedaron fuera** del listado: restan en un portafolio de
+  visualización. Los logos negros (Twinmotion, ChatGPT) van invertidos.
 - **`overflow:hidden` en la sección Sobre mí**: el orbital es más alto que la
   ventana y sus satélites aparecían flotando sobre Contacto — y provocaban
   desbordamiento horizontal en móvil.

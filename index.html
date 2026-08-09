@@ -415,82 +415,40 @@ body.bloqueado .masa { animation-play-state:paused; }
 .btn-todos:hover .disco svg { stroke:var(--base); }
 
 /* ============ SOBRE MÍ ======================================== */
-/* El sistema orbital de herramientas vive DETRAS del contenido: es
-   parte del campo, no una rejilla de fichas. Libera la columna
-   entera que antes ocupaba la retícula de logos. */
-/* El sistema no puede salirse de su seccion: con el orbital mas alto
-   que la ventana, sus satelites aparecian flotando sobre Contacto. */
+/* CONSTELACION DE HERRAMIENTAS
+   Los logos no van en cajas: flotan sueltos por el borde de la
+   seccion, unidos por hilos que se dibujan al entrar, y cada uno
+   emite su propia luz. El resplandor se saca con drop-shadow sobre el
+   PNG, asi que toma la silueta real del logo y no la de una moneda.
+   Las posiciones rodean el contenido en vez de cruzarlo. */
 .sobre-marco { position:relative; overflow:hidden; }
-.orbital { position:absolute; z-index:0; pointer-events:none;
-  left:50%; top:50%; transform:translate(-50%,-50%);
-  width:min(1020px, 94vw, 86vh); aspect-ratio:1; opacity:0;
-  transition:opacity 1.6s var(--suave); }
-/* Vive por debajo del texto: a plena intensidad los logos a color
-   competian con la lectura. Al señalar uno recupera todo su brillo. */
-.orbital.viva { opacity:.5; }
-.orbital:hover { opacity:1; }
-.orbital .nucleo { position:absolute; left:50%; top:50%; width:min(52%,560px); aspect-ratio:1;
-  transform:translate(-50%,-50%); border-radius:50%;
-  background:radial-gradient(circle, hsl(var(--th) 60% 55% / .13), transparent 62%);
-  filter:blur(28px); animation:pulsoNucleo 9s var(--suave) infinite; }
-@keyframes pulsoNucleo { 0%,100%{transform:translate(-50%,-50%) scale(1); opacity:.85}
-                         50%   {transform:translate(-50%,-50%) scale(1.12); opacity:1} }
-.anillo { position:absolute; inset:0; animation:girar var(--t,70s) linear infinite; }
-.anillo.inverso { animation-direction:reverse; }
-.anillo::before { content:''; position:absolute; inset:calc(50% - var(--r,0%)); border-radius:50%;
-  border:1px solid rgba(255,255,255,.045); }
-@keyframes girar { to { transform:rotate(360deg) } }
+.constelacion { position:absolute; inset:0; z-index:0; pointer-events:none;
+  opacity:0; transition:opacity 1.8s var(--suave); }
+.constelacion.viva { opacity:.62; }
+.constelacion svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.constelacion svg line { stroke:rgba(255,255,255,.10); stroke-width:1;
+  stroke-dasharray:900; stroke-dashoffset:900; }
+.constelacion.viva svg line { animation:trazarHilo 1.8s var(--salida) forwards var(--r,0s); }
+@keyframes trazarHilo { to { stroke-dashoffset:0 } }
 
-/* Cada transformacion vive en su propia capa. Una animacion de
-   `transform` reemplaza el transform completo del elemento: si la
-   contrarrotacion y la colocacion comparten nodo, la animacion se
-   come el centrado y los diez logos se apilan en el centro. */
-.satelite { position:absolute; inset:0; transform:rotate(var(--a)); pointer-events:none; }
-.satelite .orbe { position:absolute; left:50%; top:calc(50% - var(--r)); }
-.satelite .contra { display:block; animation:girar var(--t,70s) linear infinite reverse; }
-.anillo.inverso .satelite .contra { animation-direction:normal; }
-/* Cada herramienta viaja en su propia moneda de vidrio, teñida con el
-   color de su marca y con el logo a COLOR: el gris de antes apagaba
-   justo lo que hay que mostrar. La moneda late despacio, cada una con
-   su propio desfase, para que el sistema se lea vivo y no rigido. */
-.satelite .cara { position:absolute; left:0; top:0;
-  width:var(--s,54px); height:var(--s,54px);
-  transform:translate(-50%,-50%) rotate(calc(-1 * var(--a)));
-  pointer-events:auto;
-  display:grid; place-items:center; border-radius:50%;
-  background:
-    radial-gradient(120% 120% at 30% 20%, rgba(var(--c),.30), rgba(var(--c),.10) 60%, rgba(255,255,255,.03)),
-    rgba(255,255,255,.03);
-  border:1px solid rgba(var(--c),.30);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 0 22px -6px rgba(var(--c),.55);
-  transition:box-shadow .45s, border-color .45s, background .45s;
-}
-.satelite .cara::after { content:''; position:absolute; inset:0; border-radius:50%;
-  border:1px solid rgba(var(--c),.5); opacity:0; transform:scale(1);
-  animation:respirar var(--p,7s) var(--suave) infinite; animation-delay:var(--d,0s); }
-@keyframes respirar {
-  0%   { opacity:.5; transform:scale(1) }
-  70%  { opacity:0;  transform:scale(1.35) }
-  100% { opacity:0;  transform:scale(1.35) } }
-.satelite img { width:58%; height:58%; object-fit:contain;
-  transition:transform .5s var(--resorte); }
-/* Los logos que son negros por marca no se ven sobre fondo oscuro:
-   se les invierte el tono, no el color. */
-.satelite.negativo img { filter:invert(1) brightness(1.15); }
-.satelite.negativo .cara { box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 0 18px -10px rgba(var(--c),.4); }
-.satelite.negativo .cara::after { opacity:0; animation:none; }
-.satelite .cara:hover { border-color:rgba(var(--c),.85);
-  background:
-    radial-gradient(120% 120% at 30% 20%, rgba(var(--c),.55), rgba(var(--c),.22) 60%, rgba(255,255,255,.05)),
-    rgba(255,255,255,.05);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.34), 0 0 40px -6px rgba(var(--c),.9); }
-.satelite .cara:hover img { transform:scale(1.14); }
-.satelite .nombre { position:absolute; left:0; top:calc(var(--s,54px) * .78);
-  transform:translate(-50%,0) rotate(calc(-1 * var(--a)));
-  font-family:var(--mono); font-size:.48rem; letter-spacing:.16em; text-transform:uppercase;
-  color:var(--tenue); white-space:nowrap; opacity:0; transition:opacity .35s; }
-.satelite .cara:hover ~ .nombre { opacity:1; }
-@media (max-width:960px){ .orbital { opacity:0 !important; } }
+.estrella { position:absolute; transform:translate(-50%,-50%); pointer-events:auto;
+  display:flex; flex-direction:column; align-items:center; gap:.5rem;
+  animation:flotar var(--f,6s) var(--suave) infinite alternate; animation-delay:var(--r,0s); }
+@keyframes flotar { to { transform:translate(-50%, calc(-50% - 13px)) } }
+.estrella img { width:var(--s,46px); height:var(--s,46px); object-fit:contain;
+  filter:drop-shadow(0 0 10px rgba(var(--c),.55)) drop-shadow(0 0 26px rgba(var(--c),.26));
+  transition:filter .5s var(--suave), transform .55s var(--resorte); }
+.estrella.negativo img {
+  filter:invert(1) brightness(1.1) drop-shadow(0 0 11px rgba(255,255,255,.28)); }
+.estrella b { font-family:var(--mono); font-size:.52rem; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--debil); font-weight:400;
+  opacity:0; transition:opacity .4s var(--suave); }
+.estrella:hover b { opacity:1; color:var(--tenue); }
+.estrella:hover img { transform:scale(1.16);
+  filter:drop-shadow(0 0 16px rgba(var(--c),.95)) drop-shadow(0 0 44px rgba(var(--c),.5)); }
+.estrella.negativo:hover img {
+  filter:invert(1) brightness(1.15) drop-shadow(0 0 18px rgba(255,255,255,.5)); }
+@media (max-width:960px){ .constelacion { display:none; } }
 
 .sobre-contenido { position:relative; z-index:1; }
 .bio { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); gap:clamp(2rem,6vw,6rem); align-items:center; }
@@ -901,7 +859,8 @@ body.bloqueado .masa { animation-play-state:paused; }
      el titular se quedaba borroso. No basta con devolver la opacidad. */
   .titular .letra, .letra { opacity:1 !important; filter:none !important; }
   .subtitular span, .revelar > *, .enlace { opacity:1 !important; transform:none !important; }
-  .inicio-aparte, .baja, .orbital, .mas-filo .marca-mas { opacity:1 }
+  .inicio-aparte, .baja, .constelacion, .mas-filo .marca-mas { opacity:1 }
+  .estrella { animation:none }
   .mas-filo .raya { transform:none }
   .galeria figure, .hoja, .tira-extra figure { clip-path:none !important; opacity:1 !important; transform:none !important; }
   .ficha-portada-texto h2 span, .ficha .entra { transform:none; opacity:1; filter:none }
@@ -990,7 +949,7 @@ body.bloqueado .masa { animation-play-state:paused; }
 <section class="seccion" id="sobre">
   <div class="seccion-cuerpo acolchado sobre-marco">
 
-    <div class="orbital" id="orbital" aria-hidden="true"><div class="nucleo"></div></div>
+    <div class="constelacion" id="constelacion" aria-hidden="true"></div>
 
     <div class="sobre-contenido">
       <div class="cabeza">
@@ -1228,19 +1187,19 @@ const HITOS = [
     detalle:'Siguiente paso en la formación.' }
 ];
 
-/* Los logos ya no van en rejilla: orbitan detras del texto como parte
-   del campo. anillo 0 = interior (lo que modela), 1 = exterior (con lo
-   que representa y con lo que se apoya). color = el de la marca;
-   negativo = logos negros, que sobre fondo oscuro hay que invertir. */
+/* Los logos no van en rejilla ni en cajas: forman una constelacion
+   por el borde de Sobre mi. color = el de la marca, del que sale su
+   resplandor; negativo = logos negros, que sobre fondo oscuro hay que
+   invertir para que se vean. */
 const UTILES = [
-  { nombre:'Revit',       logo:'assets/logos/revit.webp',      anillo:0, color:'54,142,235' },
-  { nombre:'AutoCAD',     logo:'assets/logos/autocad.webp',    anillo:0, color:'229,16,80'  },
-  { nombre:'Civil 3D',    logo:'assets/logos/civil3d.webp',    anillo:0, color:'196,19,126' },
-  { nombre:'SketchUp',    logo:'assets/logos/sketchup.webp',   anillo:0, color:'23,124,180' },
-  { nombre:'D5 Render',   logo:'assets/logos/d5.webp',         anillo:1, color:'138,86,246' },
-  { nombre:'Twinmotion',  logo:'assets/logos/twinmotion.webp', anillo:1, color:'236,240,248', negativo:true },
-  { nombre:'Claude Code', logo:'assets/logos/claudecode.webp', anillo:1, color:'217,119,87'  },
-  { nombre:'ChatGPT',     logo:'assets/logos/chatgpt.webp',    anillo:1, color:'116,170,156', negativo:true }
+  { nombre:'Revit',       logo:'assets/logos/revit.webp', color:'54,142,235' },
+  { nombre:'AutoCAD',     logo:'assets/logos/autocad.webp', color:'229,16,80'  },
+  { nombre:'Civil 3D',    logo:'assets/logos/civil3d.webp', color:'196,19,126' },
+  { nombre:'SketchUp',    logo:'assets/logos/sketchup.webp', color:'23,124,180' },
+  { nombre:'D5 Render',   logo:'assets/logos/d5.webp', color:'138,86,246' },
+  { nombre:'Twinmotion',  logo:'assets/logos/twinmotion.webp', color:'236,240,248', negativo:true },
+  { nombre:'Claude Code', logo:'assets/logos/claudecode.webp', color:'217,119,87'  },
+  { nombre:'ChatGPT',     logo:'assets/logos/chatgpt.webp', color:'116,170,156', negativo:true }
 ];
 
 let PALETAS = {};
@@ -1447,36 +1406,41 @@ rueda.addEventListener('scroll', () => { ruedaALaVista = true; pedirGiro(); }, {
 addEventListener('resize', pedirGiro);
 girarRueda();
 
-/* --- Sistema orbital de herramientas -------------------------- */
-/* Dos anillos girando en sentidos opuestos. Cada satelite compensa el
-   giro de su anillo con una animacion inversa de la misma duracion,
-   asi el logo nunca se ve cabeza abajo. */
-(function montarOrbital() {
-  const orbital = document.getElementById('orbital');
-  const capas = [
-    { radio:'33%', dur:'96s',  clase:'',        tam:'clamp(44px,4.6vw,60px)' },
-    { radio:'46%', dur:'140s', clase:'inverso', tam:'clamp(40px,4.2vw,54px)' }
+/* --- Constelacion de herramientas ----------------------------- */
+/* Las posiciones van a mano y en porcentaje: rodean el contenido por
+   el borde en vez de cruzarlo, que era el problema de los anillos —
+   los logos pasaban por encima del texto. Los hilos enlazan cada una
+   con la siguiente, de modo que el conjunto enmarca la seccion. */
+(function montarConstelacion() {
+  const cielo = document.getElementById('constelacion');
+  if (!cielo) return;
+  /* Franja de arriba y franja de abajo: son las dos bandas que ningun
+     texto ocupa. El titulo vive sobre el 27% y la bio baja hasta el
+     80%, asi que cualquier estrella ahi en medio se le monta encima. */
+  const SITIOS = [
+    { x:5,  y:15 }, { x:20, y:6  }, { x:38, y:13 }, { x:57, y:5  },
+    { x:75, y:12 }, { x:92, y:18 }, { x:66, y:92 }, { x:23, y:94 }
   ];
-  capas.forEach((capa, ci) => {
-    const dentro = UTILES.filter(u => u.anillo === ci);
-    if (!dentro.length) return;
-    const anillo = document.createElement('div');
-    anillo.className = `anillo ${capa.clase}`;
-    anillo.style.setProperty('--t', capa.dur);
-    anillo.style.setProperty('--r', capa.radio);
-    anillo.innerHTML = dentro.map((u, i) => {
-      const a = (360 / dentro.length) * i + ci * 18;
-      return `<span class="satelite${u.negativo ? ' negativo' : ''}"
-                    style="--a:${a}deg; --r:${capa.radio}; --t:${capa.dur}; --s:${capa.tam};
-                           --c:${u.color}; --p:${(6 + i * 1.3).toFixed(1)}s; --d:${(i * .85).toFixed(2)}s">
-                <span class="orbe"><span class="contra">
-                  <span class="cara"><img src="${u.logo}" alt="${u.nombre}" loading="lazy"></span>
-                  <span class="nombre">${u.nombre}</span>
-                </span></span>
-              </span>`;
-    }).join('');
-    orbital.appendChild(anillo);
-  });
+  // La cadena no se cierra: un hilo del final al principio cruzaria
+  // la seccion entera por la diagonal.
+  const hilos = [[0,1],[1,2],[2,3],[3,4],[4,5],[7,6]];
+
+  const svg = `<svg aria-hidden="true">${hilos.map(([a, b], i) => {
+    const p = SITIOS[a], q = SITIOS[b];
+    return `<line x1="${p.x}%" y1="${p.y}%" x2="${q.x}%" y2="${q.y}%"
+                  style="--r:${(i * .13).toFixed(2)}s"></line>`;
+  }).join('')}</svg>`;
+
+  cielo.innerHTML = svg + UTILES.map((u, i) => {
+    const s = SITIOS[i % SITIOS.length];
+    return `<div class="estrella${u.negativo ? ' negativo' : ''}"
+                 style="left:${s.x}%; top:${s.y}%; --c:${u.color};
+                        --s:${44 + (i % 3) * 8}px; --f:${(5 + i * .55).toFixed(1)}s;
+                        --r:${(i * .28).toFixed(2)}s">
+              <img src="${u.logo}" alt="${u.nombre}" loading="lazy">
+              <b>${u.nombre}</b>
+            </div>`;
+  }).join('');
 })();
 
 /* =================================================================
@@ -2243,7 +2207,7 @@ const observador = new IntersectionObserver(en => {
     observador.unobserve(e.target);
   });
 }, { threshold:.12, rootMargin:'0px 0px -60px 0px' });
-document.querySelectorAll('.revelar, .palabras, .vitrina, .enlaces, .orbital')
+document.querySelectorAll('.revelar, .palabras, .vitrina, .enlaces, .constelacion')
   .forEach(el => observador.observe(el));
 
 /* El recorte anclado a la ventana solo hace falta mientras el titular
