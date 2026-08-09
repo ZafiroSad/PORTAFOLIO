@@ -329,8 +329,7 @@ body.bloqueado .masa { animation-play-state:paused; }
 .asoma { opacity:0; transform:translateY(26px); }
 .asoma.visible { opacity:1; transform:none;
   transition:opacity .85s var(--suave) var(--r,0s), transform .95s var(--salida) var(--r,0s); }
-.asoma.lateral { transform:translateX(-24px); }
-.asoma.lateral.der { transform:translateX(24px); }
+
 
 /* ============ INICIO ========================================== */
 .inicio { position:relative; min-height:100svh; display:flex; flex-direction:column; justify-content:flex-end;
@@ -840,19 +839,24 @@ body.bloqueado .masa { animation-play-state:paused; }
   background:rgba(0,0,0,.5); }
 .ficha-recorrido video { width:100%; height:100%; object-fit:contain; background:#000; }
 
-.ficha-navegar { display:flex; justify-content:space-between; align-items:stretch; gap:.8rem;
-  overflow:hidden;   /* la entrada lateral de los saltos no debe sacar scroll */
-  max-width:1180px; margin:0 auto; padding:clamp(2.5rem,6vh,3.6rem) var(--margen) clamp(4rem,9vh,6rem); }
-.salto { flex:1 1 0; min-width:0; padding:1.1rem 1.3rem; border-radius:20px; text-align:left;
-  display:flex; flex-direction:column; gap:.3rem;
-  transition:border-color .4s, box-shadow .45s var(--suave), transform .5s var(--salida); }
+/* Un pie de pagina discreto, no dos tarjetas que compiten con los
+   renders: lo ultimo que se ve de un proyecto debe ser el proyecto. */
+.ficha-navegar { display:flex; justify-content:space-between; align-items:flex-start; gap:1.4rem;
+  max-width:1180px; margin:0 auto;
+  padding:clamp(1.6rem,4vh,2.4rem) var(--margen) clamp(3.5rem,8vh,5rem);
+  border-top:1px solid var(--linea); }
+.ficha-navegar { margin-top:clamp(1.6rem,4vh,2.6rem); }
+.salto { min-width:0; max-width:46%; overflow:hidden; padding:.5rem .1rem; text-align:left;
+  display:flex; flex-direction:column; gap:.15rem;
+  transition:transform .5s var(--salida), opacity .4s var(--suave); opacity:.62; }
 .salto.der { text-align:right; align-items:flex-end; }
-.salto:hover { border-color:var(--linea-fuerte); box-shadow:var(--v-filo), 0 24px 56px -26px rgba(0,0,0,.9); }
-.salto:hover.izq { transform:translateX(-4px); }
-.salto:hover.der { transform:translateX(4px); }
-.salto .rot { font-family:var(--mono); font-size:.55rem; letter-spacing:.22em; text-transform:uppercase; color:var(--debil); }
-.salto .nom { font-size:.95rem; font-weight:500; letter-spacing:-.01em;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+.salto:hover { opacity:1; }
+.salto:hover.izq { transform:translateX(-5px); }
+.salto:hover.der { transform:translateX(5px); }
+.salto .rot { font-family:var(--mono); font-size:.5rem; letter-spacing:.2em; text-transform:uppercase; color:var(--debil); }
+.salto .nom { font-size:.8rem; font-weight:400; color:var(--tenue); letter-spacing:-.005em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%; }
+.salto.der .nom { direction:rtl; }   /* el recorte cae al principio, no al final */
 
 /* ============ Índice de todos los proyectos =================== */
 /* Mismo campo que el resto del sitio — piedra y luz de tarde, sin
@@ -1042,8 +1046,10 @@ body.bloqueado .masa { animation-play-state:paused; }
   .ficha-portada-texto h2 { font-size:clamp(1.6rem,7.4vw,2.4rem); }
   .datos-cinta { padding:1.6rem var(--margen) 1rem; }
   .datos-caja { padding:1.1rem 1.2rem; border-radius:20px; }
-  .ficha-navegar { flex-direction:column; gap:.6rem; padding-bottom:4rem; }
-  .salto, .salto.der { text-align:left; align-items:flex-start; }
+  .ficha-navegar { gap:.9rem; padding-bottom:3.5rem; }
+  .salto { max-width:47%; }
+  .salto .nom { font-size:.72rem; }
+  .salto .rot { font-size:.46rem; letter-spacing:.16em; }
 
   /* --- Archivo --- */
   .filtros { gap:.35rem; padding-top:calc(52px + 1.4rem); }
@@ -1806,9 +1812,9 @@ function pintarFicha(p) {
       </div>` : ''}
 
     <div class="ficha-navegar">
-      <button class="salto izq vidrio asoma lateral" data-proyecto="${previo.slug}">
+      <button class="salto izq asoma" data-proyecto="${previo.slug}">
         <span class="rot">← Anterior</span><span class="nom">${previo.titulo}</span></button>
-      <button class="salto der vidrio asoma lateral der" style="--r:.08s" data-proyecto="${sigue.slug}">
+      <button class="salto der asoma" style="--r:.08s" data-proyecto="${sigue.slug}">
         <span class="rot">Siguiente →</span><span class="nom">${sigue.titulo}</span></button>
     </div>`;
 
