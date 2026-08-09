@@ -7,16 +7,17 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v12.1 — la obra se levanta con el scroll, campo de piedra, herramientas
-por etapa. Verificado en escritorio (1600 px) y en móvil (412 px) con
-Chrome real. Sin publicar.**
+**v13.0 — PUBLICADO en https://zafirosad.github.io/PORTAFOLIO/**
+Repositorio público `ZafiroSad/PORTAFOLIO`. Verificado en escritorio
+(1600 px) y en móvil (412 px, densidad 3) contra el sitio en vivo.
 
-Pendientes antes de publicar:
-1. Verificar en un **teléfono real** (lo automatizado cubre el ancho, no el
-   tacto ni el rendimiento del `backdrop-filter` en gama media)
+Pendientes:
+1. Verificar en un **teléfono real** (lo automatizado cubre el encuadre, no
+   el tacto ni el rendimiento en gama media)
 2. Identidad gráfica propia — la entrada sigue diciendo **STICK INDUSTRIES**
    y la barra ya dice **KEVIN GIL**: falta decidir cuál manda
-3. Publicar en GitHub Pages o dominio propio
+3. El teléfono y el correo están en claro en el HTML de un repo público:
+   los rastreadores los leen. Se avisó; queda a decisión de Kevin
 
 Lo que más subiría el nivel, y depende de material de Kevin:
 **fotos de obra construida en el mismo encuadre del render.**
