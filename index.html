@@ -256,8 +256,10 @@ body.bloqueado .masa { animation-play-state:paused; }
 @keyframes cruzar { to { transform:translateX(-50%) scaleX(1); } }
 
 /* ============ Secciones ======================================= */
-.seccion { content-visibility:auto; contain-intrinsic-size:auto 100svh;
-  position:relative; min-height:100svh; padding-top:calc(var(--barra) + 1.8rem);
+/* Sin `content-visibility`: ahorraba descarga inicial, pero deja las
+   secciones sin maquetar y `offsetTop` devuelve la altura ESTIMADA —
+   los saltos del menu aterrizaban en cualquier parte. */
+.seccion { position:relative; min-height:100svh; padding-top:calc(var(--barra) + 1.8rem);
   display:flex; flex-direction:column; }
 .seccion-cuerpo {
   flex:1; display:flex; flex-direction:column;
@@ -942,6 +944,127 @@ body.bloqueado .masa { animation-play-state:paused; }
   .masa { filter:blur(56px); }
 }
 
+/* =================================================================
+   MÓVIL — va al final a propósito
+
+   El teléfono no es el escritorio estrechado: es otra lectura. Aquí no
+   hay cursor, así que nada puede depender de señalar; el pulgar cubre
+   la mitad baja; y una pantalla vertical cabe una idea, no tres.
+
+   Este bloque se coloca el ÚLTIMO del archivo porque varias reglas de
+   escritorio son igual de específicas: puestas antes, ganaban ellas
+   por orden y dejaban, por ejemplo, los títulos de la vitrina fuera de
+   pantalla — cuatro renders sin nombre.
+   ================================================================= */
+@media (max-width:760px){
+
+  /* --- Barra: cabe de una línea o no cabe --- */
+  .barra { height:52px; padding:0 .5rem 0 .95rem;
+           width:calc(100% - 1.4rem); }
+  .marca { gap:.45rem; padding:.3rem .1rem; }
+  .marca span.rotulo { font-size:.52rem; letter-spacing:.12em; white-space:nowrap; }
+  .marca .punto { width:5px; height:5px; }
+  .menu { padding:.2rem; gap:0; }
+  .menu a { font-size:.5rem; letter-spacing:.06em; padding:.5rem .42rem; white-space:nowrap; }
+  .barra.compacta { --k:.9; opacity:.95; }
+
+  /* --- Las secciones respiran según su contenido, no a 100svh --- */
+  .seccion { min-height:auto; padding-top:calc(var(--barra) + .5rem); }
+  /* padding-block, no el abreviado: el abreviado borra el margen
+     lateral que pone .acolchado y el texto se pega al borde. */
+  .seccion-cuerpo { justify-content:flex-start;
+    padding-top:clamp(1.6rem,5vh,2.6rem); padding-bottom:clamp(1.6rem,5vh,2.6rem); }
+  .cabeza { margin-bottom:1.2rem; padding-bottom:.9rem; }
+  .cabeza h2 { font-size:clamp(1.65rem,7.6vw,2.3rem); }
+  .etiqueta { margin-bottom:.6rem; }
+
+  /* --- Vitrina: cada hoja se presenta. Sin cursor no hay hover que
+         revele el nombre, así que va siempre puesto. --- */
+  .vitrina { border:none; }
+  .hoja { height:auto; aspect-ratio:4/3; border-bottom:none;
+          margin-bottom:.55rem; border-radius:16px; }
+  .hoja:last-child { margin-bottom:0; }
+  .hoja-img img { filter:saturate(.95) brightness(.86); transform:scale(1.02); }
+  .hoja-velo { background:linear-gradient(to top, rgba(11,12,16,.96) 0%,
+               rgba(11,12,16,.55) 34%, rgba(11,12,16,.06) 62%); }
+  .hoja-rotulo { display:none; }
+  .hoja-abierta { padding:1.1rem 1.2rem 1.2rem; }
+  .hoja-abierta > *, .hoja-abierta > * > * { overflow:visible; transform:none !important; }
+  .hoja-abierta .num { font-size:.55rem; letter-spacing:.16em; opacity:.75; }
+  .hoja-abierta h3 { font-size:1.18rem; margin:.3rem 0 0; }
+  .hoja-abierta p { display:none; }
+  .hoja-abierta .entrar { margin-top:.7rem; padding:.42rem .85rem; font-size:.53rem;
+    border-color:rgba(255,255,255,.34); }
+
+  .ver-todos { padding-top:1.4rem; }
+  .btn-todos { padding:.85rem 1rem .85rem 1.5rem; font-size:.82rem; }
+
+  /* --- Proceso: la escena arriba, el texto debajo --- */
+  .proceso { height:300vh; }
+  .proceso-fijo { align-items:flex-end; padding-bottom:5vh; }
+  .proceso-texto { max-width:none; }
+  .proceso-texto h2 { font-size:clamp(1.7rem,7.6vw,2.3rem); margin-bottom:.7rem; }
+  .proceso-apunte { font-size:.88rem; margin-bottom:1.2rem; max-width:34ch; }
+  .fase { padding:.34rem 0; grid-template-columns:22px 1fr; gap:.7rem; }
+  .fase b { font-size:.86rem; }
+
+  /* --- Sobre mí: una columna, sin huecos muertos --- */
+  .bio { gap:1.8rem; }
+  .bio .destacado { font-size:1.05rem; }
+  .bio p { font-size:.9rem; }
+  .rueda { height:clamp(230px,42vh,320px); padding:24% 0 24% 12px; }
+  .rueda-eje { left:44px; }
+  .hito { grid-template-columns:58px 1fr; gap:.9rem; }
+  .hito .escudo { width:58px; height:58px; }
+  .hito h4 { font-size:.95rem; }
+  .hito p { font-size:.78rem; }
+  .flujo { gap:1.5rem; margin-top:1.4rem; }
+  .etapa h4 { font-size:.95rem; }
+  .utiles { gap:1.2rem; margin-top:.8rem; }
+  .util img { width:42px; height:42px; }
+
+  /* --- Contacto: dos y dos, no cuatro apretadas --- */
+  .contacto-cuerpo { max-width:none; }
+  .enlaces { grid-template-columns:1fr 1fr; gap:.7rem; }
+  .enlace { min-height:150px; padding:1.3rem .8rem 1.1rem; gap:.9rem; border-radius:20px; }
+  .enlace .icono { width:44px; height:44px; border-radius:14px; }
+  .enlace .val { font-size:.86rem; }
+  .enlace .rot { font-size:.5rem; }
+
+  .pie { padding:1.6rem var(--margen); font-size:.54rem; gap:.4rem; }
+
+  /* --- Ficha --- */
+  .ficha-principal { height:clamp(360px,62vh,560px); }
+  .ficha-portada-texto { padding:1.4rem var(--margen) 1.6rem; }
+  .ficha-portada-texto h2 { font-size:clamp(1.6rem,7.4vw,2.4rem); }
+  .datos-cinta { padding:1.6rem var(--margen) 1rem; }
+  .datos-caja { padding:1.1rem 1.2rem; border-radius:20px; }
+  .ficha-navegar { flex-direction:column; gap:.6rem; padding-bottom:4rem; }
+  .salto, .salto.der { text-align:left; align-items:flex-start; }
+
+  /* --- Archivo --- */
+  .filtros { gap:.35rem; padding-top:calc(52px + 1.4rem); }
+  .filtro { font-size:.53rem; padding:.45rem .8rem; }
+  .rejilla-todos { gap:.7rem; }
+  .tarjeta-pie { padding:.8rem .9rem; }
+  .tarjeta-pie h4 { font-size:.92rem; }
+
+  /* --- Visor: los mandos donde llega el pulgar --- */
+  .visor { padding:.6rem; }
+  .visor-nav { bottom:1.2rem; top:auto; margin-top:0; width:52px; height:52px; }
+  .visor-nav.prev { left:calc(50% - 92px); }
+  .visor-nav.sig  { right:calc(50% - 92px); }
+  .visor-pie { bottom:5.4rem; font-size:.53rem; }
+  .visor-cerrar { top:.7rem; right:.7rem; }
+}
+
+/* Pantallas muy estrechas: el menú pierde la marca antes que partirse */
+@media (max-width:400px){
+  .barra { justify-content:center; padding:0 .4rem; }
+  .marca { display:none; }
+  .menu a { font-size:.54rem; padding:.55rem .58rem; }
+}
+
 @media (prefers-reduced-motion:reduce){
   *, *::before, *::after { animation:none !important; transition:none !important; }
   .mascara-marca { display:none }
@@ -1532,7 +1655,8 @@ document.getElementById('vitrina').innerHTML = PRINCIPALES.map((p, i) => `
   <article class="hoja" data-slug="${p.slug}" tabindex="0" role="button" aria-label="Ver ${p.titulo}">
     <div class="hoja-img">
       <img src="${ruta(p.arch, p.portada)}" srcset="${juego(p.arch, p.portada)}"
-           sizes="(max-width:860px) 100vw, 60vw" alt="${p.titulo}" decoding="async">
+           sizes="(max-width:860px) 100vw, 60vw" alt="${p.titulo}" decoding="async"
+           ${i ? 'loading="lazy"' : 'fetchpriority="high"'}>
     </div>
     <div class="hoja-velo"></div>
     <div class="hoja-rotulo"><div class="hoja-vertical">${p.titulo}</div></div>
