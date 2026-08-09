@@ -48,11 +48,9 @@ Todo se recorre desplazando. El menú salta con un desplazamiento animado.
 
 0. **Proceso** — entre Inicio y Proyectos. Sección de 340 vh con el contenido
    pegado: el desplazamiento hace de línea de tiempo y **la obra se levanta**
-   —zapatas, columnas, vigas, entrepiso, cubierta, cerramiento— dibujada en
-   canvas con geometría propia. Es el argumento del portafolio dicho en
-   imagen: *la imagen no se dibuja, se levanta*.
-   **Provisional**: cuando llegue el vídeo de OmniFlash se sustituye el canvas
-   por un `<video>` atando el mismo `avance` a su `currentTime`.
+   —cimentación, estructura, entrepiso, cubierta, cerramiento— hasta el render
+   final a color. Es el argumento del portafolio dicho en imagen: *la imagen
+   no se dibuja, se levanta*. La escena la generó Kevin con OmniFlash.
 1. **Inicio** — render de fachada a pantalla completa y la palabra
    **PORTAFOLIO** recortando ese mismo render. El botón *Inicio*
    vuelve a tocar la entrada de STICK INDUSTRIES **con un render distinto
@@ -132,14 +130,25 @@ técnico, un solo CTA por bloque, bordes con opacidad y radios.
   entrar en pantalla y la cifra. Las piezas suben en cascada detrás.
 - **El visor cambia de imagen con dos capas**, no cambiando el `src`: la que
   sale se va con desenfoque hacia un lado y la que entra llega del contrario.
-- **Los logos de software forman una CONSTELACIÓN**, no una rejilla ni una
-  órbita: sueltos, sin caja, unidos por hilos que se dibujan al entrar y
-  flotando cada uno a su ritmo. El resplandor sale de `drop-shadow` sobre el
-  PNG, así que toma la silueta del logo y no la de un contenedor — era lo
-  único que funcionaba de la versión en monedas.
-  Las posiciones van a mano en las dos franjas que ningún texto ocupa
-  (arriba del título y bajo la bio): los anillos giratorios pasaban por
-  encima del texto y no había radio que lo evitara.
+- **Los logos de software van por ETAPA, no en un muro**: Modelo →
+  Representación → Apoyo. Se probaron y descartaron, en este orden, la
+  rejilla de placas, la órbita en monedas de vidrio y la constelación
+  flotante. Lo único que sobrevivió de todas ellas es el resplandor, que
+  sale de `drop-shadow` sobre el PNG y por eso toma la silueta del logo y no
+  la de un contenedor.
+- **La escena de Proceso es una SECUENCIA DE FOTOGRAMAS en canvas, no un
+  `<video>`.** Con vídeo hay que mover `currentTime` en cada cuadro, y un
+  salto pedido antes de que resuelva el anterior se descarta: medido en
+  Chrome, el vídeo se quedaba clavado con `seeking` en `true` para siempre,
+  con `readyState` cayendo de 4 a 1. Dibujar la imagen que toca no depende
+  del decodificador. Se regenera con `herramientas/preparar-proceso.ps1`.
+- **La secuencia no compite con la portada**: unos pocos cuadros repartidos
+  entran con prioridad alta y el relleno espera al evento `load`. Hasta que
+  la página está lista se descargan 1,1 MB y **cero** fotogramas.
+- **Los escudos del trayecto van sin burbuja y a 64 px.** El eje se corta con
+  una sombra del color del fondo, no con un disco. Del logotipo de la UPB se
+  recortó **solo el escudo**: el texto va en negro y desaparecía sobre el
+  fondo oscuro.
 - **Canva y Excel quedaron fuera** del listado: restan en un portafolio de
   visualización. Los logos negros (Twinmotion, ChatGPT) van invertidos.
 - **`overflow:hidden` en la sección Sobre mí**: el orbital es más alto que la
@@ -165,12 +174,17 @@ técnico, un solo CTA por bloque, bordes con opacidad y radios.
 
 ## Medido
 
-Carga inicial **2.26 MB** en escritorio, de los que 2.15 MB son renders
-(portada + las cuatro hojas de la vitrina). Solo existen dos tamaños por
-imagen, 1600 y 2560 px, así que la vitrina descarga 1600 px por hoja aunque
-en reposo cada una ocupe un cuarto de pantalla. **Generar una tercera talla
-de ~800 px para la vitrina bajaría la carga inicial a menos de la mitad**;
-está sin hacer porque toca la calidad de imagen y eso lo decide Kevin.
+**1,1 MB hasta que la página está lista** (medido con Chrome real, no
+estimado). Bajó desde 2,26 MB al poner `content-visibility:auto` en las
+secciones: las imágenes de lo que no se ve todavía ya no se descargan.
+
+Después de `load` llegan los 3,8 MB de la secuencia de Proceso, en segunda
+fila y sin bloquear nada.
+
+Sigue pendiente, si algún día molesta: **una tercera talla de ~800 px para
+las hojas de la vitrina**. Solo existen 1600 y 2560 px, así que cada hoja
+descarga 1600 aunque en reposo ocupe un cuarto de pantalla. Sin hacer porque
+toca la calidad de imagen y eso lo decide Kevin.
 
 ## Decisiones abiertas
 
