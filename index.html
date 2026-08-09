@@ -78,7 +78,7 @@
    ampliar SIGUE funcionando: bloquearlo del todo deja fuera a quien
    necesita acercarse para leer. */
 a, button, .hoja, .tarjeta, .galeria figure, .tira-extra figure,
-.filtro, .util, .enlace, .salto, .fase, .menu a { touch-action:manipulation; }
+.filtro, .util, .enlace, .salto, .menu a { touch-action:manipulation; }
 /* El desplazamiento suave se anima por JS, no con scroll-behavior: el
    scroll suave nativo no llega a ejecutarse en esta pagina y los saltos
    del menu se quedaban quietos. Animarlo a mano ademas permite elegir
@@ -364,59 +364,6 @@ body.bloqueado .masa { animation-play-state:paused; }
   animation:gotear 2.2s var(--suave) infinite; }
 @keyframes gotear { 0% { transform:translateY(-12px); opacity:0 } 40% { opacity:1 } 100% { transform:translateY(34px); opacity:0 } }
 
-/* ============ PROCESO — la obra que se levanta ================ */
-/* Seccion alta con el contenido pegado: el desplazamiento de la
-   pagina hace de linea de tiempo de la escena. */
-.proceso { position:relative; height:340vh; }
-.proceso-fijo { position:sticky; top:0; height:100svh; overflow:hidden;
-  display:flex; align-items:center; }
-.proceso canvas { position:absolute; inset:0; width:100%; height:100%; }
-/* El video es negro por la izquierda al principio y abre a cielo al
-   final: el velo apaga esa mitad para que el texto se lea siempre,
-   sin recuadros. */
-.proceso-velo { position:absolute; inset:0; z-index:1; pointer-events:none;
-  background:linear-gradient(100deg, rgba(21,22,27,.92) 0%, rgba(21,22,27,.70) 24%,
-             rgba(21,22,27,.14) 48%, rgba(21,22,27,0) 66%); }
-@media (max-width:860px){
-  .proceso-velo { background:linear-gradient(to top, rgba(21,22,27,.985) 32%,
-                  rgba(21,22,27,.88) 46%, rgba(21,22,27,.15) 66%, rgba(21,22,27,0) 78%); }
-}
-/* El final de la escena abre a cielo claro: el texto necesita su
-   propia sombra, que cuesta menos que apagar el render entero. */
-.proceso-texto { position:relative; z-index:2; padding:0 var(--margen); max-width:34rem;
-  text-shadow:0 1px 18px rgba(12,13,17,.75), 0 0 44px rgba(12,13,17,.55); }
-.proceso-texto h2 { font-size:clamp(1.8rem,4.2vw,3.1rem); font-weight:600;
-  letter-spacing:-.035em; line-height:1.07; margin-bottom:1.1rem; }
-.proceso-apunte { color:var(--tenue); font-size:.95rem; max-width:38ch; margin-bottom:1.8rem; }
-
-/* Las fases se encienden conforme la obra llega a ellas */
-.fases { display:flex; flex-direction:column; gap:.1rem; }
-.fase { display:grid; grid-template-columns:26px 1fr; gap:.9rem; align-items:baseline;
-  padding:.42rem 0; opacity:.28; transition:opacity .45s var(--suave); }
-.fase.viva { opacity:1; }
-.fase .n { font-family:var(--mono); font-size:.55rem; letter-spacing:.16em; color:var(--debil); }
-.fase b { font-size:.92rem; font-weight:500; letter-spacing:-.01em; position:relative; }
-.fase.viva .n { color:var(--tenue); }
-.fase b::after { content:''; position:absolute; left:0; right:0; bottom:-3px; height:1px;
-  background:var(--tinta); transform:scaleX(0); transform-origin:left;
-  transition:transform .55s var(--salida); }
-.fase.viva b::after { transform:scaleX(1); }
-
-.proceso-regla { position:absolute; right:var(--margen); top:50%; transform:translateY(-50%);
-  z-index:2; width:1px; height:min(42vh,320px); background:var(--linea); }
-.proceso-regla span { display:block; width:100%; height:0; background:var(--tinta);
-  box-shadow:0 0 14px rgba(255,255,255,.5); }
-@media (max-width:860px){
-  .titular { margin-bottom:.7rem; }
-  .subtitular span { font-size:.48rem; letter-spacing:.14em; }
-
-  .proceso { height:300vh; }
-  .proceso-fijo { align-items:flex-end; padding-bottom:8vh; }
-  .proceso-texto { max-width:none; }
-  .proceso-apunte { margin-bottom:1.2rem; }
-  .proceso-regla { display:none; }
-}
-
 /* ============ PROYECTOS — vitrina a sangre ==================== */
 .vitrina { display:flex; width:100%; flex:1; min-height:clamp(420px,56vh,760px); overflow:hidden;
   border-top:1px solid var(--linea); border-bottom:1px solid var(--linea); }
@@ -689,7 +636,16 @@ body.bloqueado .masa { animation-play-state:paused; }
   overflow-y:auto; overscroll-behavior:contain;
   opacity:0; visibility:hidden;
   transition:opacity .5s var(--suave), visibility .5s, background .9s var(--suave); }
+.ficha { transform:translateY(2.2%) scale(.985); filter:blur(7px);
+  transition:opacity .5s var(--suave), visibility .5s,
+             transform .62s var(--salida), filter .5s var(--suave); }
 .ficha.abierta { opacity:1; visibility:visible; }
+.ficha.abierta.montada { transform:none; filter:none; }
+
+/* La pagina de detras se aleja y se apaga: da profundidad y deja claro
+   que lo de delante es una capa, no otra pagina. */
+.lienzo { transition:transform .62s var(--salida), filter .55s var(--suave), opacity .5s var(--suave); }
+.lienzo.atras { transform:scale(.965); filter:brightness(.55) saturate(.85); opacity:.75; }
 /* El contenido entra escalonado MIENTRAS el clon todavia viaja: sin
    esto, al aterrizar la ficha aparece de golpe ya montada y el cambio
    se lee como un corte de plano. */
@@ -871,11 +827,6 @@ body.bloqueado .masa { animation-play-state:paused; }
 .salto .nom { font-size:.95rem; font-weight:500; letter-spacing:-.01em;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
 
-/* El clon que viaja entre la rejilla y la ficha */
-.viajero { position:fixed; z-index:280; overflow:hidden; pointer-events:none;
-  will-change:transform; box-shadow:0 40px 90px -30px rgba(0,0,0,.9); }
-.viajero img { width:100%; height:100%; object-fit:cover; will-change:transform; }
-
 /* ============ Índice de todos los proyectos =================== */
 /* Mismo campo que el resto del sitio — piedra y luz de tarde, sin
    tintes de color. Opaca: translucida dejaba leer el texto de
@@ -887,7 +838,10 @@ body.bloqueado .masa { animation-play-state:paused; }
     linear-gradient(180deg, var(--base-2) 0%, var(--base) 52%, #101116 100%);
   overflow-y:auto; overscroll-behavior:contain;
   opacity:0; visibility:hidden; transition:opacity .45s var(--suave), visibility .45s; }
-.indice-capa.abierta { opacity:1; visibility:visible; }
+.indice-capa { transform:translateY(1.8%) scale(.988);
+  transition:opacity .45s var(--suave), visibility .45s,
+             transform .55s var(--salida); }
+.indice-capa.abierta { opacity:1; visibility:visible; transform:none; }
 
 /* Deja pasar la barra flotante, que va montada con margen negativo */
 .filtros { display:flex; flex-wrap:wrap; gap:.45rem;
@@ -1026,18 +980,6 @@ body.bloqueado .masa { animation-play-state:paused; }
   .ver-todos { padding-top:1.4rem; }
   .btn-todos { padding:.85rem 1rem .85rem 1.5rem; font-size:.82rem; }
 
-  /* --- Proceso: la escena arriba, el texto debajo --- */
-  .titular { margin-bottom:.7rem; }
-  .subtitular span { font-size:.48rem; letter-spacing:.14em; }
-
-  .proceso { height:300vh; }
-  .proceso-fijo { align-items:flex-end; padding-bottom:5vh; }
-  .proceso-texto { max-width:none; }
-  .proceso-texto h2 { font-size:clamp(1.7rem,7.6vw,2.3rem); margin-bottom:.7rem; }
-  .proceso-apunte { font-size:.88rem; margin-bottom:1.2rem; max-width:34ch; }
-  .fase { padding:.34rem 0; grid-template-columns:22px 1fr; gap:.7rem; }
-  .fase b { font-size:.86rem; }
-
   /* --- Sobre mí: una columna, sin huecos muertos --- */
   .bio { gap:1.8rem; }
   .bio .destacado { font-size:1.05rem; }
@@ -1109,6 +1051,7 @@ body.bloqueado .masa { animation-play-state:paused; }
   .mas-filo .raya { transform:none }
   .galeria figure, .hoja, .tira-extra figure { clip-path:none !important; opacity:1 !important; transform:none !important; }
   .ficha-portada-texto h2 span, .ficha .entra { transform:none; opacity:1; filter:none }
+  .ficha, .indice-capa, .lienzo.atras { transform:none !important; filter:none !important; opacity:1 }
   .hito { transform:none !important; opacity:1 !important; }
 }
 </style>
@@ -1167,26 +1110,6 @@ body.bloqueado .masa { animation-play-state:paused; }
     </div>
   </div>
   <div class="baja"><span>Desplace</span><span class="hilo"></span></div>
-</section>
-
-<!-- ===================== PROCESO ===================== -->
-<!-- La seccion es alta y su contenido va pegado: asi el desplazamiento
-     de la pagina se convierte en el tiempo de la escena. El dibujo es
-     provisional — cuando llegue el video de OmniFlash se sustituye el
-     canvas por un <video> y se le ata el mismo progreso. -->
-<section class="proceso" id="proceso">
-  <div class="proceso-fijo">
-    <canvas id="obra" aria-hidden="true"></canvas>
-    <div class="proceso-velo" aria-hidden="true"></div>
-    <div class="proceso-texto">
-      <div class="etiqueta revelar"><span>Proceso</span></div>
-      <h2 class="palabras" data-texto="Del modelo a la imagen."></h2>
-      <p class="proceso-apunte">El render es la última capa de un modelo ya resuelto.
-         Los espesores, los apoyos y las cotas son los que llegan a obra.</p>
-      <div class="fases" id="fases"></div>
-    </div>
-    <div class="proceso-regla"><span id="proceso-avance"></span></div>
-  </div>
 </section>
 
 <!-- ===================== PROYECTOS ===================== -->
@@ -1399,14 +1322,6 @@ const GRUPOS = [
   { clave:'carpinteria', nombre:'Carpintería' }
 ];
 
-/* Renders de fachada que se turnan en la portada: cada vez que se
-   vuelve a Inicio entra el siguiente. */
-const FACHADAS = [
-  'cazadores-09', 'cantabria-1-07', 'punta-07',
-  'cantabria-23-09', 'coincafex-03', 'casa-will-01'
-];
-let fachadaActual = 0;
-
 /* Formacion y trayectoria, en orden cronologico */
 const HITOS = [
   { anio:'2021', escudo:'assets/logos/sja.webp', sigla:'CBSJA',
@@ -1510,198 +1425,6 @@ addEventListener('pointermove', e => {
 }, { passive:true });
 
 /* =================================================================
-   PROCESO — la obra se levanta con el desplazamiento
-
-   Geometria propia, sin librerias: una lista de aristas con el
-   instante en que aparece cada una y una proyeccion isometrica que
-   gira despacio. Cada arista se DIBUJA (crece de su origen a su
-   destino) en vez de encenderse, que es lo que hace que se lea como
-   construccion y no como un interruptor.
-
-   Cuando llegue el video de OmniFlash, esto se sustituye atando el
-   mismo `avance` al currentTime del video. El andamiaje ya sirve.
-   ================================================================= */
-const FASES = [
-  { n:'01', t:'Cimentación',  desde:.00 },
-  { n:'02', t:'Estructura',   desde:.16 },
-  { n:'03', t:'Entrepiso',    desde:.40 },
-  { n:'04', t:'Cubierta',     desde:.62 },
-  { n:'05', t:'Cerramiento',  desde:.80 }
-];
-document.getElementById('fases').innerHTML = FASES.map(f => `
-  <div class="fase" data-desde="${f.desde}">
-    <span class="n">${f.n}</span><b>${f.t}</b>
-  </div>`).join('');
-
-(function montarObra() {
-  const lienzo  = document.getElementById('obra');
-  const seccion = document.getElementById('proceso');
-  if (!lienzo || !seccion) return;
-  const ctx = lienzo.getContext('2d', { alpha:false });
-
-  /* SECUENCIA DE FOTOGRAMAS, no <video>.
-     Con un video habria que mover `currentTime` en cada cuadro, y un
-     salto pedido antes de que resuelva el anterior se descarta: medido,
-     el video se quedaba clavado con `seeking` en true para siempre.
-     Dibujar la imagen que toca no depende del decodificador, se puede
-     precargar y va igual de fino en movil. */
-  /* Tres tallas. Se elige por los pixeles REALES que va a ocupar la
-     escena —ancho de ventana por densidad de pantalla—, no por el
-     ancho a secas: un movil de 412 px con densidad 3 pinta 1236, y un
-     portatil de 1440 con densidad 1 pinta 1440. Servirle 2560 al
-     primero seria tirar datos; servirle 1080 al segundo, emborronar.
-     Con la conexion lenta declarada se baja un escalon. */
-  const dprReal = Math.min(devicePixelRatio || 1, 2.5);
-  const lenta   = navigator.connection && /^(slow-)?2g$|^3g$/.test(navigator.connection.effectiveType || '');
-  const pixeles = innerWidth * dprReal;
-
-  let talla;
-  if (lenta || innerWidth < 700)   talla = 'p';
-  else if (pixeles > 2100)         talla = 'xl';
-  else                             talla = 'g';
-
-  const CARPETA = 'assets/proceso/' + talla + '/';
-  const TOTAL   = talla === 'p' ? 60 : 80;
-  const ANCHO_FUENTE = talla === 'p' ? 1080 : talla === 'g' ? 1920 : 2560;
-
-  const cuadros = new Array(TOTAL);
-  let listos = 0, ultimoDibujado = -1, avance = 0;
-
-  const cargar = (i, prisa) => {
-    if (cuadros[i]) return;
-    const im = new Image();
-    im.decoding = 'async';
-    im.fetchPriority = prisa ? 'high' : 'low';
-    im.src = CARPETA + String(i + 1).padStart(3, '0') + '.webp';
-    im.onload = () => { listos++; if (i === indice()) pintar(); };
-    cuadros[i] = im;
-  };
-  const exacto = () => avance * (TOTAL - 1);
-  const indice = () => Math.min(TOTAL - 1, Math.round(exacto()));
-
-  /* Primero un puñado repartido para tener el recorrido entero cuanto
-     antes, y el relleno despues y en segunda fila: asi nunca se ve un
-     hueco, solo mas o menos detalle. La secuencia pesa mas que la
-     portada entera, asi que no puede competir con ella: el relleno
-     espera a que la pagina haya terminado de cargar. */
-  function precargar() {
-    // Solo el primero entra antes de que la pagina termine: es el que
-    // evita ver un hueco si se baja de golpe. Todo lo demas espera, o
-    // los cuadros —que pesan mas que la portada entera— le robarian el
-    // ancho de banda justo cuando hay que enseñar el render de entrada.
-    cargar(0, true);
-    const resto = () => {
-      for (let i = 0; i < TOTAL; i += 10) cargar(i);   // el recorrido entero, a saltos
-      let i = 0;
-      const tanda = () => {
-        let n = 0;
-        while (i < TOTAL && n < 3) { cargar(i); i++; n++; }
-        if (i < TOTAL) setTimeout(tanda, 110);
-      };
-      setTimeout(tanda, 300);
-    };
-    if (document.readyState === 'complete') setTimeout(resto, 500);
-    else addEventListener('load', () => setTimeout(resto, 500), { once:true });
-  }
-
-  function medir() {
-    /* Pedirle al lienzo mas pixeles de los que la fuente puede dar
-       solo consigue estirar la imagen y que se vea blanda. */
-    const dpr = Math.min(devicePixelRatio || 1, 2,
-                         ANCHO_FUENTE / Math.max(1, lienzo.clientWidth));
-    lienzo.width  = Math.round(lienzo.clientWidth  * Math.max(1, dpr));
-    lienzo.height = Math.round(lienzo.clientHeight * Math.max(1, dpr));
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-  }
-
-  const util = i => {
-    const im = cuadros[i];
-    return (im && im.complete && im.naturalWidth) ? im : null;
-  };
-  // El que toca, o el mas cercano que ya haya llegado
-  const cercano = i => {
-    if (util(i)) return cuadros[i];
-    for (let d = 1; d < TOTAL; d++) {
-      if (util(i - d)) return cuadros[i - d];
-      if (util(i + d)) return cuadros[i + d];
-    }
-    return null;
-  };
-
-  function pintar() {
-    const e = exacto();
-    const i = Math.min(TOTAL - 1, Math.floor(e));
-    const fraccion = e - i;                  // 0..1 entre este cuadro y el siguiente
-    const im = cercano(i);
-    if (!im) return;
-
-    const W = lienzo.width, H = lienzo.height;
-    ctx.fillStyle = '#0c0d10';
-    ctx.fillRect(0, 0, W, H);
-
-    /* En apaisado la escena cubre el hueco y se descentra a la derecha
-       para dejarle sitio al texto. En vertical eso recortaria la casa
-       hasta dejar un fragmento: ahi se ajusta al ancho y se sube, y el
-       texto vive debajo. */
-    const relLienzo = W / H, relImg = im.naturalWidth / im.naturalHeight;
-    let escala, x, y;
-    if (relLienzo < relImg * .72) {
-      escala = W / im.naturalWidth;
-      x = 0;
-      y = H * .30 - (im.naturalHeight * escala) * .5;
-    } else {
-      escala = Math.max(W / im.naturalWidth, H / im.naturalHeight);
-      x = (W - im.naturalWidth  * escala) * .62;
-      y = (H - im.naturalHeight * escala) * .5;
-    }
-    ctx.drawImage(im, x, y, im.naturalWidth * escala, im.naturalHeight * escala);
-
-    /* Los ochenta cuadros reparten el recorrido a un cuadro cada 38 px
-       de desplazamiento: yendo despacio se veian los saltos. Aqui se
-       funde el siguiente encima segun la fraccion, asi que entre dos
-       cuadros hay transicion y no escalon. Cuesta un `drawImage` mas y
-       evita triplicar el peso de la secuencia. */
-    const sig = util(i + 1);
-    if (sig && fraccion > 0.01) {
-      ctx.globalAlpha = fraccion;
-      ctx.drawImage(sig, x, y, sig.naturalWidth * escala, sig.naturalHeight * escala);
-      ctx.globalAlpha = 1;
-    }
-    ultimoDibujado = e;
-  }
-
-  const fases = [...document.querySelectorAll('.fase')];
-  const regla = document.getElementById('proceso-avance');
-  let pedido = false;
-  function recalcular() {
-    if (pedido) return;
-    pedido = true;
-    requestAnimationFrame(() => {
-      pedido = false;
-      const caja = seccion.getBoundingClientRect();
-      const recorrido = seccion.offsetHeight - innerHeight;
-      avance = recorrido > 0 ? Math.min(1, Math.max(0, -caja.top / recorrido)) : 0;
-      regla.style.height = (avance * 100).toFixed(1) + '%';
-      fases.forEach(f => f.classList.toggle('viva', avance >= Number(f.dataset.desde)));
-      // con fundido, el umbral es la fraccion, no el indice entero
-      if (Math.abs(exacto() - ultimoDibujado) > 0.02) pintar();
-    });
-  }
-
-  let aLaVista = false, arrancado = false;
-  new IntersectionObserver(en => {
-    aLaVista = en[0].isIntersecting;
-    if (aLaVista && !arrancado) { arrancado = true; precargar(); }
-    if (aLaVista) { medir(); recalcular(); }
-  }, { rootMargin: '250px' }).observe(seccion);
-
-  addEventListener('scroll', () => { if (aLaVista) recalcular(); }, { passive: true });
-  addEventListener('resize', () => { medir(); ultimoDibujado = -1; recalcular(); });
-  medir();
-})();
-
-/* =================================================================
    VITRINA
    ================================================================= */
 document.getElementById('vitrina').innerHTML = PRINCIPALES.map((p, i) => `
@@ -1726,6 +1449,7 @@ document.getElementById('cuenta-todos').textContent = String(TODOS.length).padSt
 /* =================================================================
    INDICE + FILTROS POR GRUPO
    ================================================================= */
+const lienzo     = document.querySelector('.lienzo');
 const capaIndice = document.getElementById('indice-capa');
 const rejilla    = document.getElementById('rejilla-todos');
 
@@ -1792,6 +1516,7 @@ document.getElementById('filtros').addEventListener('click', e => {
 
 function abrirIndice() {
   capaIndice.classList.add('abierta');
+  lienzo.classList.add('atras');
   document.body.classList.add('bloqueado');
   // `visibility` no dispara al observador: lo de dentro se enciende a mano
   capaIndice.querySelectorAll('.asoma').forEach(el => el.classList.add('visible'));
@@ -1800,7 +1525,10 @@ function abrirIndice() {
 }
 function cerrarIndice() {
   capaIndice.classList.remove('abierta');
-  if (!ficha.classList.contains('abierta')) document.body.classList.remove('bloqueado');
+  if (!ficha.classList.contains('abierta')) {
+    document.body.classList.remove('bloqueado');
+    lienzo.classList.remove('atras');
+  }
 }
 document.getElementById('indice-cerrar').addEventListener('click', cerrarIndice);
 
@@ -2075,11 +1803,10 @@ function pintarFicha(p) {
   /* --- Revelados dentro de la ficha --- */
   const obs = new IntersectionObserver(en => {
     en.forEach(e => {
-      if (!e.isIntersecting) return;
-      e.target.classList.add('dentro', 'visible');
-      obs.unobserve(e.target);
+      if (e.isIntersecting) e.target.classList.add('dentro', 'visible');
+      else if (e.intersectionRatio === 0) e.target.classList.remove('dentro', 'visible');
     });
-  }, { root: ficha, threshold: .1 });
+  }, { root: ficha, threshold: [0, .1] });
   contenido.querySelectorAll('.galeria figure').forEach(f => obs.observe(f));
   const filo = contenido.querySelector('#mas-filo');
   if (filo) obs.observe(filo);
@@ -2106,79 +1833,29 @@ function actualizarGlobo() {
   arco.style.strokeDashoffset = (169.6 * (1 - avanceGal)).toFixed(1);
 }
 
+/* La ficha entra como UNA pieza: sube un poco, se enfoca y se asienta,
+   mientras la pagina de detras se aleja y se apaga.
+
+   Antes viajaba un clon del render desde la hoja hasta la portada de la
+   ficha. Sobre el papel es la transicion mas rica, pero el origen y el
+   destino tienen proporciones muy distintas —una hoja estrecha contra
+   una portada a pantalla completa—, asi que por bien que se compense la
+   escala el recorrido nunca se lee parejo: es la pieza la que cambia de
+   forma mientras viaja. Una capa que entra entera siempre se ve
+   uniforme, porque no hay nada que se deforme. */
 function abrirFicha(slug, hoja) {
   const p = TODOS.find(x => x.slug === slug);
   if (!p) return;
 
-  const parado = quieto();
-  const origen = hoja && hoja.querySelector('img');
   hojaOrigen = hoja || null;
-
   pintarFicha(p);
   document.body.classList.add('bloqueado');
   history.replaceState(null, '', '#' + slug);
 
-  if (!origen || parado) {
-    ficha.classList.add('abierta', 'montada');
-    ficha.scrollTop = 0;
-    return;
-  }
-
-  const desde = origen.getBoundingClientRect();
-  const viajero = document.createElement('div');
-  viajero.className = 'viajero';
-  viajero.innerHTML = `<img src="${origen.currentSrc || origen.src}" alt="">`;
-  document.body.appendChild(viajero);
-
-  ficha.style.visibility = 'visible';
-  ficha.style.opacity = '0';
   ficha.scrollTop = 0;
-  const hasta = contenido.querySelector('.ficha-principal').getBoundingClientRect();
-
-  /* El clon se monta YA en su tamaño final y viaja con `transform`.
-     Antes se animaban left/top/width/height, que rehacen la geometria
-     de la pagina en cada cuadro: por eso el vuelo se veia a tirones.
-     Con transform el trabajo se va al compositor y va suelto.
-     La imagen de dentro lleva la escala inversa para no deformarse
-     mientras el marco cambia de proporcion. */
-  const dx = desde.left - hasta.left, dy = desde.top - hasta.top;
-  const sx = desde.width / hasta.width, sy = desde.height / hasta.height;
-  viajero.style.cssText = `left:${hasta.left}px; top:${hasta.top}px;` +
-    `width:${hasta.width}px; height:${hasta.height}px; transform-origin:0 0;`;
-  const cara = viajero.firstElementChild;
-  cara.style.transformOrigin = '0 0';
-  const curva = { duration: 780, easing: 'cubic-bezier(.22,1,.28,1)', fill: 'forwards' };
-
-  // La ficha se vuelve opaca MIENTRAS el clon viaja, no al final: si se
-  // espera al aterrizaje, durante todo el vuelo se ve la pagina anterior
-  // por detras del clon y el movimiento se lee sucio.
-  ficha.animate([{ opacity:0 }, { opacity:1 }],
-    { duration: 420, delay: 180, easing: 'ease-out', fill: 'forwards' });
-
-  // Y el contenido de la ficha arranca su entrada a mitad del vuelo:
-  // cuando el clon aterriza, el titulo ya viene subiendo. Sin esto, el
-  // aterrizaje era un corte — la pagina del proyecto aparecia montada
-  // y quieta justo en el fotograma en que el clon desaparecia.
-  setTimeout(() => ficha.classList.add('montada'), 300);
-
-  cara.animate([{ transform:`scale(${(1/sx).toFixed(4)}, ${(1/sy).toFixed(4)})` },
-                { transform:'none' }], curva);
-  const vuelo = viajero.animate([
-    { transform:`translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})` },
-    { transform:'none' }
-  ], curva);
-
-  vuelo.onfinish = () => {
-    ficha.classList.add('abierta');
-    ficha.getAnimations().forEach(a => a.cancel());
-    ficha.style.opacity = '';
-    ficha.style.visibility = '';
-    // El clon no se quita de golpe: se funde sobre la imagen real, que
-    // ya esta debajo en la misma posicion. Eso borra el ultimo corte.
-    viajero.animate([{ opacity:1 }, { opacity:0 }],
-      { duration: 320, easing:'ease-out', fill:'forwards' })
-      .onfinish = () => viajero.remove();
-  };
+  ficha.classList.add('abierta');
+  lienzo.classList.add('atras');
+  requestAnimationFrame(() => ficha.classList.add('montada'));
 }
 
 function cerrarFicha() {
@@ -2190,47 +1867,12 @@ function cerrarFicha() {
   const indiceVivo = capaIndice.classList.contains('abierta');
   if (!indiceVivo) document.body.classList.remove('bloqueado');
 
-  const princ   = contenido.querySelector('.ficha-principal');
-  const destino = hojaOrigen && hojaOrigen.querySelector('img');
-  const caja    = destino && destino.getBoundingClientRect();
-
-  const puedeVolver = princ && destino && !quieto() && ficha.scrollTop < 40 &&
-                      document.body.contains(hojaOrigen) &&
-                      caja.width > 0 && caja.bottom > 0 && caja.top < innerHeight;
-
   ficha.classList.remove('montada');
-
-  if (!puedeVolver) { ficha.classList.remove('abierta'); hojaOrigen = null; return; }
-
-  const desde = princ.getBoundingClientRect();
-  const viajero = document.createElement('div');
-  viajero.className = 'viajero';
-  viajero.innerHTML = `<img src="${destino.currentSrc || destino.src}" alt="">`;
-  document.body.appendChild(viajero);
-
-  // Mismo FLIP que a la ida, en sentido contrario
-  const sx = caja.width / desde.width, sy = caja.height / desde.height;
-  const dx = caja.left - desde.left,   dy = caja.top - desde.top;
-  viajero.style.cssText = `left:${desde.left}px; top:${desde.top}px;` +
-    `width:${desde.width}px; height:${desde.height}px; transform-origin:0 0;`;
-  const cara = viajero.firstElementChild;
-  cara.style.transformOrigin = '0 0';
-  const curva = { duration: 660, easing: 'cubic-bezier(.22,1,.28,1)', fill: 'forwards' };
-
   ficha.classList.remove('abierta');
-
-  cara.animate([{ transform:'none' },
-                { transform:`scale(${(1/sx).toFixed(4)}, ${(1/sy).toFixed(4)})` }], curva);
-  viajero.animate([
-    { transform:'none' },
-    { transform:`translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})` }
-  ], curva)
-   .onfinish = () => {
-      viajero.animate([{ opacity:1 }, { opacity:0 }],
-        { duration: 240, easing:'ease-out', fill:'forwards' })
-        .onfinish = () => { viajero.remove(); hojaOrigen = null; };
-   };
+  if (!indiceVivo) lienzo.classList.remove('atras');
+  hojaOrigen = null;
 }
+
 document.getElementById('ficha-cerrar').addEventListener('click', cerrarFicha);
 
 function mudarProyecto(slug) {
@@ -2293,37 +1935,15 @@ function saltarA(destino) {
   history.replaceState(null, '', destino);
 }
 
-/* Volver a Inicio no lleva corte de pantalla: vuelve a tocarse la
-   entrada de STICK INDUSTRIES sobre un render de fachada distinto al
-   de la vuelta anterior. */
+/* Inicio devuelve a la portada, sin mas ceremonia: sube con el mismo
+   desplazamiento animado que el resto del menu. Antes rehacia la
+   entrada completa de marca, que dura cuatro segundos y se cruzaba en
+   el camino de quien solo queria volver arriba. */
 function volverAlInicio() {
-  if (animScroll) { cancelAnimationFrame(animScroll); animScroll = null; }
-  scrollTo(0, 0);
+  if (ficha.classList.contains('abierta')) cerrarFicha();
+  if (capaIndice.classList.contains('abierta')) cerrarIndice();
   history.replaceState(null, '', location.pathname);
-
-  fachadaActual = (fachadaActual + 1) % FACHADAS.length;
-  const nombre = FACHADAS[fachadaActual];
-  const img = document.getElementById('render-inicio');
-  if (img) {
-    img.src    = `assets/renders/${nombre}.webp`;
-    img.srcset = `assets/renders/${nombre}.webp 1600w, assets/renders/${nombre}@2x.webp 2560w`;
-  }
-  // Una animacion CSS ya consumida no se rebobina: hay que reemplazar
-  // el nodo para que vuelva a correr desde el principio.
-  const mascara = document.querySelector('.mascara-marca');
-  const lamina  = document.querySelector('.lamina img');
-  const titular = document.getElementById('titular');
-  if (mascara) {
-    const copia = mascara.cloneNode(true);
-    mascara.replaceWith(copia);
-    marcarEntrada(copia);
-  }
-  if (titular) repartir(titular, 'PORTAFOLIO', 3.05, .06);
-  if (lamina) {
-    lamina.style.animation = 'none';
-    void lamina.offsetWidth;
-    lamina.style.animation = '';
-  }
+  irA(0, 1100);
 }
 
 document.addEventListener('click', e => {
@@ -2521,13 +2141,17 @@ addEventListener('resize', () => {
   if (capaIndice.classList.contains('abierta')) ajustarRejilla();
 });
 
+/* Van Y VUELVEN. Antes cada bloque se animaba una sola vez y al subir
+   de nuevo ya estaba puesto; ahora se rearma al salir de pantalla, asi
+   que el recorrido se siente igual de vivo en los dos sentidos.
+   El rearme pide que el elemento haya salido DEL TODO —umbral 0— para
+   que un bloque a medio ver no parpadee mientras se ajusta el scroll. */
 const observador = new IntersectionObserver(en => {
   en.forEach(e => {
-    if (!e.isIntersecting) return;
-    e.target.classList.add('visible', 'viva');
-    observador.unobserve(e.target);
+    if (e.isIntersecting) e.target.classList.add('visible', 'viva');
+    else if (e.intersectionRatio === 0) e.target.classList.remove('visible', 'viva');
   });
-}, { threshold:.12, rootMargin:'0px 0px -60px 0px' });
+}, { threshold:[0, .12], rootMargin:'0px 0px -60px 0px' });
 document.querySelectorAll('.revelar, .palabras, .vitrina, .enlaces, .flujo')
   .forEach(el => observador.observe(el));
 
@@ -2537,9 +2161,8 @@ document.querySelectorAll('.revelar, .palabras, .vitrina, .enlaces, .flujo')
    en movil se quedaba invisible. */
 const asomador = new IntersectionObserver(en => {
   en.forEach(e => {
-    if (!e.isIntersecting) return;
-    e.target.classList.add('visible');
-    asomador.unobserve(e.target);
+    if (e.isIntersecting) e.target.classList.add('visible');
+    else e.target.classList.remove('visible');
   });
 }, { threshold:0, rootMargin:'0px 0px -8px 0px' });
 document.querySelectorAll('.asoma').forEach(el => asomador.observe(el));

@@ -38,14 +38,12 @@ PORTAFOLIO/
 │   ├── logos/                   logos de software y escudos de formación
 │   ├── renders/                 imágenes en 1600 y 2560 px
 │   ├── video/                   6 recorridos (1280x720) + fotogramas de portada
-│   ├── proceso/g · proceso/p    la obra levantándose: 80 y 60 cuadros
 │   ├── datos/tierra.json        silueta de continentes para el globo (13 KB)
 │   └── paletas.json             color dominante por proyecto
 └── herramientas/
     ├── optimizar-imagenes.ps1   extrae y convierte los renders del archivo
     ├── optimizar-videos.ps1     comprime los recorridos
     ├── extraer-paletas.ps1      saca el color dominante de cada portada
-    ├── preparar-proceso.ps1     saca los cuadros de la escena de Proceso
     └── preparar-tierra.py       adelgaza el GeoJSON de Natural Earth
 ```
 
@@ -53,15 +51,10 @@ PORTAFOLIO/
 
 Todo se recorre desplazando. El menú salta con un desplazamiento animado.
 
-0. **Proceso** — entre Inicio y Proyectos. Sección de 340 vh con el contenido
-   pegado: el desplazamiento hace de línea de tiempo y **la obra se levanta**
-   —cimentación, estructura, entrepiso, cubierta, cerramiento— hasta el render
-   final a color. Es el argumento del portafolio dicho en imagen: *la imagen
-   no se dibuja, se levanta*. La escena la generó Kevin con OmniFlash.
 1. **Inicio** — render de fachada a pantalla completa y la palabra
-   **PORTAFOLIO** recortando ese mismo render. El botón *Inicio*
-   vuelve a tocar la entrada de STICK INDUSTRIES **con un render distinto
-   cada vez**, tomado de la lista `FACHADAS`.
+   **PORTAFOLIO** en sólido, con las letras asentándose una a una y un
+   brillo que las recorre al final. El botón *Inicio* sube a la portada
+   con el mismo desplazamiento animado que el resto del menú.
 2. **Proyectos** — cuatro hojas verticales a sangre, de borde a borde de la
    ventana. Botón *Ver todos los proyectos* → índice con filtros por grupo.
 3. **Sobre mí** — biografía; el trayecto como **rueda** —el hito del centro
