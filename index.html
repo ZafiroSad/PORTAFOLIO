@@ -1372,7 +1372,7 @@ document.getElementById('fases').innerHTML = FASES.map(f => `
   const angosto = innerWidth < 900 ||
                   (navigator.connection && /2g|3g/.test(navigator.connection.effectiveType || ''));
   const CARPETA = angosto ? 'assets/proceso/p/' : 'assets/proceso/g/';
-  const TOTAL   = angosto ? 60 : 120;
+  const TOTAL   = angosto ? 60 : 80;
 
   const cuadros = new Array(TOTAL);
   let listos = 0, ultimo = -1, avance = 0;
@@ -1394,24 +1394,36 @@ document.getElementById('fases').innerHTML = FASES.map(f => `
      portada entera, asi que no puede competir con ella: el relleno
      espera a que la pagina haya terminado de cargar. */
   function precargar() {
-    for (let i = 0; i < TOTAL; i += 12) cargar(i, true);
+    // Solo el primero entra antes de que la pagina termine: es el que
+    // evita ver un hueco si se baja de golpe. Todo lo demas espera, o
+    // los cuadros —que pesan mas que la portada entera— le robarian el
+    // ancho de banda justo cuando hay que enseñar el render de entrada.
+    cargar(0, true);
     const resto = () => {
+      for (let i = 0; i < TOTAL; i += 10) cargar(i);   // el recorrido entero, a saltos
       let i = 0;
       const tanda = () => {
         let n = 0;
-        while (i < TOTAL && n < 5) { cargar(i); i++; n++; }
+        while (i < TOTAL && n < 3) { cargar(i); i++; n++; }
         if (i < TOTAL) setTimeout(tanda, 110);
       };
-      tanda();
+      setTimeout(tanda, 300);
     };
-    if (document.readyState === 'complete') setTimeout(resto, 600);
-    else addEventListener('load', () => setTimeout(resto, 600), { once:true });
+    if (document.readyState === 'complete') setTimeout(resto, 500);
+    else addEventListener('load', () => setTimeout(resto, 500), { once:true });
   }
 
   function medir() {
-    const dpr = Math.min(devicePixelRatio || 1, 2);
-    lienzo.width  = Math.round(lienzo.clientWidth  * dpr);
-    lienzo.height = Math.round(lienzo.clientHeight * dpr);
+    /* La fuente mide 1920 px de ancho. Pedirle al lienzo el doble de
+       pixeles solo consigue que la imagen se estire y se vea blanda:
+       se limita al ancho real de la secuencia. */
+    const ANCHO_FUENTE = angosto ? 1080 : 1920;
+    const dpr = Math.min(devicePixelRatio || 1, 2,
+                         ANCHO_FUENTE / Math.max(1, lienzo.clientWidth));
+    lienzo.width  = Math.round(lienzo.clientWidth  * Math.max(1, dpr));
+    lienzo.height = Math.round(lienzo.clientHeight * Math.max(1, dpr));
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
   }
 
   function pintar() {
