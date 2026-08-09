@@ -27,13 +27,16 @@
    tecnico, un solo CTA por bloque, bordes con opacidad y radios.
    ================================================================= */
 :root {
-  /* --- Base: grafito azulado, nunca negro puro --- */
-  --base:   #0b0c10;
-  --base-2: #101219;
+  /* --- Base: grafito neutro y algo mas claro. Los azules y violetas
+     saturados de la version anterior daban el aire de portada de IA;
+     aqui el campo se mueve en tonos de piedra, hormigon y luz de
+     tarde, que es de donde viene el material del oficio. --- */
+  --base:   #15161b;
+  --base-2: #1d1f26;
   --tinta:  #f7f8fa;
   --n-200:  #dfe1e8;
-  --tenue:  #a6a9b6;
-  --debil:  #6f7383;
+  --tenue:  #adb0bb;
+  --debil:  #797d8a;
 
   --linea:        rgba(255,255,255,.10);
   --linea-fuerte: rgba(255,255,255,.26);
@@ -44,7 +47,7 @@
               rgba(255,255,255,.028) 44%,
               rgba(255,255,255,.055) 100%);
   --v-borde: rgba(255,255,255,.11);
-  --v-blur:  blur(26px) saturate(180%);
+  --v-blur:  blur(16px) saturate(175%);   /* 26px se veia igual y costaba el doble */
   --v-filo:  inset 0 1px 0 rgba(255,255,255,.18),
              inset 0 -1px 0 rgba(255,255,255,.045),
              inset 1px 0 0 rgba(255,255,255,.05),
@@ -93,42 +96,45 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
    ================================================================= */
 .campo { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
   background:
-    radial-gradient(120% 80% at 50% -10%, rgba(120,150,210,.09), transparent 60%),
-    linear-gradient(180deg, var(--base-2) 0%, var(--base) 45%, #08090d 100%); }
+    radial-gradient(130% 85% at 50% -12%, rgba(196,204,220,.07), transparent 62%),
+    linear-gradient(180deg, var(--base-2) 0%, var(--base) 48%, #101116 100%); }
 
-.masa { position:absolute; border-radius:50%; filter:blur(84px); opacity:.5;
-  will-change:transform; }
-/* Cada masa deriva por su cuenta y ademas responde al scroll (--y):
-   el campo se mueve con la pagina, asi nunca se lee como un fondo fijo */
-.m1 { width:62vmax; height:62vmax; left:-18vmax; top:-14vmax;
-      background:radial-gradient(circle, hsl(var(--th) 62% 46% / .40), transparent 68%);
-      animation:derivaA 46s var(--suave) infinite; }
-.m2 { width:52vmax; height:52vmax; right:-16vmax; top:8vmax;
-      background:radial-gradient(circle, hsl(28 78% 52% / .22), transparent 66%);
-      animation:derivaB 58s var(--suave) infinite; }
-.m3 { width:70vmax; height:70vmax; left:12vmax; bottom:-30vmax;
-      background:radial-gradient(circle, hsl(258 55% 50% / .26), transparent 68%);
-      animation:derivaC 64s var(--suave) infinite; }
-.m4 { width:40vmax; height:40vmax; right:6vmax; bottom:-8vmax;
-      background:radial-gradient(circle, hsl(190 62% 48% / .18), transparent 66%);
-      animation:derivaB 52s var(--suave) infinite reverse; }
+/* SOLO se anima translate. Animar `scale` obliga a rasterizar de nuevo
+   el desenfoque en cada cuadro — es lo que hundia los fotogramas por
+   segundo; moviendo la capa ya rasterizada el coste es casi cero. */
+.masa { position:absolute; border-radius:50%; filter:blur(72px); opacity:.55;
+  will-change:transform; contain:strict; }
+.m1 { width:66vmax; height:66vmax; left:-20vmax; top:-16vmax;
+      background:radial-gradient(circle, hsl(214 22% 62% / .30), transparent 68%);
+      animation:derivaA 52s var(--suave) infinite; }
+.m2 { width:56vmax; height:56vmax; right:-18vmax; top:6vmax;
+      background:radial-gradient(circle, hsl(32 30% 64% / .22), transparent 66%);
+      animation:derivaB 64s var(--suave) infinite; }
+.m3 { width:74vmax; height:74vmax; left:10vmax; bottom:-32vmax;
+      background:radial-gradient(circle, hsl(28 16% 58% / .20), transparent 68%);
+      animation:derivaC 70s var(--suave) infinite; }
+.m4 { width:46vmax; height:46vmax; right:4vmax; bottom:-10vmax;
+      background:radial-gradient(circle, hsl(196 18% 60% / .18), transparent 66%);
+      animation:derivaB 58s var(--suave) infinite reverse; }
 @keyframes derivaA {
-  0%,100% { transform:translate3d(0, calc(var(--y,0px) * .22), 0) scale(1) }
-  50%     { transform:translate3d(9vmax, calc(var(--y,0px) * .22 + 6vmax), 0) scale(1.14) } }
+  0%,100% { transform:translate3d(0, calc(var(--y,0px) * .22), 0) }
+  50%     { transform:translate3d(9vmax, calc(var(--y,0px) * .22 + 7vmax), 0) } }
 @keyframes derivaB {
-  0%,100% { transform:translate3d(0, calc(var(--y,0px) * .32), 0) scale(1.08) }
-  50%     { transform:translate3d(-11vmax, calc(var(--y,0px) * .32 + 9vmax), 0) scale(.92) } }
+  0%,100% { transform:translate3d(0, calc(var(--y,0px) * .32), 0) }
+  50%     { transform:translate3d(-11vmax, calc(var(--y,0px) * .32 + 9vmax), 0) } }
 @keyframes derivaC {
-  0%,100% { transform:translate3d(0, calc(var(--y,0px) * -.18), 0) scale(1) }
-  50%     { transform:translate3d(7vmax, calc(var(--y,0px) * -.18 - 7vmax), 0) scale(1.18) } }
+  0%,100% { transform:translate3d(0, calc(var(--y,0px) * -.18), 0) }
+  50%     { transform:translate3d(8vmax, calc(var(--y,0px) * -.18 - 8vmax), 0) } }
 
-/* Grano: quita el bandeado de los degradados y da textura de pelicula */
-.grano { position:absolute; inset:-200%; opacity:.05; mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E");
-  animation:temblar 5s steps(4) infinite; }
-@keyframes temblar {
-  0%{transform:translate(0,0)} 25%{transform:translate(-2%,1%)}
-  50%{transform:translate(1%,-2%)} 75%{transform:translate(-1%,-1%)} 100%{transform:translate(0,0)} }
+/* Grano: quita el bandeado de los degradados y da textura de pelicula.
+   Sin mix-blend-mode y sin desbordar la ventana: mezclar una capa del
+   quintuple del area en cada cuadro costaba mas que todo lo demas. */
+.grano { position:absolute; inset:0; opacity:.045;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E"); }
+
+/* Con una capa encima el campo no se ve: no hay por que seguir
+   animandolo mientras haya ficha, indice o visor abiertos. */
+body.bloqueado .masa { animation-play-state:paused; }
 
 /* Todo el contenido vive por encima del campo */
 .lienzo { position:relative; z-index:1; }
@@ -228,6 +234,10 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   opacity:0; filter:blur(16px);
   animation:enfocar 1.1s var(--salida) forwards;
 }
+/* `background-attachment:fixed` obliga a recomponer el recorte en cada
+   cuadro del desplazamiento. Cuando el titular ya salio de pantalla no
+   aporta nada, y soltarlo devuelve fluidez al resto de la pagina. */
+.titular.suelto .letra { background-attachment:scroll; }
 @keyframes enfocar { to { opacity:1; filter:blur(0); } }
 @media (hover:none) { .letra { background-attachment:scroll; background-size:700% auto; } }
 .regla-marca {
@@ -415,7 +425,10 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   left:50%; top:50%; transform:translate(-50%,-50%);
   width:min(1020px, 94vw, 86vh); aspect-ratio:1; opacity:0;
   transition:opacity 1.6s var(--suave); }
-.orbital.viva { opacity:1; }
+/* Vive por debajo del texto: a plena intensidad los logos a color
+   competian con la lectura. Al señalar uno recupera todo su brillo. */
+.orbital.viva { opacity:.5; }
+.orbital:hover { opacity:1; }
 .orbital .nucleo { position:absolute; left:50%; top:50%; width:min(52%,560px); aspect-ratio:1;
   transform:translate(-50%,-50%); border-radius:50%;
   background:radial-gradient(circle, hsl(var(--th) 60% 55% / .13), transparent 62%);
@@ -436,23 +449,42 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 .satelite .orbe { position:absolute; left:50%; top:calc(50% - var(--r)); }
 .satelite .contra { display:block; animation:girar var(--t,70s) linear infinite reverse; }
 .anillo.inverso .satelite .contra { animation-direction:normal; }
-/* Sin placa ni recuadro: el logo flota desnudo y muy apagado, para
-   que se lea como parte del campo y no como una ficha por encima del
-   texto. Solo al señalarlo recupera su color y su vidrio. */
+/* Cada herramienta viaja en su propia moneda de vidrio, teñida con el
+   color de su marca y con el logo a COLOR: el gris de antes apagaba
+   justo lo que hay que mostrar. La moneda late despacio, cada una con
+   su propio desfase, para que el sistema se lea vivo y no rigido. */
 .satelite .cara { position:absolute; left:0; top:0;
   width:var(--s,54px); height:var(--s,54px);
   transform:translate(-50%,-50%) rotate(calc(-1 * var(--a)));
   pointer-events:auto;
-  display:grid; place-items:center; border-radius:18px;
-  background:transparent; border:1px solid transparent;
-  transition:background .45s, border-color .45s, box-shadow .45s;
+  display:grid; place-items:center; border-radius:50%;
+  background:
+    radial-gradient(120% 120% at 30% 20%, rgba(var(--c),.30), rgba(var(--c),.10) 60%, rgba(255,255,255,.03)),
+    rgba(255,255,255,.03);
+  border:1px solid rgba(var(--c),.30);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 0 22px -6px rgba(var(--c),.55);
+  transition:box-shadow .45s, border-color .45s, background .45s;
 }
-.satelite img { width:62%; height:62%; object-fit:contain;
-  filter:grayscale(1) opacity(.20) contrast(.85); transition:filter .55s var(--suave); }
-.satelite .cara:hover { background:rgba(255,255,255,.09); border-color:rgba(255,255,255,.16);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.24), 0 16px 38px -12px rgba(0,0,0,.85);
-  backdrop-filter:blur(10px); }
-.satelite .cara:hover img { filter:grayscale(0) opacity(1) contrast(1); }
+.satelite .cara::after { content:''; position:absolute; inset:0; border-radius:50%;
+  border:1px solid rgba(var(--c),.5); opacity:0; transform:scale(1);
+  animation:respirar var(--p,7s) var(--suave) infinite; animation-delay:var(--d,0s); }
+@keyframes respirar {
+  0%   { opacity:.5; transform:scale(1) }
+  70%  { opacity:0;  transform:scale(1.35) }
+  100% { opacity:0;  transform:scale(1.35) } }
+.satelite img { width:58%; height:58%; object-fit:contain;
+  transition:transform .5s var(--resorte); }
+/* Los logos que son negros por marca no se ven sobre fondo oscuro:
+   se les invierte el tono, no el color. */
+.satelite.negativo img { filter:invert(1) brightness(1.15); }
+.satelite.negativo .cara { box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 0 18px -10px rgba(var(--c),.4); }
+.satelite.negativo .cara::after { opacity:0; animation:none; }
+.satelite .cara:hover { border-color:rgba(var(--c),.85);
+  background:
+    radial-gradient(120% 120% at 30% 20%, rgba(var(--c),.55), rgba(var(--c),.22) 60%, rgba(255,255,255,.05)),
+    rgba(255,255,255,.05);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.34), 0 0 40px -6px rgba(var(--c),.9); }
+.satelite .cara:hover img { transform:scale(1.14); }
 .satelite .nombre { position:absolute; left:0; top:calc(var(--s,54px) * .78);
   transform:translate(-50%,0) rotate(calc(-1 * var(--a)));
   font-family:var(--mono); font-size:.48rem; letter-spacing:.16em; text-transform:uppercase;
@@ -473,22 +505,28 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
    centro es el grande; los de arriba y abajo se van reduciendo segun
    su distancia al centro, como una rueda que gira. La escala y la
    opacidad las calcula el JS en cada cuadro. */
+/* Sin tarjeta: el trayecto es una linea de tiempo que se pierde por
+   arriba y por abajo. Encerrarlo en un panel lo convertia en un
+   widget, y ademas dejaba media caja vacia. */
 .bio-trayecto { display:flex; flex-direction:column; justify-content:center; }
-.rueda-marco { position:relative; border-radius:24px; padding:.2rem .4rem; }
-.rueda-marco::before, .rueda-marco::after {
-  content:''; position:absolute; left:1px; right:1px; height:30%; z-index:3; pointer-events:none; }
-.rueda-marco::before { top:1px;    border-radius:24px 24px 0 0;
-  background:linear-gradient(to bottom, rgba(11,12,16,.92) 4%, transparent); }
-.rueda-marco::after  { bottom:1px; border-radius:0 0 24px 24px;
-  background:linear-gradient(to top, rgba(11,12,16,.92) 4%, transparent); }
+.rueda-marco { position:relative;
+  /* Se recorta con mascara, no pintando un degradado del color de la
+     base: sobre un campo con masas de luz, ese degradado dibujaba un
+     rectangulo mas oscuro — el fantasma de la tarjeta que ya no esta. */
+  -webkit-mask-image:linear-gradient(to bottom, transparent, #000 24%, #000 76%, transparent);
+          mask-image:linear-gradient(to bottom, transparent, #000 24%, #000 76%, transparent); }
+/* El eje sobre el que van ensartados los hitos */
+.rueda-eje { position:absolute; left:22px; top:0; bottom:0; width:1px; z-index:0;
+  background:linear-gradient(to bottom, transparent, var(--linea) 22%, var(--linea) 78%, transparent); }
 
 .rueda {
   height:clamp(300px, 44vh, 450px);
   /* overscroll auto a proposito: al llegar al extremo de la rueda el
      desplazamiento continua en la pagina en vez de quedarse atrapado */
   overflow-y:auto; overscroll-behavior:auto;
+  position:relative; z-index:1;
   scroll-snap-type:y proximity;
-  padding:26% 1rem;    /* para que el primero y el ultimo puedan centrarse */
+  padding:26% 0;       /* para que el primero y el ultimo puedan centrarse */
   scrollbar-width:none;
 }
 .rueda::-webkit-scrollbar { display:none; }
@@ -502,12 +540,12 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   transition:transform .28s var(--suave), opacity .28s var(--suave);
 }
 .hito .escudo {
-  width:46px; height:46px; border-radius:14px; overflow:hidden;
-  background:rgba(255,255,255,.05); border:1px solid var(--linea);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+  position:relative; z-index:1;
+  width:46px; height:46px; border-radius:50%; overflow:hidden;
+  background:var(--base); border:1px solid var(--linea);
   display:flex; align-items:center; justify-content:center;
   font-family:var(--mono); font-size:.5rem; font-weight:700; color:var(--debil);
-  transition:border-color .4s, box-shadow .4s;
+  transition:border-color .4s, box-shadow .4s, background .4s;
 }
 .hito .escudo img { width:100%; height:100%; object-fit:contain; padding:7px; }
 .hito .anio { font-family:var(--mono); font-size:.56rem; letter-spacing:.2em; color:var(--debil); }
@@ -517,38 +555,53 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   color:var(--n-200); background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.08);
   border-radius:999px; padding:.2rem .55rem; margin-left:.6rem;
   vertical-align:middle; white-space:nowrap; }
-.hito.foco .escudo { border-color:var(--linea-fuerte);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 10px 26px -12px rgba(0,0,0,.9); }
+.hito.foco .escudo { border-color:var(--tinta);
+  box-shadow:0 0 0 4px rgba(21,22,27,1), 0 0 22px -4px rgba(255,255,255,.28); }
 
 /* ============ CONTACTO ======================================== */
-.contacto-cuerpo { max-width:1180px; }
-.contacto-cuerpo .apunte { color:var(--n-200); font-size:clamp(1.05rem,1.8vw,1.5rem);
-  max-width:30ch; line-height:1.35; letter-spacing:-.02em; margin-bottom:2rem; font-weight:300; }
+/* Toda la seccion se centra, cabecera incluida: el titulo alineado a
+   la izquierda sobre un cuerpo centrado se leia como un descuadre. */
+#contacto .cabeza { flex-direction:column; align-items:center; text-align:center; }
+#contacto .cabeza .etiqueta { margin-bottom:.7rem; }
+.contacto-cuerpo { max-width:980px; margin:0 auto; text-align:center; }
+.contacto-cuerpo .apunte { color:var(--n-200); font-size:clamp(1.15rem,2.2vw,1.75rem);
+  max-width:24ch; margin:0 auto 2.6rem; line-height:1.3; letter-spacing:-.025em; font-weight:300; }
 .contacto-cuerpo .apunte b { font-weight:500; color:var(--tinta); }
 
-/* Cuatro accesos en vidrio. Se inclinan hacia el cursor: el reflejo
-   se mueve en sentido contrario, que es lo que da la sensacion de
-   espesor de cristal y no de tarjeta plana. */
-.enlaces { display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:.8rem; }
-.enlace { position:relative; display:flex; flex-direction:column; gap:1.6rem;
-  padding:1.3rem 1.4rem; border-radius:22px; overflow:hidden;
+/* Cuatro accesos centrados. Cada uno lleva el color de su marca: en
+   reposo apenas se insinua en el borde y el icono; al señalarlo, el
+   color sube y tiñe la pieza entera. Sin datos a la vista — el numero,
+   el correo y el usuario personal no se publican; el unico usuario que
+   se muestra es el del estudio, porque ahi el usuario ES la marca. */
+.enlaces { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:.9rem; max-width:900px; margin:0 auto; }
+.enlace { --c:255,255,255;
+  position:relative; display:flex; flex-direction:column; align-items:center; gap:1rem;
+  padding:1.8rem 1.2rem 1.5rem; border-radius:24px; overflow:hidden; text-align:center;
   opacity:0; transform:translateY(26px);
-  transition:opacity .8s var(--suave), transform .9s var(--salida),
-             border-color .45s var(--suave), box-shadow .5s var(--suave); }
+  transition:opacity .8s var(--suave), transform .55s var(--salida),
+             border-color .45s var(--suave), box-shadow .5s var(--suave), background .5s var(--suave); }
 .enlaces.visible .enlace { opacity:1; transform:none; }
-.enlace:hover { border-color:var(--linea-fuerte);
-  box-shadow:var(--v-filo), 0 30px 70px -28px rgba(0,0,0,.95); }
-.enlace .icono { width:38px; height:38px; border-radius:12px; display:grid; place-items:center;
-  background:rgba(255,255,255,.08); box-shadow:inset 0 1px 0 rgba(255,255,255,.2);
-  transition:transform .6s var(--resorte), background .4s; }
-.enlace:hover .icono { transform:translateY(-3px) scale(1.06); background:rgba(255,255,255,.14); }
+.enlace::before { content:''; position:absolute; inset:0; border-radius:inherit; z-index:-1;
+  background:radial-gradient(120% 90% at 50% 0%, rgba(var(--c),.30), transparent 70%);
+  opacity:0; transition:opacity .55s var(--suave); }
+.enlace:hover { transform:translateY(-6px); border-color:rgba(var(--c),.5);
+  box-shadow:var(--v-filo), 0 30px 70px -30px rgba(var(--c),.5), 0 20px 50px -30px rgba(0,0,0,.9); }
+.enlace:hover::before { opacity:1; }
+.enlace .icono { width:52px; height:52px; border-radius:17px; display:grid; place-items:center;
+  color:rgb(var(--c));
+  background:rgba(var(--c),.13); border:1px solid rgba(var(--c),.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+  transition:transform .6s var(--resorte), background .45s, color .45s, border-color .45s; }
+.enlace:hover .icono { transform:translateY(-2px) scale(1.08);
+  background:rgb(var(--c)); border-color:rgb(var(--c)); color:#0d0e12; }
+/* Marcas de fondo claro: su icono se lee mejor en negativo */
+.enlace.claro:hover .icono { color:#fff; }
+.enlace .val { display:block; font-size:1rem; font-weight:500; letter-spacing:-.01em; }
 .enlace .rot { display:block; font-family:var(--mono); font-size:.55rem; letter-spacing:.2em;
-  text-transform:uppercase; color:var(--debil); }
-.enlace .val { display:block; font-size:.98rem; font-weight:500; letter-spacing:-.01em; margin-top:.25rem;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.enlace .flecha { position:absolute; top:1.35rem; right:1.35rem; color:var(--debil);
-  transition:transform .5s var(--salida), color .4s; }
-.enlace:hover .flecha { transform:translate(3px,-3px); color:var(--tinta); }
+  text-transform:uppercase; color:var(--debil); margin-top:.3rem;
+  transition:color .45s var(--suave); }
+.enlace:hover .rot { color:var(--tenue); }
 
 .pie { padding:2.2rem var(--margen); margin-top:clamp(2rem,6vh,4rem);
   border-top:1px solid var(--linea);
@@ -777,8 +830,8 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 
 /* El numero de columnas lo fija el JS para que la ultima fila no quede
    coja; el auto-fill es solo el punto de partida si el JS no corre. */
-.rejilla-todos { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-  gap:clamp(.8rem,1.6vw,1.4rem); padding:.6rem var(--margen) clamp(4rem,9vh,6rem); }
+.rejilla-todos { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+  gap:clamp(.9rem,1.8vw,1.6rem); padding:.6rem var(--margen) clamp(4rem,9vh,6rem); }
 .tarjeta { position:relative; cursor:pointer; opacity:0; transform:translateY(22px);
   transition:opacity .7s var(--suave), transform .8s var(--salida); }
 .rejilla-todos.visible .tarjeta { opacity:1; transform:none; }
@@ -893,9 +946,6 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
       <div class="subtitular"><span>Ingeniero civil · Visualización arquitectónica</span></div>
     </div>
     <div class="inicio-aparte">
-      <p>Levanto el proyecto en modelo antes de que exista en obra: los espesores,
-         los apoyos y la luz que va a tener de verdad. De ahí salen las imágenes,
-         los recorridos y los planos con que se coordina.</p>
       <div class="dato mono">
         <span>Kevin Gil</span><span class="sep"></span>
         <span>Bucaramanga, Colombia</span><span class="sep"></span>
@@ -956,7 +1006,8 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 
         <div class="bio-trayecto">
           <div class="etiqueta">Trayecto</div>
-          <div class="rueda-marco vidrio">
+          <div class="rueda-marco">
+            <span class="rueda-eje" aria-hidden="true"></span>
             <div class="rueda" id="rueda"></div>
           </div>
         </div>
@@ -977,8 +1028,8 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
     </div>
     <div class="contacto-cuerpo">
       <div class="revelar">
-        <p class="apunte">Este es el trabajo. Si quiere ver algo con más detalle,
-           saber <b>cómo se resolvió</b> o simplemente saludar, aquí estoy.</p>
+        <p class="apunte">Si algo de aquí le <b>despertó una pregunta</b>,
+           me gusta responderla.</p>
       </div>
       <div class="enlaces" id="enlaces"></div>
     </div>
@@ -1169,18 +1220,18 @@ const HITOS = [
 ];
 
 /* Los logos ya no van en rejilla: orbitan detras del texto como parte
-   del campo. anillo 0 = interior, anillo 1 = exterior. */
+   del campo. anillo 0 = interior (lo que modela), 1 = exterior (con lo
+   que representa y con lo que se apoya). color = el de la marca;
+   negativo = logos negros, que sobre fondo oscuro hay que invertir. */
 const UTILES = [
-  { nombre:'Revit',       logo:'assets/logos/revit.webp',      anillo:0 },
-  { nombre:'AutoCAD',     logo:'assets/logos/autocad.webp',    anillo:0 },
-  { nombre:'Civil 3D',    logo:'assets/logos/civil3d.webp',    anillo:0 },
-  { nombre:'SketchUp',    logo:'assets/logos/sketchup.webp',   anillo:0 },
-  { nombre:'D5 Render',   logo:'assets/logos/d5.webp',         anillo:1 },
-  { nombre:'Twinmotion',  logo:'assets/logos/twinmotion.webp', anillo:1 },
-  { nombre:'Claude Code', logo:'assets/logos/claudecode.webp', anillo:1 },
-  { nombre:'ChatGPT',     logo:'assets/logos/chatgpt.webp',    anillo:1 },
-  { nombre:'Canva',       logo:'assets/logos/canva.webp',      anillo:1 },
-  { nombre:'Excel',       logo:'assets/logos/excel.webp',      anillo:1 }
+  { nombre:'Revit',       logo:'assets/logos/revit.webp',      anillo:0, color:'54,142,235' },
+  { nombre:'AutoCAD',     logo:'assets/logos/autocad.webp',    anillo:0, color:'229,16,80'  },
+  { nombre:'Civil 3D',    logo:'assets/logos/civil3d.webp',    anillo:0, color:'196,19,126' },
+  { nombre:'SketchUp',    logo:'assets/logos/sketchup.webp',   anillo:0, color:'23,124,180' },
+  { nombre:'D5 Render',   logo:'assets/logos/d5.webp',         anillo:1, color:'138,86,246' },
+  { nombre:'Twinmotion',  logo:'assets/logos/twinmotion.webp', anillo:1, color:'236,240,248', negativo:true },
+  { nombre:'Claude Code', logo:'assets/logos/claudecode.webp', anillo:1, color:'217,119,87'  },
+  { nombre:'ChatGPT',     logo:'assets/logos/chatgpt.webp',    anillo:1, color:'116,170,156', negativo:true }
 ];
 
 let PALETAS = {};
@@ -1287,14 +1338,14 @@ function ajustarRejilla() {
   const util  = rejilla.clientWidth
               - parseFloat(getComputedStyle(rejilla).paddingLeft)
               - parseFloat(getComputedStyle(rejilla).paddingRight);
-  const MIN = 250;
+  const MIN = 340;    /* tarjetas mas grandes: a 250 se leian diminutas */
   const maxCols = Math.max(1, Math.floor((util + hueco) / (MIN + hueco)));
 
   // Un filtro con menos proyectos que columnas no estira las tarjetas
   // a lo ancho de la pantalla: las acota y centra la fila, que se lee
   // como composicion y no como una fila coja.
   if (visibles < maxCols) {
-    rejilla.style.gridTemplateColumns = `repeat(${visibles}, minmax(0, 420px))`;
+    rejilla.style.gridTemplateColumns = `repeat(${visibles}, minmax(0, 520px))`;
     rejilla.style.justifyContent = 'center';
     return;
   }
@@ -1370,13 +1421,20 @@ function girarRueda() {
   });
   if (masCerca) masCerca.classList.add('foco');
 }
-let ruedaPendiente = false;
+/* La rueda solo se recalcula cuando esta en pantalla. Medir nueve
+   hitos en cada cuadro del scroll de la pagina forzaba diez calculos
+   de maquetacion por fotograma — era el mayor lastre de fluidez. */
+let ruedaPendiente = false, ruedaALaVista = false;
 function pedirGiro() {
-  if (ruedaPendiente) return;
+  if (ruedaPendiente || !ruedaALaVista) return;
   ruedaPendiente = true;
   requestAnimationFrame(() => { girarRueda(); ruedaPendiente = false; });
 }
-rueda.addEventListener('scroll', pedirGiro, { passive:true });
+new IntersectionObserver(en => {
+  ruedaALaVista = en[0].isIntersecting;
+  if (ruedaALaVista) pedirGiro();
+}, { rootMargin:'120px' }).observe(rueda);
+rueda.addEventListener('scroll', () => { ruedaALaVista = true; pedirGiro(); }, { passive:true });
 addEventListener('resize', pedirGiro);
 girarRueda();
 
@@ -1399,7 +1457,9 @@ girarRueda();
     anillo.style.setProperty('--r', capa.radio);
     anillo.innerHTML = dentro.map((u, i) => {
       const a = (360 / dentro.length) * i + ci * 18;
-      return `<span class="satelite" style="--a:${a}deg; --r:${capa.radio}; --t:${capa.dur}; --s:${capa.tam}">
+      return `<span class="satelite${u.negativo ? ' negativo' : ''}"
+                    style="--a:${a}deg; --r:${capa.radio}; --t:${capa.dur}; --s:${capa.tam};
+                           --c:${u.color}; --p:${(6 + i * 1.3).toFixed(1)}s; --d:${(i * .85).toFixed(2)}s">
                 <span class="orbe"><span class="contra">
                   <span class="cara"><img src="${u.logo}" alt="${u.nombre}" loading="lazy"></span>
                   <span class="nombre">${u.nombre}</span>
@@ -1424,25 +1484,27 @@ const FLECHA_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" 
 const GMAIL = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(CONTACTO.correo)}` +
               `&su=${encodeURIComponent('Sobre tu portafolio')}`;
 
+/* val = lo que se ve. Ni el numero, ni el correo, ni el usuario
+   personal se publican: el enlace ya lleva el dato. El unico usuario
+   a la vista es el del estudio, que ahi es la marca. */
 const ENLACES = [
-  { rot:'WhatsApp',  val:CONTACTO.telefono,   icono:WA_SVG,
+  { val:'WhatsApp',  rot:'Escríbame', icono:WA_SVG,  color:'37,211,102',
     url:`https://wa.me/${CONTACTO.whatsapp}?text=${encodeURIComponent(CONTACTO.mensaje)}` },
-  { rot:'Correo',    val:'kevingilarevalo10', icono:MAIL_SVG, url:GMAIL },
-  { rot:'Instagram', val:'@' + CONTACTO.instagram, icono:IG_SVG,
+  { val:'Correo',    rot:'Gmail',     icono:MAIL_SVG, color:'234,67,53', url:GMAIL },
+  { val:'Instagram', rot:'Personal',  icono:IG_SVG,  color:'225,48,108',
     url:`https://www.instagram.com/${CONTACTO.instagram}` },
-  { rot:'El estudio', val:'@' + CONTACTO.igEstudio, icono:IG_SVG,
+  { val:'@' + CONTACTO.igEstudio, rot:'Visual 3D Studio', icono:IG_SVG, color:'168,132,255',
     url:`https://www.instagram.com/${CONTACTO.igEstudio}` }
 ];
 
 document.getElementById('enlaces').innerHTML = ENLACES.map((e, i) => `
   <a class="enlace vidrio" href="${e.url}" target="_blank" rel="noopener"
-     style="transition-delay:${(i * .08).toFixed(2)}s">
+     style="--c:${e.color}; transition-delay:${(i * .08).toFixed(2)}s">
     <span class="icono">${e.icono}</span>
     <span>
-      <span class="rot">${e.rot}</span>
       <span class="val">${e.val}</span>
+      <span class="rot">${e.rot}</span>
     </span>
-    <span class="flecha">${FLECHA_SVG}</span>
   </a>`).join('');
 
 /* =================================================================
@@ -2120,7 +2182,7 @@ function moverParallax(raiz, alto) {
   });
 }
 
-let tickScroll = false, ultimaY = 0;
+let tickScroll = false, ultimaY = 0, seccionActiva = null;
 addEventListener('scroll', () => {
   if (tickScroll) return;
   tickScroll = true;
@@ -2143,8 +2205,13 @@ addEventListener('scroll', () => {
 
     let activa = '';
     secciones.forEach(s => { if (s.getBoundingClientRect().top <= innerHeight * .4) activa = s.id; });
-    enlacesMenu.forEach(a => a.classList.toggle('activo', a.getAttribute('href') === '#' + activa));
-    moverGota(document.querySelector('.menu a.activo'));
+    // La gota solo se mueve cuando cambia la seccion: recolocarla en
+    // cada cuadro obligaba a medir el menu sin que nada hubiera cambiado.
+    if (activa !== seccionActiva) {
+      seccionActiva = activa;
+      enlacesMenu.forEach(a => a.classList.toggle('activo', a.getAttribute('href') === '#' + activa));
+      moverGota(document.querySelector('.menu a.activo'));
+    }
 
     pedirGiro();
     tickScroll = false;
@@ -2169,6 +2236,15 @@ const observador = new IntersectionObserver(en => {
 }, { threshold:.12, rootMargin:'0px 0px -60px 0px' });
 document.querySelectorAll('.revelar, .palabras, .vitrina, .enlaces, .orbital')
   .forEach(el => observador.observe(el));
+
+/* El recorte anclado a la ventana solo hace falta mientras el titular
+   se ve; despues es peso muerto en cada cuadro del desplazamiento. */
+(function soltarTitular() {
+  const t = document.getElementById('titular');
+  if (!t) return;
+  new IntersectionObserver(en => t.classList.toggle('suelto', !en[0].isIntersecting))
+    .observe(t);
+})();
 
 /* Enlace directo a un proyecto */
 function desdeDireccion() {
