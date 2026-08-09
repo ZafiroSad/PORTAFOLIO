@@ -7,13 +7,15 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v8.0 — escala oscura, catálogo curado. Verificado en escritorio. Sin publicar.**
+**v9.0 — campo vivo, vidrio líquido y globo de ubicación.
+Verificado en escritorio (1600 px) y en móvil (412 px) con Chrome headless.
+Sin publicar.**
 
 Pendientes antes de publicar:
-1. Verificar la vista **móvil en un teléfono real** (no se pudo automatizar:
-   la ventana de Chrome no baja de ~1500 px de ancho)
-2. Identidad gráfica propia — hoy la barra dice **STICK INDUSTRIES** en texto,
-   sin logotipo, por decisión explícita mientras no exista
+1. Verificar en un **teléfono real** (lo automatizado cubre el ancho, no el
+   tacto ni el rendimiento del `backdrop-filter` en gama media)
+2. Identidad gráfica propia — la entrada sigue diciendo **STICK INDUSTRIES**
+   y la barra ya dice **KEVIN GIL**: falta decidir cuál manda
 3. Publicar en GitHub Pages o dominio propio
 
 ## Arquitectura
@@ -31,34 +33,45 @@ PORTAFOLIO/
 │   ├── logos/                   logos de software y escudos de formación
 │   ├── renders/                 imágenes en 1600 y 2560 px
 │   ├── video/                   6 recorridos (1280x720) + fotogramas de portada
+│   ├── datos/tierra.json        silueta de continentes para el globo (13 KB)
 │   └── paletas.json             color dominante por proyecto
 └── herramientas/
     ├── optimizar-imagenes.ps1   extrae y convierte los renders del archivo
     ├── optimizar-videos.ps1     comprime los recorridos
-    └── extraer-paletas.ps1      saca el color dominante de cada portada
+    ├── extraer-paletas.ps1      saca el color dominante de cada portada
+    └── preparar-tierra.py       adelgaza el GeoJSON de Natural Earth
 ```
 
 ### Recorrido
 
 Todo se recorre desplazando. El menú salta con un desplazamiento animado.
 
-1. **Inicio** — render de fachada a pantalla completa. El botón *Inicio*
+1. **Inicio** — render de fachada a pantalla completa y la palabra
+   **PORTAFOLIO** recortando ese mismo render. El botón *Inicio*
    vuelve a tocar la entrada de STICK INDUSTRIES **con un render distinto
    cada vez**, tomado de la lista `FACHADAS`.
 2. **Proyectos** — cuatro hojas verticales a sangre, de borde a borde de la
    ventana. Botón *Ver todos los proyectos* → índice con filtros por grupo.
-3. **Sobre mí** — biografía, cifras, herramientas en placas a color y el
-   trayecto como **rueda**: el hito del centro va entero y los vecinos se
-   reducen según su distancia al centro.
-4. **Contacto** — WhatsApp, Gmail y los dos Instagram.
+3. **Sobre mí** — biografía y el trayecto como **rueda**: el hito del centro
+   va entero y los vecinos se reducen según su distancia al centro. Detrás,
+   las herramientas **orbitan** en dos anillos como parte del campo.
+4. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail y los dos
+   Instagram. Sin texto de venta.
 
 ### Lenguaje visual
 
-**Escala oscura (`#09090b`)**: el render es la única fuente de luz de la
-página. Todo lo demás se mantiene por debajo de él en luminosidad. Es la
-convención de los estudios de visualización, y coincide con el
-*dark-first* que declara `STICK_UI_SYSTEM.md`. La versión clara de la v7
-quedó descartada: hacía que el sitio se leyera genérico.
+**No hay color de fondo: hay un campo.** Cuatro masas de luz desenfocadas
+derivan muy despacio detrás de todo, con grano de película encima y una base
+grafito azulada (`#0b0c10`) que nunca llega a negro. El negro plano de la v8
+hacía que la página se leyera básica.
+
+**Vidrio líquido.** El contenido no se apoya en paneles opacos sino en
+superficies translúcidas con filo especular (`inset` claro arriba, oscuro
+abajo) y un reflejo que sigue al cursor. La clase `.vidrio` lo concentra todo.
+
+El render sigue siendo lo más brillante de la pantalla: el vidrio solo lo
+enmarca. Se conservan las reglas del `STICK_UI_SYSTEM`: mono para todo dato
+técnico, un solo CTA por bloque, bordes con opacidad y radios.
 
 ## Decisiones tomadas
 
@@ -91,7 +104,40 @@ quedó descartada: hacía que el sitio se leyera genérico.
   de `background-clip:text`. Se animan `opacity` y `filter`.
 - **El rótulo vertical se desplaza en el contenedor, no en el texto**: dentro
   de `writing-mode` vertical con `rotate(180deg)` los ejes quedan girados.
-- **La ficha se funde mientras el clon viaja**, no al aterrizar.
+- **La ficha se funde mientras el clon viaja**, no al aterrizar, y el clon
+  **no se quita de golpe: se funde** sobre la imagen real ya colocada debajo.
+  El contenido de la ficha arranca su entrada a los 340 ms, con el clon aún
+  en vuelo. Los tres juntos son lo que quita el corte al abrir un proyecto.
+- **La ficha es opaca.** Translúcida dejaba leer el texto de la página por
+  detrás de los renders. Lleva su propio campo teñido con `--th/--ts`.
+- **La ficha no lleva párrafo descriptivo ni año ni estado**: basta el título
+  sobre el render. Debajo queda una sola cinta con DÓNDE y CUÁNTAS.
+- **El lugar se responde girando un globo**, no escribiéndolo: canvas 2D con
+  proyección ortográfica que rota hacia las coordenadas del proyecto según
+  sube la cinta por la pantalla. Sin librerías. Las coordenadas son de
+  MUNICIPIO, no del lote.
+- **La galería reparte filas completas por JS** (`repartirFilas`): dos piezas
+  iguales o una a lo ancho, y lo que sobre ocupa su fila entera. Con la
+  retícula CSS de 6 columnas de la v8, un número impar dejaba hueco negro.
+  La tira de material adicional usa `flex-grow`, que por definición tampoco
+  puede dejar hueco.
+- **El material adicional no se anuncia con texto**: un filo que se dibuja al
+  entrar en pantalla y la cifra. Las piezas suben en cascada detrás.
+- **El visor cambia de imagen con dos capas**, no cambiando el `src`: la que
+  sale se va con desenfoque hacia un lado y la que entra llega del contrario.
+- **Los logos de software orbitan como parte del campo**, sin placa ni
+  recuadro y en gris al 20 %: solo al señalarlos recuperan color y vidrio.
+  La rejilla de fichas de la v8 se leía cuadriculada y comía una columna.
+- **Cada transformación va en su propio nodo** en el orbital. Una animación
+  de `transform` reemplaza el transform completo del elemento: con la
+  contrarrotación y el centrado en el mismo nodo, los diez logos se apilaban
+  en el centro.
+- **`overflow:hidden` en la sección Sobre mí**: el orbital es más alto que la
+  ventana y sus satélites aparecían flotando sobre Contacto — y provocaban
+  desbordamiento horizontal en móvil.
+- **Los bloques con `overflow:hidden` que animan texto llevan
+  `padding-bottom` compensado con margen negativo**: sin eso el recorte corta
+  los trazos que bajan de la línea base (la g de «Ingeniero»).
 
 ## Decisiones abiertas
 
