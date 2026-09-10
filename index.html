@@ -1592,11 +1592,20 @@ body.bloqueado .masa { animation-play-state:paused; }
 /* =================================================================
    CONTACTO
    ================================================================= */
+/* El numero y el correo van CODIFICADOS, no en claro.
+ *
+ * Este repositorio es publico, y los rastreadores que barren GitHub buscan
+ * justo eso: cadenas con forma de correo o de telefono. Codificados en base64
+ * no hay nada que reconocer en el archivo, y el sitio funciona igual porque
+ * los enlaces se arman al vuelo en el navegador.
+ *
+ * No es cifrado ni pretende serlo: quien mire el codigo con intencion los
+ * saca en un segundo. Detiene al que barre en masa, que es el que molesta. */
 const CONTACTO = {
-  whatsapp:  '573156307424',
-  telefono:  '315 630 7424',
+  whatsapp:  atob('NTczMTU2MzA3NDI0'),
+  telefono:  atob('MzE1IDYzMCA3NDI0'),
   mensaje:   'Hola Kevin, vi tu portafolio.',
-  correo:    'kevingilarevalo10@gmail.com',
+  correo:    atob('a2V2aW5naWxhcmV2YWxvMTBAZ21haWwuY29t'),
   instagram: 'kevingilarevalo'
 };
 
@@ -1605,6 +1614,15 @@ const CONTACTO = {
    Espeja la carpeta  02. WORK\03. STICK INDUSTRIES\99. RECURSOS MARCA\PROYECTOS
    PORTAFOLIO : los cuatro de PRINCIPALES abren la vitrina y los de
    SECUNDARIOS completan el indice.
+
+   NO HAY CAMPO `video`. Los seis recorridos siguen en assets/video/ y en el
+   repositorio, pero NINGUNA ficha los muestra: todos llevan quemada en el
+   cuadro la marca de BELVAL o la de VISUAL 3D STUDIO —en Ruitoque y en el
+   Lote 23, a pantalla completa— y los de La Punta van rotulados con nombres
+   propios de los clientes. Un portafolio que ensena el trabajo de Kevin
+   firmado por otra oficina se contradice a si mismo, y los nombres de
+   terceros no se publican. Devolverlos es volver a poner `video:'<clave>'`
+   en el proyecto que toque, cuando exista un recorrido limpio.
 
    slug    identificador del proyecto (define el enlace directo)
    arch    prefijo de los archivos de render en assets/renders
@@ -1617,25 +1635,25 @@ const PRINCIPALES = [
   { slug:'cazadores', arch:'cazadores', titulo:'Lote 1 · Cazadores Resort', tipo:'Vivienda unifamiliar',
     grupo:'vivienda', lugar:'Condominio Cazadores Resort', anio:'2026', estado:'En curso',
     coord:[7.02,-73.09],
-    portada:9, piezas:[9,7,8,10,13,11,12,6,5,4,3,1,2,14], extra:[], video:'cazadores',
+    portada:9, piezas:[9,7,8,10,13,11,12,6,5,4,3,1,2,14], extra:[],
     texto:'Vivienda de dos plantas sobre ladera, resuelta con piedra, madera y grandes paños de vidrio. El encargo pedía verificar cómo se comporta la fachada contra la pendiente del lote, así que la serie recorre el volumen completo antes de entrar a los espacios interiores.' },
 
   { slug:'cantabria-1', arch:'cantabria-1', titulo:'Lote 1 · Villas de Cantabria', tipo:'Vivienda unifamiliar',
     grupo:'vivienda', lugar:'Villas de Cantabria', anio:'2026', estado:'En curso',
     coord:[7.055,-73.085],
-    portada:7, piezas:[7,12,14,13,3,10], extra:[1,2,4,5,6,8,9,11], video:'cantabria-1',
+    portada:7, piezas:[7,12,14,13,3,10], extra:[1,2,4,5,6,8,9,11],
     texto:'La casa se organiza alrededor de una sala a doble altura que conecta visualmente los dos niveles. El acristalamiento continuo obligó a cuidar los reflejos: en visualización, un vidrio mal resuelto delata el render antes que cualquier otro material.' },
 
   { slug:'cantabria-23', arch:'cantabria-23', titulo:'Lote 23 · Villas de Cantabria', tipo:'Vivienda unifamiliar',
     grupo:'vivienda', lugar:'Villas de Cantabria', anio:'2026', estado:'En curso',
     coord:[7.055,-73.085],
-    portada:9, piezas:[9,13,3,10,11], extra:[1,2,4,5,6,7,8,12], video:'cantabria-23',
+    portada:9, piezas:[9,13,3,10,11], extra:[1,2,4,5,6,7,8,12],
     texto:'Fachada de líneas rectas con patio interior y piscina. La cocina abierta y la escalera funcionan como pieza central del primer nivel, y el recorrido se armó para leer esa continuidad de un espacio al siguiente.' },
 
   { slug:'punta', arch:'punta', titulo:'Punta Ruitoque', tipo:'Vivienda de lujo',
     grupo:'vivienda', lugar:'Ruitoque', anio:'2026', estado:'Terminado',
     coord:[7.005,-73.12],
-    portada:7, piezas:[7,18,12,13], extra:[1,2,3,4,5,6,8,9,10,11,14,15,16,17,19,20,21,22], video:'punta',
+    portada:7, piezas:[7,18,12,13], extra:[1,2,3,4,5,6,8,9,10,11,14,15,16,17,19,20,21,22],
     texto:'El proyecto más extenso del archivo: se modelaron y ambientaron todos los espacios de la casa, desde el teatro hasta cada alcoba. La selección muestra la fachada y tres habitaciones; el resto del material queda más abajo.' }
 ];
 
@@ -1643,7 +1661,7 @@ const SECUNDARIOS = [
   { slug:'coincafex', arch:'coincafex', titulo:'Coincafex', tipo:'Sede corporativa',
     grupo:'corporativo', lugar:'Girón, zona industrial', anio:'2026', estado:'Terminado',
     coord:[7.07,-73.17],
-    portada:3, piezas:[3,8,10,5,6,2,4], extra:[1,9], video:'coincafex',
+    portada:3, piezas:[3,8,10,5,6,2,4], extra:[1,9],
     texto:'La intervención envuelve una bodega existente con una piel metálica microperforada que unifica el volumen y oculta la cubierta. Adentro, las oficinas se resolvieron con luz cálida rasante y madera para que el interior no leyera como industrial.' },
 
   { slug:'casa-campo', arch:'casa-will', titulo:'Casa Campo', tipo:'Vivienda campestre',
@@ -1655,7 +1673,7 @@ const SECUNDARIOS = [
   { slug:'ruitoque-34', arch:'ruitoque', titulo:'Casa 34 · Ruitoque', tipo:'Vivienda urbana',
     grupo:'vivienda', lugar:'Ruitoque', anio:'2025', estado:'Terminado',
     coord:[7.02,-73.13],
-    portada:1, piezas:[1,2], extra:[], video:'ruitoque',
+    portada:1, piezas:[1,2], extra:[],
     texto:'La misma fachada resuelta de día y de noche, para mostrar cómo cambia el proyecto cuando entra la iluminación exterior.' },
 
   { slug:'closets-lebrija', arch:'lebrija', titulo:'Closets Lebrija', tipo:'Carpintería a medida',
@@ -1930,7 +1948,6 @@ const rueda = document.getElementById('rueda');
 document.getElementById('cifras').innerHTML = [
   ['Proyectos', TODOS.length],
   ['Imágenes', TODOS.reduce((n, p) => n + p.piezas.length + (p.extra ? p.extra.length : 0), 0)],
-  ['Recorridos', TODOS.filter(p => p.video).length],
   // "Ubicaciones", no "municipios": son coordenadas distintas, y varias
   // caen en el mismo municipio.
   ['Ubicaciones', new Set(TODOS.map(p => p.coord.join())).size],
@@ -2039,15 +2056,18 @@ const ENLACES = [
   { val:'Correo',    rot:'Gmail',     icono:MAIL_SVG, color:'234,67,53', url:GMAIL },
   { val:'Instagram', rot:'Trabajo',   icono:IG_SVG,  color:'225,48,108',
     url:`https://www.instagram.com/${CONTACTO.instagram}` },
-  /* La tarjeta queda guardada en la agenda del telefono con un toque:
-     es la forma en que un contacto sobrevive al cierre de la pestana. */
+  /* La tarjeta queda guardada en la agenda del telefono con un toque: es la
+     forma en que un contacto sobrevive al cierre de la pestana. Se ARMA en el
+     navegador en vez de servirse como archivo, para que el .vcf —que lleva el
+     numero y el correo en claro, porque si no no sirve de nada— no exista en
+     un repositorio publico. */
   { val:'Tarjeta',   rot:'Guardar contacto', icono:TARJETA_SVG, color:'196,178,140',
-    url:'compartir/kevin-gil.vcf', descarga:'kevin-gil.vcf' }
+    url:'#', tarjeta:true }
 ];
 
 document.getElementById('enlaces').innerHTML = ENLACES.map((e, i) => `
   <a class="enlace vidrio" href="${e.url}"
-     ${e.descarga ? `download="${e.descarga}"` : 'target="_blank" rel="noopener"'}
+     ${e.tarjeta ? 'data-tarjeta' : 'target="_blank" rel="noopener"'}
      style="--c:${e.color}; transition-delay:${(i * .08).toFixed(2)}s">
     <span class="icono">${e.icono}</span>
     <span>
@@ -2055,6 +2075,46 @@ document.getElementById('enlaces').innerHTML = ENLACES.map((e, i) => `
       <span class="rot">${e.rot}</span>
     </span>
   </a>`).join('');
+
+/* =================================================================
+   LA TARJETA DE CONTACTO
+
+   Se arma aqui y se entrega como archivo temporal en vez de vivir como
+   .vcf en el repositorio: un vCard util lleva el numero y el correo en
+   claro, y este repositorio es publico.
+   ================================================================= */
+document.querySelector('[data-tarjeta]')?.addEventListener('click', e => {
+  e.preventDefault();
+  const vcard = [
+    'BEGIN:VCARD',
+    'VERSION:3.0',
+    'N:Gil Arévalo;Kevin;;;',
+    'FN:Kevin Gil',
+    'TITLE:Ingeniero civil · Visualización arquitectónica',
+    'ORG:STICK INDUSTRIES',
+    `TEL;TYPE=CELL:+${CONTACTO.whatsapp}`,
+    `EMAIL;TYPE=INTERNET:${CONTACTO.correo}`,
+    'URL:https://zafirosad.github.io/PORTAFOLIO/',
+    `X-SOCIALPROFILE;TYPE=instagram:https://www.instagram.com/${CONTACTO.instagram}`,
+    'ADR;TYPE=WORK:;;Bucaramanga;Santander;;;Colombia',
+    'NOTE:Portafolio de visualización arquitectónica.',
+    'END:VCARD',
+    // El formato vCard exige fin de linea de Windows (CR LF). Se arma con
+    // fromCharCode y no escribiendo la secuencia de escape: este archivo se
+    // edita desde scripts, y ahi una barra invertida seguida de r acaba
+    // convertida en el caracter de verdad, parte la cadena y rompe el
+    // JavaScript entero. Paso, y dejo la vitrina vacia.
+  ].join(String.fromCharCode(13, 10));
+
+  const url = URL.createObjectURL(new Blob([vcard], {type:'text/vcard;charset=utf-8'}));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'kevin-gil.vcf';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+});
 
 /* =================================================================
    FICHA DE PROYECTO
@@ -2160,16 +2220,6 @@ function pintarFicha(p) {
             <img src="${ruta(p.arch, n)}" srcset="${juego(p.arch, n)}" sizes="30vw"
                  alt="${p.titulo} — adicional ${j + 1}" loading="lazy" decoding="async">
           </figure>`).join('')}
-      </div>` : ''}
-
-    ${p.video ? `
-      <div class="ficha-recorrido asoma">
-        <div class="rotulo">Recorrido</div>
-        <div class="marco">
-          <video controls preload="none" playsinline poster="assets/video/${p.video}-poster.webp">
-            <source src="assets/video/${p.video}.mp4" type="video/mp4">
-          </video>
-        </div>
       </div>` : ''}
 
     <div class="ficha-navegar">

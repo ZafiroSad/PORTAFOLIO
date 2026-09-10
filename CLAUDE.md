@@ -8,12 +8,17 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v17.2 — identidad propia, reel, enlaces que se comparten y hoja de vida.**
+**v17.5 — fuera la marca ajena, y el contacto deja de estar en claro.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
 
 Lo que trae la v17 sobre la v16.4:
 
+- **Los seis recorridos salen de las fichas.** Todos llevaban quemada la
+  marca de BELVAL o la de VISUAL 3D STUDIO, y los de La Punta iban rotulados
+  con nombres propios de los clientes.
+- **El teléfono y el correo dejan de estar en claro** en el HTML, y la tarjeta
+  `.vcf` se arma en el navegador en vez de vivir como archivo en el repo.
 - **El reel**, sección propia entre Proyectos y Sobre mí: 40 s con los cinco
   proyectos principales, apertura y cierre de marca, **y música** compuesta
   sobre el propio corte.
@@ -40,8 +45,9 @@ Lo que trae la v17 sobre la v16.4:
 Pendientes:
 1. Verificar en un **teléfono real** (lo automatizado cubre el encuadre, no
    el tacto ni el rendimiento en gama media)
-2. El teléfono y el correo siguen en claro en el HTML de un repo público:
-   los rastreadores los leen. Se avisó; queda a decisión de Kevin
+2. La hoja de vida en PDF **sí** lleva el teléfono y el correo en claro, y
+   vive en un repositorio público. Es su función —una hoja de vida sin
+   teléfono no sirve—, pero conviene saberlo
 
 Lo que más subiría el nivel, y depende de material de Kevin:
 **fotos de obra construida en el mismo encuadre del render.**
@@ -166,6 +172,22 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
 
 ## Decisiones tomadas
 
+- **Un recorrido con marca ajena no entra en el portafolio.** Los seis que
+  había llevan quemado en el cuadro el logo de BELVAL o el de VISUAL 3D
+  STUDIO —en Ruitoque y en el Lote 23, a pantalla completa— y los de La Punta
+  rotulan las habitaciones con **nombres propios de los clientes**. Un
+  portafolio que enseña el trabajo de Kevin firmado por otra oficina se
+  contradice a sí mismo, y los nombres de terceros no se publican. Se
+  descartó recortar el encuadre: haría falta un 15-18 % por lado, y esos
+  vídeos ya se ven blandos a 720p. **Los archivos siguen en el repositorio**;
+  lo que se quitó es el campo `video` del catálogo, así que devolverlos es
+  una línea el día que existan recorridos limpios.
+- **El contacto va codificado en el fuente, no en claro.** El repositorio es
+  público y los rastreadores buscan justo cadenas con forma de correo o de
+  teléfono; en base64 no hay nada que reconocer, y los enlaces se arman en el
+  navegador. No es cifrado: detiene al que barre en masa, no al que mira. Por
+  lo mismo la tarjeta `.vcf` se genera al vuelo — un vCard útil lleva los
+  datos en claro y no debe existir como archivo en el repo.
 - **Las cifras se cuentan, no se escriben.** `10 proyectos · 97 imágenes ·
   6 recorridos · 8 ubicaciones` sale del catálogo en cada carga. Una cifra
   escrita a mano se queda vieja el día que entra un proyecto, y en un
