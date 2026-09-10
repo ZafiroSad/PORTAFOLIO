@@ -257,8 +257,16 @@ body.bloqueado .masa { animation-play-state:paused; }
   display:flex; align-items:center; justify-content:center;
   background:var(--base);
   animation:disolverMarca 1.1s var(--salida) 2.75s forwards;
+  /* NUNCA recibe el puntero. Es una capa de bienvenida que cubre la ventana
+     entera con z-index 400: si su animacion no llega a correr —y no corre
+     mientras la pestana esta en segundo plano, porque el navegador congela
+     las animaciones ahi— se quedaria tragandose todos los clics del sitio.
+     Medido: 78 s despues de cargar seguia opaca e interceptando el puntero. */
+  pointer-events:none;
 }
 @keyframes disolverMarca { to { opacity:0; visibility:hidden; } }
+/* El JS la retira del todo cuando acaba, o pasado un plazo si no acaba. */
+.mascara-marca.fuera { display:none; }
 
 .marca-entrada { width:min(66vw, 640px); position:relative; color:var(--tinta); }
 .marca-entrada svg { display:block; width:100%; height:auto; overflow:visible; }
@@ -589,6 +597,9 @@ body.bloqueado .masa { animation-play-state:paused; }
   .reel-pie .reel-descarga-aviso { display:none; }
 }
 
+.hoja-vida { display:flex; justify-content:center; padding:clamp(1.6rem,4vh,2.6rem) 0 0; }
+.hoja-vida .disco svg { transition:stroke .4s; }
+.hoja-vida a:hover .disco { transform:translateY(2px) rotate(0deg); }
 .ver-todos { display:flex; justify-content:center; padding:clamp(1.4rem,3.5vh,2.4rem) var(--margen) 0; }
 .btn-todos {
   position:relative; overflow:hidden;
@@ -825,6 +836,17 @@ body.bloqueado .masa { animation-play-state:paused; }
 .ficha-barra .nombre { font-family:var(--mono); font-size:.61rem; letter-spacing:.2em;
   text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   text-shadow:0 1px 12px rgba(0,0,0,.8); }
+.ficha-acciones { display:flex; align-items:center; gap:.5rem; }
+/* En movil el nombre del proyecto ya ocupa su sitio: el boton se queda con
+   el icono, que es lo que se reconoce sin leer. */
+@media (max-width:560px){
+  #ficha-compartir-texto { display:none; }
+  #ficha-compartir { padding:.5rem .7rem; }
+}
+/* Confirmacion de la copia: el propio boton lo dice, sin sacar un aviso
+   flotante que haya que buscar con la vista. */
+#ficha-compartir.hecho { color:var(--base); background:var(--tinta); border-color:var(--tinta); }
+#ficha-compartir #ficha-compartir-texto { white-space:nowrap; }
 .ficha-cerrar { display:flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.58rem;
   letter-spacing:.2em; text-transform:uppercase; color:var(--tenue); padding:.5rem .95rem;
   border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
@@ -1421,6 +1443,18 @@ body.bloqueado .masa { animation-play-state:paused; }
     </div>
     <div class="contacto-cuerpo">
       <div class="enlaces" id="enlaces"></div>
+      <!-- La hoja de vida no es un canal de contacto: es un documento, y va
+           aparte para que se vea que existe. La genera
+           herramientas/preparar-cv.mjs desde los datos de este mismo archivo. -->
+      <div class="hoja-vida asoma">
+        <a class="btn-todos vidrio" href="compartir/kevin-gil-cv.pdf" download="kevin-gil-cv.pdf">
+          <span>Descargar la hoja de vida</span>
+          <span class="cuenta" id="cuenta-cv">PDF · 1 página</span>
+          <span class="disco"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+            ><path d="M12 4v12M7 12l5 5 5-5M5 20h14"/></svg></span>
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -1447,7 +1481,17 @@ body.bloqueado .masa { animation-play-state:paused; }
 <div class="ficha" id="ficha" role="dialog" aria-modal="true" aria-label="Proyecto">
   <div class="ficha-barra vidrio">
     <span class="nombre mono" id="ficha-nombre"></span>
-    <button class="ficha-cerrar" id="ficha-cerrar"><span class="aspa"></span> Cerrar</button>
+    <div class="ficha-acciones">
+      <button class="ficha-cerrar" id="ficha-compartir" aria-label="Compartir este proyecto">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>
+          <path d="M8.4 10.8 15.6 6.5M8.4 13.2l7.2 4.3"/>
+        </svg>
+        <span id="ficha-compartir-texto">Compartir</span>
+      </button>
+      <button class="ficha-cerrar" id="ficha-cerrar"><span class="aspa"></span> Cerrar</button>
+    </div>
   </div>
   <div id="ficha-contenido"></div>
 </div>
@@ -1645,6 +1689,26 @@ function repartir(el, texto, retraso, paso = .045) {
 /* La entrada ya no reparte letras: dibuja el logo, y su coreografia vive
    entera en el CSS (.marca-entrada). Aqui solo queda el titular. */
 repartir(document.getElementById('titular'), 'PORTAFOLIO', 3.45, .06);
+
+/* La capa de bienvenida se retira del DOM cuando su animacion termina — y
+   tambien si NO termina. Chrome congela las animaciones de una pestana en
+   segundo plano: quien abre el enlace en una pestana de fondo y vuelve al
+   rato se encontraba la capa entera todavia puesta. El plazo se cuenta
+   desde que la pagina se ve, no desde que se carga. */
+(() => {
+  const capa = document.querySelector('.mascara-marca');
+  if (!capa) return;
+  const retirar = () => capa.classList.add('fuera');
+  capa.addEventListener('animationend', retirar, { once:true });
+
+  let reloj = null;
+  const armar = () => {
+    if (document.hidden || reloj) return;
+    reloj = setTimeout(retirar, 5000);   // la coreografia acaba a los 3,85 s
+  };
+  document.addEventListener('visibilitychange', armar);
+  armar();
+})();
 
 document.querySelectorAll('.palabras').forEach(t => {
   t.innerHTML = t.dataset.texto.split(' ').map((p, i) =>
@@ -2117,6 +2181,98 @@ function cerrarFicha() {
 }
 
 document.getElementById('ficha-cerrar').addEventListener('click', cerrarFicha);
+
+/* =================================================================
+   COMPARTIR UN PROYECTO
+
+   El enlace que se comparte NO es `…/#slug`, es `…/p/<slug>/`: una
+   pagina de verdad, con el titulo y la imagen de ESE proyecto en sus
+   meta. El rastreador que hace la vista previa de WhatsApp o LinkedIn
+   no ejecuta JavaScript ni lee el fragmento, asi que con `#slug` todos
+   los proyectos salian con la misma tarjeta — la del sitio entero.
+   Las paginas las genera `herramientas/preparar-enlaces.mjs`.
+   ================================================================= */
+const compartirBtn   = document.getElementById('ficha-compartir');
+const compartirTexto = document.getElementById('ficha-compartir-texto');
+
+function enlaceDe(p) {
+  // En local `location.href` acaba en index.html; en el sitio, en la carpeta.
+  const base = location.href.replace(/(index\.html)?(#.*)?$/, '');
+  return `${base}p/${p.slug}/`;
+}
+
+compartirBtn.addEventListener('click', async () => {
+  if (!proyectoActual) return;
+  const url = enlaceDe(proyectoActual);
+  const datos = { title: `${proyectoActual.titulo} · STICK INDUSTRIES`, url };
+
+  /* La hoja del sistema solo en pantallas tactiles. Chrome de escritorio
+     tambien expone `navigator.share`, pero ahi abre el dialogo de Windows,
+     que es un rodeo para algo que en un computador se resuelve pegando el
+     enlace: se mira el tipo de puntero, no si la API existe. */
+  if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+    try { await navigator.share(datos); return; }
+    catch (e) { if (e.name === 'AbortError') return; }   // lo cerro a proposito
+  }
+  if (await copiar(url)) {
+    avisarCopiado('Enlace copiado');
+  } else {
+    /* Ultimo recurso: se abre la propia pagina del proyecto. El enlace queda
+       en la barra de direcciones, donde siempre se puede copiar a mano. */
+    avisarCopiado('Enlace abierto');
+    window.open(url, '_blank', 'noopener');
+  }
+});
+
+/* Copiar al portapapeles tiene tres caminos, y hacen falta los tres:
+
+   1. `navigator.clipboard`, la API moderna. Ojo: cuando el navegador no
+      reconoce la llamada como gesto del usuario, la promesa **no rechaza —
+      se queda pendiente para siempre**, y sin un plazo el boton se queda
+      diciendo "Compartir" y nadie sabe si copio. De ahi el `Promise.race`.
+   2. `execCommand('copy')` sobre un textarea, el camino viejo, que funciona
+      en contextos donde la API moderna no.
+   3. Si ninguno sale, quien llama abre la pagina y el enlace queda a la
+      vista en la barra de direcciones. */
+function copiar(texto) {
+  const moderno = (async () => {
+    try {
+      await navigator.clipboard.writeText(texto);
+      return true;
+    } catch { return false; }
+  })();
+  const plazo = new Promise((r) => setTimeout(() => r(false), 1200));
+
+  return Promise.race([moderno, plazo]).then((ok) => ok || conTextarea(texto));
+}
+
+function conTextarea(texto) {
+  try {
+    const caja = document.createElement('textarea');
+    caja.value = texto;
+    caja.setAttribute('readonly', '');
+    caja.style.cssText = 'position:fixed; top:0; left:-9999px; opacity:0';
+    document.body.appendChild(caja);
+    caja.select();
+    const ok = document.execCommand('copy');
+    caja.remove();
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Confirma la copia en el propio boton y lo devuelve a su sitio. */
+let vueltaAviso = null;
+function avisarCopiado(texto) {
+  clearTimeout(vueltaAviso);
+  compartirTexto.textContent = texto;
+  compartirBtn.classList.add('hecho');
+  vueltaAviso = setTimeout(() => {
+    compartirTexto.textContent = 'Compartir';
+    compartirBtn.classList.remove('hecho');
+  }, 2200);
+}
 
 function mudarProyecto(slug) {
   const p = TODOS.find(x => x.slug === slug);

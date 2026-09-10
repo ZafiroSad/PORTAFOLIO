@@ -8,14 +8,21 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v17.0 — identidad propia.** Publicado en
-https://zafirosad.github.io/PORTAFOLIO/, repositorio público
+**v17.2 — identidad propia, reel, enlaces que se comparten y hoja de vida.**
+Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
 
 Lo que trae la v17 sobre la v16.4:
 
 - **El reel**, sección propia entre Proyectos y Sobre mí: 40 s con los cinco
   proyectos principales, apertura y cierre de marca.
+- **Una página de compartir por proyecto** (`p/<slug>/`), con su propio título
+  e imagen: pegar el enlace de un proyecto en WhatsApp ya no muestra la tarjeta
+  del sitio entero, sino esa casa.
+- **Botón Compartir** en la ficha de cada proyecto.
+- **Hoja de vida en PDF**, una hoja, generada desde los datos del propio sitio.
+- Corregido un fallo que dejaba la capa de bienvenida **tragándose todos los
+  clics** si su animación no llegaba a correr.
 - El **logo de STICK INDUSTRIES vectorizado** desde su único PNG de origen,
   y usado como marca del sitio: barra, entrada, favicon e imagen de compartir.
 - La **entrada dibuja el logo** en vez de escribir la palabra con la
@@ -47,7 +54,8 @@ PORTAFOLIO/
 ├── propuestas/                  variantes que se compararon y se descartaron
 ├── fuentes/                     material pesado de origen (fuera del repo)
 │   └── logos-originales/        los 11 PNG de partida de los logos
-├── compartir/                   tarjeta .vcf, QR y el reel vertical
+├── p/<slug>/                    una página de compartir por proyecto (generada)
+├── compartir/                   tarjeta .vcf, QR, hoja de vida y reel vertical
 ├── assets/
 │   ├── marca/                   logo, isotipo, favicons e imagen de compartir
 │   ├── logos/                   logos de software y escudos de formación
@@ -58,7 +66,9 @@ PORTAFOLIO/
 └── herramientas/
     ├── vectorizar-logo.py       traza el logo desde su PNG y escribe el SVG
     ├── preparar-marca.py        deriva isotipo y favicons del SVG maestro
-    ├── preparar-og.py           compone la imagen de compartir 1200x630
+    ├── preparar-og.py           compone las imágenes de compartir 1200x630
+    ├── preparar-enlaces.mjs     escribe p/<slug>/ desde el catálogo
+    ├── preparar-cv.mjs          imprime la hoja de vida en PDF
     ├── optimizar-imagenes.ps1   extrae y convierte los renders del archivo
     ├── optimizar-videos.ps1     comprime los recorridos
     ├── extraer-paletas.ps1      saca el color dominante de cada portada
@@ -127,8 +137,51 @@ El render sigue siendo lo más brillante de la pantalla: el vidrio solo lo
 enmarca. Se conservan las reglas del `STICK_UI_SYSTEM`: mono para todo dato
 técnico, un solo CTA por bloque, bordes con opacidad y radios.
 
+### Lo que se genera, y cuándo
+
+Tres cosas del sitio no se escriben a mano: se derivan de lo que ya está en
+`index.html`. Si cambia el catálogo o el trayecto, se vuelven a correr.
+
+```powershell
+node herramientas/preparar-enlaces.mjs   # catálogo -> p/<slug>/ + su og.jpg
+node herramientas/preparar-cv.mjs        # trayecto + catálogo -> hoja de vida en PDF
+python herramientas/preparar-og.py       # render + logo -> assets/marca/og.jpg
+```
+
+**Las páginas de compartir** existen porque el sitio es un solo `index.html` y
+los proyectos se abren con `#slug`: eso basta para un navegador, pero el
+rastreador que hace la vista previa de WhatsApp o LinkedIn no ejecuta
+JavaScript ni lee el fragmento, así que todos los proyectos salían con la misma
+tarjeta. Ahora `…/p/cantabria-23/` es una URL de verdad, con su título y su
+imagen, y al abrirla la persona aterriza en la ficha ya abierta.
+
+**La hoja de vida** no tiene datos propios: lee `HITOS`, `UTILES`, el catálogo y
+`CONTACTO` del `index.html`, así que el PDF nunca puede desviarse de lo que
+cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
+
 ## Decisiones tomadas
 
+- **La capa de bienvenida NUNCA recibe el puntero.** Cubre la ventana entera
+  con `z-index:400`, y si su animación no llega a correr se queda tragándose
+  todos los clics del sitio. Pasa de verdad: Chrome congela las animaciones de
+  una pestaña en segundo plano, y medido en una pestaña de fondo seguía opaca e
+  interceptando el puntero **78 s después de cargar**. Va con
+  `pointer-events:none` y además el JS la retira cuando su animación termina —
+  o pasado un plazo si no termina, contado desde que la página se ve.
+- **Copiar al portapapeles necesita un plazo, no solo un `catch`.** Cuando el
+  navegador no reconoce la llamada como gesto del usuario, la promesa de
+  `navigator.clipboard.writeText` **no rechaza: se queda pendiente para
+  siempre**, y el botón se quedaba sin decir nada. Hay tres caminos: la API
+  moderna con `Promise.race`, `execCommand` sobre un textarea, y abrir la
+  página para que el enlace quede en la barra de direcciones.
+- **La hoja del sistema (`navigator.share`) solo en pantallas táctiles.** Chrome
+  de escritorio también la expone, pero ahí abre el diálogo de Windows, que es
+  un rodeo para algo que en un computador se resuelve pegando el enlace. Se
+  mira `pointer: coarse`, no si la API existe.
+- **El CV se mide, no se tantea.** Salía en dos hojas y cada ajuste a ojo fallaba;
+  medido en el navegador, el documento pesaba **300,3 mm contra los 297 de un
+  A4** — sobraban 3,3. Y el `break-inside:avoid` en la rejilla empeoraba las
+  cosas: hacía saltar de hoja un bloque entero teniendo sitio.
 - **El reel se monta aparte, no en este repositorio.** Vive como proyecto de
   video propio en `01. PROYECTOS` → `06. VIDEO - REEL STICK INDUSTRIES`,
   con su bitácora; aquí solo entra el MP4 comprimido. El sitio no es el sitio
