@@ -1,22 +1,33 @@
-# PORTAFOLIO — Kevin Gil
+# PORTAFOLIO — STICK INDUSTRIES · Kevin Gil
 
 CV interactiva y portafolio de visualización arquitectónica.
 
 > No busca vender: busca **mostrar el trabajo**. Es la carta de presentación
-> de Kevin Gil como ingeniero civil y visualizador.
+> de Kevin Gil como ingeniero civil y visualizador, bajo la marca
+> **STICK INDUSTRIES**.
 
 ## Estado actual
 
-**v13.0 — PUBLICADO en https://zafirosad.github.io/PORTAFOLIO/**
-Repositorio público `ZafiroSad/PORTAFOLIO`. Verificado en escritorio
-(1600 px) y en móvil (412 px, densidad 3) contra el sitio en vivo.
+**v17.0 — identidad propia.** Publicado en
+https://zafirosad.github.io/PORTAFOLIO/, repositorio público
+`ZafiroSad/PORTAFOLIO`.
+
+Lo que trae la v17 sobre la v16.4:
+
+- El **logo de STICK INDUSTRIES vectorizado** desde su único PNG de origen,
+  y usado como marca del sitio: barra, entrada, favicon e imagen de compartir.
+- La **entrada dibuja el logo** en vez de escribir la palabra con la
+  tipografía del sitio.
+- **VISUAL 3D STUDIO retirado** de portada y contacto. Se conserva en el
+  trayecto de Sobre mí, que es donde es cierto: cerró en agosto de 2026.
+- **Imagen de compartir propia** (`og:image`) — antes el enlace pegado en
+  WhatsApp salía sin marca.
+- **Tarjeta de contacto** (`.vcf`) como cuarto acceso de Contacto.
 
 Pendientes:
 1. Verificar en un **teléfono real** (lo automatizado cubre el encuadre, no
    el tacto ni el rendimiento en gama media)
-2. Identidad gráfica propia — la entrada sigue diciendo **STICK INDUSTRIES**
-   y la barra ya dice **KEVIN GIL**: falta decidir cuál manda
-3. El teléfono y el correo están en claro en el HTML de un repo público:
+2. El teléfono y el correo siguen en claro en el HTML de un repo público:
    los rastreadores los leen. Se avisó; queda a decisión de Kevin
 
 Lo que más subiría el nivel, y depende de material de Kevin:
@@ -33,19 +44,49 @@ PORTAFOLIO/
 ├── CLAUDE.md                    este archivo
 ├── propuestas/                  variantes que se compararon y se descartaron
 ├── fuentes/                     material pesado de origen (fuera del repo)
+│   └── logos-originales/        los 11 PNG de partida de los logos
+├── compartir/                   tarjeta .vcf y QR del sitio
 ├── assets/
-│   ├── marca/                   favicon
+│   ├── marca/                   logo, isotipo, favicons e imagen de compartir
 │   ├── logos/                   logos de software y escudos de formación
 │   ├── renders/                 imágenes en 1600 y 2560 px
 │   ├── video/                   6 recorridos (1280x720) + fotogramas de portada
 │   ├── datos/tierra.json        silueta de continentes para el globo (13 KB)
 │   └── paletas.json             color dominante por proyecto
 └── herramientas/
+    ├── vectorizar-logo.py       traza el logo desde su PNG y escribe el SVG
+    ├── preparar-marca.py        deriva isotipo y favicons del SVG maestro
+    ├── preparar-og.py           compone la imagen de compartir 1200x630
     ├── optimizar-imagenes.ps1   extrae y convierte los renders del archivo
     ├── optimizar-videos.ps1     comprime los recorridos
     ├── extraer-paletas.ps1      saca el color dominante de cada portada
     └── preparar-tierra.py       adelgaza el GeoJSON de Natural Earth
 ```
+
+### La marca
+
+De STICK INDUSTRIES solo existía un PNG de 1774 x 887 px, sin vector. Todo lo
+demás sale de ahí, en dos pasos encadenados:
+
+```powershell
+python herramientas/vectorizar-logo.py    # PNG -> assets/marca/stick-industries.svg
+python herramientas/preparar-marca.py     # SVG -> isotipo y favicons
+python herramientas/preparar-og.py        # SVG + render -> og.jpg
+```
+
+| Archivo | Qué es | Dónde se usa |
+|---|---|---|
+| `stick-industries.svg` | logotipo completo, 10 KB, tres partes con `id` | entrada del sitio |
+| `isotipo.svg` | la flecha sola, en `currentColor` | barra |
+| `isotipo-claro.svg` | la misma con el color escrito | escudo del trayecto |
+| `favicon.svg` + `favicon-32/180/512.png` | isotipo sobre tarjeta grafito | pestaña, iOS, PWA |
+| `og.jpg` | render + logo + firma, 1200x630 | enlace compartido |
+| `v3s.png` | el cubo de VISUAL 3D STUDIO | escudo de ese hito |
+
+El SVG del logotipo va **incrustado en el HTML**, no como `<img>`: la entrada
+anima la flecha, STICK e INDUSTRIES por separado, y desde un `<img>` el
+interior del SVG es inalcanzable para el CSS. Si el logo cambia, se re-ejecuta
+`vectorizar-logo.py` y se vuelve a pegar el `d=` de cada parte en `index.html`.
 
 ### Recorrido
 
@@ -83,8 +124,31 @@ técnico, un solo CTA por bloque, bordes con opacidad y radios.
 
 ## Decisiones tomadas
 
+- **Manda STICK INDUSTRIES, firma Kevin Gil.** La barra y la entrada llevan
+  el logo; el nombre propio vive en la portada, en el pie y en Sobre mí.
+  Decidido por Kevin el 2026-09-10, cerrando el pendiente que arrastraba
+  la v13.
+- **VISUAL 3D STUDIO solo en el trayecto.** Cerró el 2026-08-29: presentarlo
+  en portada o en contacto sería falso. Como hito de trayectoria es cierto y
+  suma, así que ahí se queda, y al lado va el hito de STICK INDUSTRIES.
+- **El logo se vectorizó, no se reescribió con una fuente.** Buscar una
+  tipografía parecida habría dado un logo *casi* igual, que es peor que uno
+  igual: se traza el original con marching squares y queda exacto.
+- **Los contadores de la D y la R obligan a un solo `path`.** Un contorno
+  encerrado en otro solo se lee como agujero si comparten `path` y hay
+  `fill-rule="evenodd"` declarado EN el path, no heredado del `<svg>`.
+- **El logo NO se traza sobre la imagen ampliada.** Ampliar con Lanczos antes
+  de buscar contornos parecía más preciso y era lo contrario: los trazos
+  finísimos de INDUSTRIES se difuminaban y cerraban esos mismos contadores.
+- **La entrada anima el SVG, no reproduce un video.** Un sting renderizado
+  obligaría a descargar megabytes antes del primer cuadro, en el momento más
+  sensible de la carga; el SVG pesa 10 KB, es nítido a cualquier tamaño y
+  `prefers-reduced-motion` lo apaga sin más.
+- **El favicon es la flecha con la cola CORTADA**, no la flecha entera
+  reducida —que a 32 px es un pelo horizontal— ni recortada contra el borde
+  del cuadro, que se lee como un accidente de encuadre.
 - **Un solo archivo HTML.** El sitio no tiene estado ni datos dinámicos.
-- **El catálogo espeja la carpeta** `02. WORK\03. PROYECTOS PERSONALES\
+- **El catálogo espeja la carpeta** `02. WORK\03. STICK INDUSTRIES\99. RECURSOS MARCA\
   PROYECTOS PORTAFOLIO`: los cuatro de `PRINCIPALES` abren la vitrina y los
   de `SECUNDARIOS` completan el índice.
 - **La portada de cada proyecto es su render de FACHADA**, sin excepción
@@ -220,7 +284,7 @@ En orden de impacto:
 ## Cómo verlo
 
 ```powershell
-cd C:\Users\kevin\Downloads\PORTAFOLIO
+cd "C:\Users\kevin\Documents\KEVIN\02. WORK\03. STICK INDUSTRIES\99. RECURSOS MARCA\PORTAFOLIO"
 python -m http.server 8899
 ```
 
