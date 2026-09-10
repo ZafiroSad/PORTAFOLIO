@@ -21,6 +21,9 @@ Lo que trae la v17 sobre la v16.4:
   del sitio entero, sino esa casa.
 - **Botón Compartir** en la ficha de cada proyecto.
 - **Hoja de vida en PDF**, una hoja, generada desde los datos del propio sitio.
+- **Cifras del archivo** en Sobre mí, contadas del catálogo, no escritas a mano.
+- **`sitemap.xml`, `robots.txt` y datos estructurados** (`schema.org`): antes un
+  buscador solo veía la portada y no sabía de quién era el sitio.
 - Corregido un fallo que dejaba la capa de bienvenida **tragándose todos los
   clics** si su animación no llegaba a correr.
 - El **logo de STICK INDUSTRIES vectorizado** desde su único PNG de origen,
@@ -143,7 +146,7 @@ Tres cosas del sitio no se escriben a mano: se derivan de lo que ya está en
 `index.html`. Si cambia el catálogo o el trayecto, se vuelven a correr.
 
 ```powershell
-node herramientas/preparar-enlaces.mjs   # catálogo -> p/<slug>/ + su og.jpg
+node herramientas/preparar-enlaces.mjs   # catálogo -> p/<slug>/, og.jpg, sitemap.xml, robots.txt
 node herramientas/preparar-cv.mjs        # trayecto + catálogo -> hoja de vida en PDF
 python herramientas/preparar-og.py       # render + logo -> assets/marca/og.jpg
 ```
@@ -161,6 +164,10 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
 
 ## Decisiones tomadas
 
+- **Las cifras se cuentan, no se escriben.** `10 proyectos · 97 imágenes ·
+  6 recorridos · 8 ubicaciones` sale del catálogo en cada carga. Una cifra
+  escrita a mano se queda vieja el día que entra un proyecto, y en un
+  portafolio una cifra vieja es peor que ninguna.
 - **La capa de bienvenida NUNCA recibe el puntero.** Cubre la ventana entera
   con `z-index:400`, y si su animación no llega a correr se queda tragándose
   todos los clics del sitio. Pasa de verdad: Chrome congela las animaciones de

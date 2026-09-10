@@ -20,6 +20,64 @@
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 
+<!-- Datos estructurados. Sin esto un buscador ve un sitio de imagenes y no
+     sabe de quien es, que hace ni donde: el `sameAs` es lo que le permite unir
+     esta pagina con los perfiles, y `knowsAbout` lo que la conecta con las
+     busquedas del oficio. El mapa de las paginas de proyecto va en
+     sitemap.xml, que genera herramientas/preparar-enlaces.mjs. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://zafirosad.github.io/PORTAFOLIO/#kevin",
+      "name": "Kevin Gil",
+      "alternateName": "Kevin Stick Gil Arévalo",
+      "jobTitle": "Ingeniero civil y visualizador arquitectónico",
+      "url": "https://zafirosad.github.io/PORTAFOLIO/",
+      "image": "https://zafirosad.github.io/PORTAFOLIO/assets/marca/og.jpg",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Bucaramanga",
+        "addressRegion": "Santander",
+        "addressCountry": "CO"
+      },
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "Universidad Pontificia Bolivariana, seccional Bucaramanga"
+      },
+      "knowsAbout": [
+        "Visualización arquitectónica",
+        "Modelado BIM",
+        "Ingeniería civil",
+        "Autodesk Revit",
+        "Renderizado 3D",
+        "Planos técnicos"
+      ],
+      "sameAs": ["https://www.instagram.com/kevingilarevalo"],
+      "worksFor": { "@id": "https://zafirosad.github.io/PORTAFOLIO/#stick" }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://zafirosad.github.io/PORTAFOLIO/#stick",
+      "name": "STICK INDUSTRIES",
+      "url": "https://zafirosad.github.io/PORTAFOLIO/",
+      "logo": "https://zafirosad.github.io/PORTAFOLIO/assets/marca/favicon-512.png",
+      "founder": { "@id": "https://zafirosad.github.io/PORTAFOLIO/#kevin" },
+      "areaServed": "Santander, Colombia"
+    },
+    {
+      "@type": "WebSite",
+      "url": "https://zafirosad.github.io/PORTAFOLIO/",
+      "name": "STICK INDUSTRIES · Kevin Gil",
+      "inLanguage": "es-CO",
+      "about": { "@id": "https://zafirosad.github.io/PORTAFOLIO/#kevin" }
+    }
+  ]
+}
+</script>
+
 <style>
 /* =================================================================
    PORTAFOLIO — Kevin Gil
@@ -600,6 +658,15 @@ body.bloqueado .masa { animation-play-state:paused; }
 .hoja-vida { display:flex; justify-content:center; padding:clamp(1.6rem,4vh,2.6rem) 0 0; }
 .hoja-vida .disco svg { transition:stroke .4s; }
 .hoja-vida a:hover .disco { transform:translateY(2px) rotate(0deg); }
+/* ============ Cifras =========================================== */
+.cifras { display:flex; flex-wrap:wrap; gap:clamp(1.6rem,5vw,3.4rem);
+  padding:clamp(1.4rem,3.4vh,2.4rem) 0 0; margin-top:clamp(1rem,2.6vh,1.8rem);
+  border-top:1px solid var(--linea); }
+.cifras .cifra { display:flex; flex-direction:column; gap:.3rem; }
+.cifras b { font-size:clamp(1.7rem,3.4vw,2.5rem); font-weight:800; line-height:1;
+  letter-spacing:-.02em; }
+.cifras span { font-family:var(--mono); font-size:.58rem; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--debil); }
 .ver-todos { display:flex; justify-content:center; padding:clamp(1.4rem,3.5vh,2.4rem) var(--margen) 0; }
 .btn-todos {
   position:relative; overflow:hidden;
@@ -1426,6 +1493,10 @@ body.bloqueado .masa { animation-play-state:paused; }
         </div>
       </div>
 
+      <!-- Las cifras NO se escriben a mano: se cuentan del catalogo. Una cifra
+           escrita a mano se queda vieja el dia que entra un proyecto. -->
+      <div class="cifras asoma" id="cifras"></div>
+
       <div class="flujo" id="flujo"></div>
     </div>
 
@@ -1845,6 +1916,18 @@ capaIndice.addEventListener('click', e => {
    SOBRE MI — rueda del trayecto
    ================================================================= */
 const rueda = document.getElementById('rueda');
+/* Se cuentan del catalogo cada vez que carga la pagina, asi que una cifra
+   no puede quedarse vieja: si entra un proyecto, sube sola. */
+document.getElementById('cifras').innerHTML = [
+  ['Proyectos', TODOS.length],
+  ['Imágenes', TODOS.reduce((n, p) => n + p.piezas.length + (p.extra ? p.extra.length : 0), 0)],
+  ['Recorridos', TODOS.filter(p => p.video).length],
+  // "Ubicaciones", no "municipios": son coordenadas distintas, y varias
+  // caen en el mismo municipio.
+  ['Ubicaciones', new Set(TODOS.map(p => p.coord.join())).size],
+].map(([rotulo, n]) => `
+  <div class="cifra"><b>${n}</b><span>${rotulo}</span></div>`).join('');
+
 rueda.innerHTML = HITOS.map(h => `
   <div class="hito">
     <div class="escudo">${h.escudo ? `<img src="${h.escudo}" alt="">` : h.sigla}</div>

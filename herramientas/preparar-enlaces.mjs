@@ -121,8 +121,40 @@ function main() {
     ], {stdio: 'inherit'});
   }
 
-  console.log(`\n${proyectos.length} paginas de compartir en p/`);
+  mapaDelSitio(proyectos);
+
+  console.log(`\n${proyectos.length} paginas en p/, mas sitemap.xml y robots.txt`);
   console.log(proyectos.map((p) => `  ${SITIO}/p/${p.slug}/`).join('\n'));
+}
+
+/**
+ * Mapa del sitio y robots.txt.
+ *
+ * Sin esto un buscador solo conoce la portada: las paginas de proyecto no
+ * estan enlazadas desde ninguna parte —el sitio los abre con JavaScript— y por
+ * tanto no existen para el. Con el mapa, cada proyecto es una pagina indexable
+ * con su propio titulo y su propia imagen.
+ */
+function mapaDelSitio(proyectos) {
+  const urls = [`${SITIO}/`, ...proyectos.map((p) => `${SITIO}/p/${p.slug}/`)];
+  const entradas = urls.map((u, i) => [
+    '  <url>',
+    `    <loc>${u}</loc>`,
+    '    <changefreq>monthly</changefreq>',
+    `    <priority>${i === 0 ? '1.0' : '0.8'}</priority>`,
+    '  </url>',
+  ].join('\n')).join('\n');
+
+  writeFileSync(resolve(RAIZ, 'sitemap.xml'), [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    entradas,
+    '</urlset>',
+    '',
+  ].join('\n'), 'utf8');
+
+  writeFileSync(resolve(RAIZ, 'robots.txt'),
+    ['User-agent: *', 'Allow: /', '', `Sitemap: ${SITIO}/sitemap.xml`, ''].join('\n'), 'utf8');
 }
 
 main();
