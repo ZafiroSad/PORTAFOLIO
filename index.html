@@ -639,6 +639,14 @@ body.bloqueado .masa { animation-play-state:paused; }
   width:min(94vw, 1500px); max-height:84vh; border-radius:14px;
   background:#000; box-shadow:0 40px 120px -40px rgba(0,0,0,1);
 }
+.reel-mudo {
+  position:absolute; left:50%; bottom:1.6rem; transform:translateX(-50%);
+  display:none; font-size:.58rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--tenue); background:rgba(255,255,255,.07); border:1px solid var(--v-borde);
+  padding:.5rem 1rem; border-radius:999px; text-align:center; max-width:calc(100% - 2rem);
+}
+.reel-capa.sin-sonido .reel-mudo { display:block; }
+
 .reel-cerrar {
   position:absolute; top:1.2rem; right:1.4rem; z-index:2;
   width:44px; height:44px; border-radius:50%;
@@ -1451,7 +1459,7 @@ body.bloqueado .masa { animation-play-state:paused; }
           </svg>
         </span>
         <span class="reel-pie">
-          <span class="mono">40 s · 1080p · Sin audio</span>
+          <span class="mono">40 s · 1080p · Con sonido</span>
           <span class="mono reel-descarga-aviso">Toque para reproducir</span>
         </span>
       </button>
@@ -1577,6 +1585,7 @@ body.bloqueado .masa { animation-play-state:paused; }
 
 <div class="reel-capa" id="reel-capa" role="dialog" aria-modal="true" aria-label="Reel">
   <button class="reel-cerrar" id="reel-cerrar" aria-label="Cerrar">&times;</button>
+  <p class="reel-mudo mono">El navegador bloqueó el sonido · actívelo en el control de volumen</p>
 </div>
 
 <script>
@@ -2549,21 +2558,32 @@ function abrirReel() {
   reelVideo.src = 'assets/video/reel.mp4';
   reelVideo.poster = 'assets/video/reel-poster.webp';
   reelVideo.controls = true;
-  reelVideo.autoplay = true;
   reelVideo.playsInline = true;
-  /* Sin audio en el archivo, pero muteado explicitamente: es lo unico
-     que garantiza que el autoplay no lo bloquee el navegador. */
-  reelVideo.muted = true;
   reelCapa.appendChild(reelVideo);
 
   reelCapa.classList.add('abierta');
   document.body.style.overflow = 'hidden';
   requestAnimationFrame(() => reelCapa.classList.add('visible'));
+
+  /* CON SONIDO SI SE PUEDE, MUDO SI NO.
+     El reel lleva musica, asi que arrancar muteado —que era lo correcto
+     cuando no la tenia— seria esconder la mitad de la pieza. Y se puede
+     intentar: quien llega aqui acaba de pulsar el cartel, y ese gesto es
+     justo lo que los navegadores exigen para dejar sonar un video solo.
+     Aun asi el permiso no esta garantizado (hay ajustes que lo bloquean),
+     de modo que si `play()` es rechazado se reintenta en silencio y se
+     avisa de que el sonido esta ahi, a un clic del control de volumen. */
+  reelVideo.play().catch(() => {
+    if (!reelVideo) return;
+    reelVideo.muted = true;
+    reelVideo.play().catch(() => {});
+    reelCapa.classList.add('sin-sonido');
+  });
 }
 
 function cerrarReel() {
   if (!reelVideo) return;
-  reelCapa.classList.remove('visible');
+  reelCapa.classList.remove('visible', 'sin-sonido');
   const v = reelVideo;
   reelVideo = null;
   v.pause();

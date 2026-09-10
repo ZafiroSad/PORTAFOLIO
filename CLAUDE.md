@@ -15,7 +15,8 @@ Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 Lo que trae la v17 sobre la v16.4:
 
 - **El reel**, sección propia entre Proyectos y Sobre mí: 40 s con los cinco
-  proyectos principales, apertura y cierre de marca.
+  proyectos principales, apertura y cierre de marca, **y música** compuesta
+  sobre el propio corte.
 - **Una página de compartir por proyecto** (`p/<slug>/`), con su propio título
   e imagen: pegar el enlace de un proyecto en WhatsApp ya no muestra la tarjeta
   del sitio entero, sino esa casa.
@@ -114,8 +115,9 @@ Todo se recorre desplazando. El menú salta con un desplazamiento animado.
 2. **Proyectos** — cuatro hojas verticales a sangre, de borde a borde de la
    ventana. Botón *Ver todos los proyectos* → índice con filtros por grupo.
 3. **El reel** — un cartel a lo ancho con el fotograma más vendedor; al
-   pulsarlo, el video se abre en una capa. El `<video>` **no existe** hasta ese
-   momento: lo crea el JS y lo destruye al cerrar.
+   pulsarlo, el video se abre en una capa **y arranca con sonido**. El
+   `<video>` **no existe** hasta ese momento: lo crea el JS y lo destruye al
+   cerrar.
 4. **Sobre mí** — biografía; el trayecto como **rueda** —el hito del centro
    va entero, con luz propia, y los vecinos se reducen según su distancia—;
    y abajo las herramientas **por etapa**: Modelo, Representación, Apoyo.
@@ -193,6 +195,13 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
   video propio en `01. PROYECTOS` → `06. VIDEO - REEL STICK INDUSTRIES`,
   con su bitácora; aquí solo entra el MP4 comprimido. El sitio no es el sitio
   donde se edita video.
+- **El reel arranca CON sonido, y cae a mudo solo si el navegador lo
+  bloquea.** Arrancar muteado era lo correcto cuando el reel no llevaba
+  música; ahora sería esconder la mitad de la pieza. Y se puede intentar:
+  quien llega a la capa acaba de pulsar el cartel, y ese gesto es justo lo que
+  los navegadores exigen para dejar sonar un video solo. Si aun así `play()`
+  es rechazado, se reintenta en silencio y un aviso dice dónde está el
+  control de volumen. Verificado: con un clic real, `muted` es `false`.
 - **El `<video>` del reel se CREA al abrirlo y se DESTRUYE al cerrarlo.**
   Dejarlo en el HTML —aunque sea con `preload="none"`— basta para que algunos
   navegadores pidan los primeros bytes al montar la página, y son 12,6 MB que
