@@ -514,6 +514,81 @@ body.bloqueado .masa { animation-play-state:paused; }
   background:rgba(255,255,255,.09); backdrop-filter:blur(12px); }
 
 /* ============ Boton de indice — pildora liquida =============== */
+/* ============ Reel ============================================
+   El cartel es un boton, no un <video> con `poster`: asi el navegador
+   no reserva decodificador ni empieza a negociar el archivo, y los 15 MB
+   del reel no se tocan hasta que alguien lo pide. El <video> se crea por
+   JS al abrir la capa. */
+.reel-marco { padding:clamp(1rem,3vh,2rem) 0 0; display:flex; justify-content:center; }
+.reel-cartel {
+  position:relative; display:block; width:min(100%, 1180px);
+  aspect-ratio:16/9; border-radius:20px; overflow:hidden;
+  border:1px solid var(--linea); background:var(--base-2);
+  cursor:pointer; padding:0;
+  box-shadow:var(--v-sombra);
+  transition:transform .6s var(--salida), box-shadow .6s var(--suave);
+}
+.reel-cartel:hover { transform:translateY(-4px); box-shadow:0 34px 80px -30px rgba(0,0,0,.9); }
+.reel-cartel img { width:100%; height:100%; object-fit:cover; display:block;
+  transition:transform 1.1s var(--salida), filter .6s var(--suave); }
+.reel-cartel:hover img { transform:scale(1.028); }
+.reel-velo { position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(0,0,0,.62) 0%, rgba(0,0,0,.12) 42%, rgba(0,0,0,.28) 100%); }
+
+/* El disco de reproducir late muy despacio: es lo unico de la pagina que
+   pide una accion, y sin ese pulso pasa por adorno. */
+.reel-boton {
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:76px; height:76px; border-radius:50%;
+  display:grid; place-items:center; color:var(--base);
+  background:var(--tinta); padding-left:4px;
+  box-shadow:0 0 0 0 rgba(255,255,255,.35);
+  transition:transform .5s var(--salida), background .4s;
+  animation:latirReel 3.6s var(--suave) infinite;
+}
+@keyframes latirReel {
+  0%,100% { box-shadow:0 0 0 0 rgba(255,255,255,.34) }
+  60%     { box-shadow:0 0 0 22px rgba(255,255,255,0) } }
+.reel-cartel:hover .reel-boton { transform:translate(-50%,-50%) scale(1.07); }
+
+.reel-pie {
+  position:absolute; left:0; right:0; bottom:0;
+  display:flex; justify-content:space-between; align-items:baseline;
+  gap:1rem; padding:1.05rem 1.35rem;
+  font-size:.6rem; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--tenue);
+}
+.reel-descarga-aviso { color:var(--debil); }
+
+/* La capa del reproductor, hermana del lienzo como las demas modales. */
+.reel-capa {
+  position:fixed; inset:0; z-index:310; display:none;
+  place-items:center; background:rgba(8,9,12,.94);
+  backdrop-filter:blur(10px);
+  opacity:0; transition:opacity .5s var(--suave);
+}
+.reel-capa.abierta { display:grid; }
+.reel-capa.visible { opacity:1; }
+.reel-capa video {
+  width:min(94vw, 1500px); max-height:84vh; border-radius:14px;
+  background:#000; box-shadow:0 40px 120px -40px rgba(0,0,0,1);
+}
+.reel-cerrar {
+  position:absolute; top:1.2rem; right:1.4rem; z-index:2;
+  width:44px; height:44px; border-radius:50%;
+  display:grid; place-items:center; cursor:pointer;
+  color:var(--tinta); font-size:1.5rem; line-height:1;
+  background:rgba(255,255,255,.08); border:1px solid var(--v-borde);
+  transition:background .35s, transform .45s var(--salida);
+}
+.reel-cerrar:hover { background:rgba(255,255,255,.16); transform:rotate(90deg); }
+
+@media (max-width:700px){
+  .reel-boton { width:60px; height:60px; }
+  .reel-pie { padding:.8rem .95rem; font-size:.52rem; letter-spacing:.14em; }
+  .reel-pie .reel-descarga-aviso { display:none; }
+}
+
 .ver-todos { display:flex; justify-content:center; padding:clamp(1.4rem,3.5vh,2.4rem) var(--margen) 0; }
 .btn-todos {
   position:relative; overflow:hidden;
@@ -1136,10 +1211,13 @@ body.bloqueado .masa { animation-play-state:paused; }
   .visor-cerrar { top:.7rem; right:.7rem; }
 }
 
-/* Pantallas muy estrechas: el menú pierde la marca antes que partirse */
+/* Pantallas muy estrechas: el rótulo se va, el isotipo se queda.
+   Antes desaparecía la marca entera y el sitio se quedaba sin firma fija
+   en el teléfono; la flecha sola cabe de sobra y basta para reconocerla. */
 @media (max-width:400px){
-  .barra { justify-content:center; padding:0 .4rem; }
-  .marca { display:none; }
+  .barra { padding:0 .4rem 0 .7rem; }
+  .marca span.rotulo { display:none; }
+  .marca { gap:0; }
   /* Solo se ajusta el ancho: el alto tocable se hereda del bloque de
      arriba. Rebajarlo aqui era lo que dejaba los enlaces en 32 px. */
   .menu a { font-size:.54rem; padding-left:.6rem; padding-right:.6rem; }
@@ -1185,6 +1263,7 @@ body.bloqueado .masa { animation-play-state:paused; }
     <span class="gota" id="gota"></span>
     <a href="#inicio" data-reiniciar>Inicio</a>
     <a href="#proyectos">Proyectos</a>
+    <a href="#reel">Reel</a>
     <a href="#sobre">Sobre mí</a>
     <a href="#contacto">Contacto</a>
   </nav>
@@ -1256,6 +1335,36 @@ body.bloqueado .masa { animation-play-state:paused; }
         <span class="cuenta" id="cuenta-todos"></span>
         <span class="disco"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== REEL =====================
+     El video pesa 15 MB, asi que NO se carga con la pagina: lo que se ve es
+     el cartel, y el <video> no existe en el DOM hasta que alguien lo pide. -->
+<section class="seccion seccion-reel" id="reel">
+  <div class="seccion-cuerpo acolchado">
+    <div class="cabeza">
+      <div>
+        <div class="etiqueta revelar"><span>En movimiento</span></div>
+        <h2 class="palabras" data-texto="El reel."></h2>
+      </div>
+    </div>
+
+    <div class="reel-marco asoma">
+      <button class="reel-cartel" id="reel-abrir" aria-label="Reproducir el reel — 40 segundos">
+        <img src="assets/video/reel-poster.webp" alt="" loading="lazy" decoding="async">
+        <span class="reel-velo"></span>
+        <span class="reel-boton">
+          <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+            <path d="M8 5.5v13l11-6.5z" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="reel-pie">
+          <span class="mono">40 s · 1080p · Sin audio</span>
+          <span class="mono reel-descarga-aviso">Toque para reproducir</span>
+        </span>
       </button>
     </div>
   </div>
@@ -1349,6 +1458,10 @@ body.bloqueado .masa { animation-play-state:paused; }
   <div class="visor-escena" id="visor-escena"></div>
   <button class="visor-nav sig" id="visor-sig" aria-label="Siguiente">&#8250;</button>
   <div class="visor-pie mono" id="visor-pie"></div>
+</div>
+
+<div class="reel-capa" id="reel-capa" role="dialog" aria-modal="true" aria-label="Reel">
+  <button class="reel-cerrar" id="reel-cerrar" aria-label="Cerrar">&times;</button>
 </div>
 
 <script>
@@ -2175,10 +2288,56 @@ document.addEventListener('keydown', e => {
     return;
   }
   if (e.key === 'Escape') {
+    if (reelVideo) { cerrarReel(); return; }
     if (ficha.classList.contains('abierta')) { cerrarFicha(); return; }
     if (capaIndice.classList.contains('abierta')) cerrarIndice();
   }
 });
+
+/* =================================================================
+   REEL
+   El <video> se CREA al abrir y se DESTRUYE al cerrar. Dejarlo en el
+   HTML —aunque sea con preload="none"— basta para que algunos
+   navegadores pidan los primeros bytes del archivo al montar la
+   pagina, y son 15 MB que nadie ha pedido todavia.
+   ================================================================= */
+const reelCapa = document.getElementById('reel-capa');
+let reelVideo = null;
+
+function abrirReel() {
+  if (reelVideo) return;
+  reelVideo = document.createElement('video');
+  reelVideo.src = 'assets/video/reel.mp4';
+  reelVideo.poster = 'assets/video/reel-poster.webp';
+  reelVideo.controls = true;
+  reelVideo.autoplay = true;
+  reelVideo.playsInline = true;
+  /* Sin audio en el archivo, pero muteado explicitamente: es lo unico
+     que garantiza que el autoplay no lo bloquee el navegador. */
+  reelVideo.muted = true;
+  reelCapa.appendChild(reelVideo);
+
+  reelCapa.classList.add('abierta');
+  document.body.style.overflow = 'hidden';
+  requestAnimationFrame(() => reelCapa.classList.add('visible'));
+}
+
+function cerrarReel() {
+  if (!reelVideo) return;
+  reelCapa.classList.remove('visible');
+  const v = reelVideo;
+  reelVideo = null;
+  v.pause();
+  setTimeout(() => {
+    v.remove();
+    reelCapa.classList.remove('abierta');
+    document.body.style.overflow = '';
+  }, 480);
+}
+
+document.getElementById('reel-abrir').addEventListener('click', abrirReel);
+document.getElementById('reel-cerrar').addEventListener('click', cerrarReel);
+reelCapa.addEventListener('click', e => { if (e.target === reelCapa) cerrarReel(); });
 
 let tactilX = null;
 visor.addEventListener('touchstart', e => { tactilX = e.changedTouches[0].clientX; }, { passive:true });
@@ -2197,7 +2356,7 @@ const barra     = document.getElementById('barra');
 const menu      = document.getElementById('menu');
 const gota      = document.getElementById('gota');
 const campo     = document.querySelector('.campo');
-const secciones = [...document.querySelectorAll('#proyectos, #sobre, #contacto')];
+const secciones = [...document.querySelectorAll('#proyectos, #reel, #sobre, #contacto')];
 const enlacesMenu = [...document.querySelectorAll('.menu a')];
 const laminaImg = document.getElementById('render-inicio');
 

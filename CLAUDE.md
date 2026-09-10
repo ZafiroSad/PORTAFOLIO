@@ -14,6 +14,8 @@ https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 
 Lo que trae la v17 sobre la v16.4:
 
+- **El reel**, sección propia entre Proyectos y Sobre mí: 40 s con los cinco
+  proyectos principales, apertura y cierre de marca.
 - El **logo de STICK INDUSTRIES vectorizado** desde su único PNG de origen,
   y usado como marca del sitio: barra, entrada, favicon e imagen de compartir.
 - La **entrada dibuja el logo** en vez de escribir la palabra con la
@@ -45,12 +47,12 @@ PORTAFOLIO/
 ├── propuestas/                  variantes que se compararon y se descartaron
 ├── fuentes/                     material pesado de origen (fuera del repo)
 │   └── logos-originales/        los 11 PNG de partida de los logos
-├── compartir/                   tarjeta .vcf y QR del sitio
+├── compartir/                   tarjeta .vcf, QR y el reel vertical
 ├── assets/
 │   ├── marca/                   logo, isotipo, favicons e imagen de compartir
 │   ├── logos/                   logos de software y escudos de formación
 │   ├── renders/                 imágenes en 1600 y 2560 px
-│   ├── video/                   6 recorridos (1280x720) + fotogramas de portada
+│   ├── video/                   6 recorridos, el reel y sus fotogramas de portada
 │   ├── datos/tierra.json        silueta de continentes para el globo (13 KB)
 │   └── paletas.json             color dominante por proyecto
 └── herramientas/
@@ -98,11 +100,14 @@ Todo se recorre desplazando. El menú salta con un desplazamiento animado.
    con el mismo desplazamiento animado que el resto del menú.
 2. **Proyectos** — cuatro hojas verticales a sangre, de borde a borde de la
    ventana. Botón *Ver todos los proyectos* → índice con filtros por grupo.
-3. **Sobre mí** — biografía; el trayecto como **rueda** —el hito del centro
+3. **El reel** — un cartel a lo ancho con el fotograma más vendedor; al
+   pulsarlo, el video se abre en una capa. El `<video>` **no existe** hasta ese
+   momento: lo crea el JS y lo destruye al cerrar.
+4. **Sobre mí** — biografía; el trayecto como **rueda** —el hito del centro
    va entero, con luz propia, y los vecinos se reducen según su distancia—;
    y abajo las herramientas **por etapa**: Modelo, Representación, Apoyo.
-4. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail y los dos
-   Instagram. Sin texto de venta.
+5. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail, Instagram y la
+   tarjeta `.vcf`. Sin texto de venta.
 
 ### Lenguaje visual
 
@@ -124,6 +129,21 @@ técnico, un solo CTA por bloque, bordes con opacidad y radios.
 
 ## Decisiones tomadas
 
+- **El reel se monta aparte, no en este repositorio.** Vive como proyecto de
+  video propio en `01. PROYECTOS` → `06. VIDEO - REEL STICK INDUSTRIES`,
+  con su bitácora; aquí solo entra el MP4 comprimido. El sitio no es el sitio
+  donde se edita video.
+- **El `<video>` del reel se CREA al abrirlo y se DESTRUYE al cerrarlo.**
+  Dejarlo en el HTML —aunque sea con `preload="none"`— basta para que algunos
+  navegadores pidan los primeros bytes al montar la página, y son 12,6 MB que
+  nadie ha pedido. Medido: con el cartel, la página está lista con **0,59 MB y
+  ningún MP4 solicitado**.
+- **El cartel del reel es un `<button>` con una imagen, no un `<video
+  poster=…>`.** Un `<video>`, aunque no reproduzca, reserva decodificador y
+  negocia el archivo.
+- **En pantallas de menos de 400 px el rótulo de la barra se va, el isotipo se
+  queda.** Antes desaparecía la marca entera y el teléfono se quedaba sin firma
+  fija; la flecha sola cabe de sobra.
 - **Manda STICK INDUSTRIES, firma Kevin Gil.** La barra y la entrada llevan
   el logo; el nombre propio vive en la portada, en el pie y en Sobre mí.
   Decidido por Kevin el 2026-09-10, cerrando el pendiente que arrastraba
@@ -246,9 +266,11 @@ técnico, un solo CTA por bloque, bordes con opacidad y radios.
 
 ## Medido
 
-**1,1 MB hasta que la página está lista** (medido con Chrome real, no
-estimado). Bajó desde 2,26 MB al poner `content-visibility:auto` en las
-secciones: las imágenes de lo que no se ve todavía ya no se descargan.
+**0,59 MB y 8 peticiones hasta que la página está lista** (Chrome real,
+2026-09-10, con el reel ya publicado). **Ningún MP4 se solicita**: los 12,6 MB
+del reel solo se descargan si alguien pulsa el cartel.
+
+Antes fueron 1,1 MB, y antes de eso 2,26 MB.
 
 Después de `load` llegan los 3,8 MB de la secuencia de Proceso, en segunda
 fila y sin bloquear nada.
@@ -287,5 +309,10 @@ En orden de impacto:
 cd "C:\Users\kevin\Documents\KEVIN\02. WORK\03. STICK INDUSTRIES\99. RECURSOS MARCA\PORTAFOLIO"
 python -m http.server 8899
 ```
+
+**Ojo con el vídeo.** `python -m http.server` no soporta *Range requests*, y
+sin eso NINGÚN `<video>` reproduce en local — ni el reel ni los recorridos de
+las fichas. No es un fallo del sitio: en GitHub Pages funcionan. Para probarlos
+en local hace falta un servidor que responda 206.
 
 Desde el teléfono, con el PC en la misma red Wi-Fi: `http://192.168.0.103:8899`
