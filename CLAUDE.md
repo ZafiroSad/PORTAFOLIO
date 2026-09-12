@@ -8,20 +8,25 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v17.5 — fuera la marca ajena, y el contacto deja de estar en claro.**
+**v18.1 — logo nuevo, textos sin relleno, herramientas y el reel con ritmo.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
 
-Lo que trae la v17 sobre la v16.4:
+Lo que trae la v18 sobre la v16.4:
 
 - **Los seis recorridos salen de las fichas.** Todos llevaban quemada la
   marca de BELVAL o la de VISUAL 3D STUDIO, y los de La Punta iban rotulados
   con nombres propios de los clientes.
 - **El teléfono y el correo dejan de estar en claro** en el HTML, y la tarjeta
   `.vcf` se arma en el navegador en vez de vivir como archivo en el repo.
-- **El reel**, sección propia entre Proyectos y Sobre mí: 40 s con los cinco
-  proyectos principales, apertura y cierre de marca, **y música** compuesta
-  sobre el propio corte.
+- **El reel**, sección propia entre Proyectos y Sobre mí: **45 s** con los
+  cinco proyectos, cada uno abierto por su cartela y con una cifra
+  sobreimpresa, y doce imágenes armándose en mosaico antes del cierre. Con
+  música compuesta sobre el propio corte.
+- **Herramientas**, sección nueva: las tres apps de la suite que resuelven
+  obra, con capturas reales de cada una corriendo.
+- **Logo actualizado** en todo: barra, entrada, favicon, imagen de compartir,
+  hoja de vida y las dos piezas del reel.
 - **Una página de compartir por proyecto** (`p/<slug>/`), con su propio título
   e imagen: pegar el enlace de un proyecto en WhatsApp ya no muestra la tarjeta
   del sitio entero, sino esa casa.
@@ -68,6 +73,7 @@ PORTAFOLIO/
 ├── compartir/                   tarjeta .vcf, QR, hoja de vida y reel vertical
 ├── assets/
 │   ├── marca/                   logo, isotipo, favicons e imagen de compartir
+│   ├── suite/                   capturas de las apps (las toma capturar-suite.mjs)
 │   ├── logos/                   logos de software y escudos de formación
 │   ├── renders/                 imágenes en 1600 y 2560 px
 │   ├── video/                   6 recorridos, el reel y sus fotogramas de portada
@@ -79,6 +85,7 @@ PORTAFOLIO/
     ├── preparar-og.py           compone las imágenes de compartir 1200x630
     ├── preparar-enlaces.mjs     escribe p/<slug>/ desde el catálogo
     ├── preparar-cv.mjs          imprime la hoja de vida en PDF
+    ├── capturar-suite.mjs       capturas reales de las apps, con puppeteer
     ├── optimizar-imagenes.ps1   extrae y convierte los renders del archivo
     ├── optimizar-videos.ps1     comprime los recorridos
     ├── extraer-paletas.ps1      saca el color dominante de cada portada
@@ -87,8 +94,9 @@ PORTAFOLIO/
 
 ### La marca
 
-De STICK INDUSTRIES solo existía un PNG de 1774 x 887 px, sin vector. Todo lo
-demás sale de ahí, en dos pasos encadenados:
+Del logo solo existe un PNG de 1774 x 887 px, sin vector — y ya se ha
+actualizado una vez, así que esto se vuelve a correr cuando llegue otro. Todo
+lo demás sale de ahí, en tres pasos encadenados:
 
 ```powershell
 python herramientas/vectorizar-logo.py    # PNG -> assets/marca/stick-industries.svg
@@ -98,7 +106,7 @@ python herramientas/preparar-og.py        # SVG + render -> og.jpg
 
 | Archivo | Qué es | Dónde se usa |
 |---|---|---|
-| `stick-industries.svg` | logotipo completo, 10 KB, tres partes con `id` | entrada del sitio |
+| `stick-industries.svg` | logotipo completo, 9 KB, tres partes con `id` | entrada del sitio |
 | `isotipo.svg` | la flecha sola, en `currentColor` | barra |
 | `isotipo-claro.svg` | la misma con el color escrito | escudo del trayecto |
 | `favicon.svg` + `favicon-32/180/512.png` | isotipo sobre tarjeta grafito | pestaña, iOS, PWA |
@@ -108,7 +116,12 @@ python herramientas/preparar-og.py        # SVG + render -> og.jpg
 El SVG del logotipo va **incrustado en el HTML**, no como `<img>`: la entrada
 anima la flecha, STICK e INDUSTRIES por separado, y desde un `<img>` el
 interior del SVG es inalcanzable para el CSS. Si el logo cambia, se re-ejecuta
-`vectorizar-logo.py` y se vuelve a pegar el `d=` de cada parte en `index.html`.
+`vectorizar-logo.py` y se vuelve a pegar el `d=` de cada parte —y el `viewBox`—
+en `index.html`, y lo mismo en las dos piezas del reel.
+
+**El isotipo se corta por una FRACCIÓN del ancho, no por un píxel fijo.** Con
+el corte en píxeles, la actualización del logo lo habría partido por otro
+sitio; con la fracción, sale igual aunque cambien las proporciones.
 
 ### Recorrido
 
@@ -124,10 +137,12 @@ Todo se recorre desplazando. El menú salta con un desplazamiento animado.
    pulsarlo, el video se abre en una capa **y arranca con sonido**. El
    `<video>` **no existe** hasta ese momento: lo crea el JS y lo destruye al
    cerrar.
-4. **Sobre mí** — biografía; el trayecto como **rueda** —el hito del centro
+4. **Herramientas** — las tres apps de la suite que resuelven obra: ATLAS,
+   AROS y QUANTITY, con una captura real de cada una.
+5. **Sobre mí** — biografía; el trayecto como **rueda** —el hito del centro
    va entero, con luz propia, y los vecinos se reducen según su distancia—;
    y abajo las herramientas **por etapa**: Modelo, Representación, Apoyo.
-5. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail, Instagram y la
+6. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail, Instagram y la
    tarjeta `.vcf`. Sin texto de venta.
 
 ### Lenguaje visual
@@ -172,6 +187,18 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
 
 ## Decisiones tomadas
 
+- **Las capturas de las apps son REALES, no maquetas.** Las toma
+  `herramientas/capturar-suite.mjs` con puppeteer sobre el Chrome instalado, y
+  se recortan a la zona que cuenta algo. Una maqueta de una app que existe es
+  una mentira pequeña que no hace falta contar.
+- **Solo entran las tres apps de obra.** ATLAS, AROS y QUANTITY. Las otras
+  cuatro de la suite —finanzas, inversiones, entrenamiento— quedan mencionadas
+  en una línea: en un portafolio de ingeniería civil desenfocan.
+- **El texto de Sobre mí dice lo que pasa, no lo que suena bien.** La versión
+  anterior afirmaba que «los espesores, los apoyos y **la luz** se replantean
+  en obra». La luz no se replantea: era una enumeración bonita y falsa. Una
+  frase de portafolio que un ingeniero puede desmontar en dos segundos cuesta
+  más de lo que aporta.
 - **Un recorrido con marca ajena no entra en el portafolio.** Los seis que
   había llevan quemado en el cuadro el logo de BELVAL o el de VISUAL 3D
   STUDIO —en Ruitoque y en el Lote 23, a pantalla completa— y los de La Punta
