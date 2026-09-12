@@ -25,7 +25,7 @@ import numpy as np
 from PIL import Image
 from skimage import measure
 
-ORIGEN = Path(r"C:\Users\kevin\Documents\KEVIN\02. WORK\03. STICK INDUSTRIES\99. RECURSOS MARCA\STICK INDUSTRIES.png")
+ORIGEN = Path(r"C:\Users\kevin\Documents\KEVIN\02. WORK\03. STICK INDUSTRIES\99. RECURSOS MARCA\LOGO BLANCO.png")
 DESTINO = Path(__file__).resolve().parent.parent / "assets" / "marca" / "stick-industries.svg"
 
 ESCALA = 4           # factor del viewBox (no se remuestrea la imagen)
@@ -34,7 +34,13 @@ UMBRAL = 128         # por debajo de este gris se considera tinta
 
 
 def cargar_mascara() -> np.ndarray:
-    im = Image.open(ORIGEN).convert("L")
+    # El PNG viene en RGBA. Se compone sobre blanco antes de pasar a gris:
+    # convertir de RGBA a "L" directamente descarta el alfa y ensucia el borde
+    # de las letras, que es justo lo que aqui hay que conservar limpio.
+    rgba = Image.open(ORIGEN).convert("RGBA")
+    lienzo = Image.new("RGB", rgba.size, (255, 255, 255))
+    lienzo.paste(rgba, mask=rgba.getchannel("A"))
+    im = lienzo.convert("L")
     a = np.array(im)
     ys, xs = np.nonzero(a < UMBRAL)
     # recorte al area util, con un margen de 2 px para que el contorno cierre

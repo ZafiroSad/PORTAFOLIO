@@ -89,8 +89,12 @@ def texto_espaciado(d: ImageDraw.ImageDraw, xy, texto, fuente, color, tracking):
 
 def portada_del_sitio(salida: Path) -> None:
     base = con_velo(fondo_encajado(RENDERS / "cantabria-23-09@2x.webp"), 70, 235)
+    # El logo se coloca por su ALTO, no por una fraccion fija: al actualizarlo
+    # cambio de relacion 3,23 a 2,53 y con el `y` de antes se montaba sobre la
+    # firma. Asi la separacion se mantiene aunque el logotipo vuelva a cambiar.
     ancho = int(W * 0.52)
-    x, y = int(W * 0.08), int(H * 0.52)
+    alto_logo = ancho * 1412 / 3572
+    x, y = int(W * 0.08), int(H - 78 - 26 - alto_logo)
     base = pegar_con_sombra(base, logo_claro(ancho), x, y)
 
     d = ImageDraw.Draw(base)

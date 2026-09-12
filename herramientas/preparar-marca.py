@@ -24,7 +24,10 @@ import cairosvg
 BASE = Path(__file__).resolve().parent.parent / "assets" / "marca"
 MAESTRO = BASE / "stick-industries.svg"
 
-CORTE_X = 2500          # a la izquierda de aqui la cola de la flecha se corta
+# Donde se corta la cola, en FRACCION del ancho del logo — no en pixeles.
+# Asi el isotipo sigue saliendo igual si el logotipo cambia de proporciones,
+# que es exactamente lo que paso al actualizarlo.
+CORTE_REL = 0.77
 MARGEN = 1.26           # aire alrededor del isotipo dentro del cuadrado
 GRAFITO = "#15161b"     # la base del sitio; el favicon es una tarjeta de ese tono
 CLARO = "#f2f2f2"
@@ -34,9 +37,11 @@ def flecha() -> list[tuple[float, float]]:
     """Puntos del path `logo-flecha` del maestro."""
     # El espacio antes de la d importa: sin el, el patron encaja tambien dentro
     # de id="logo-flecha" y devuelve ese texto como si fuera geometria.
-    d = re.search(r'id="logo-flecha"[^>]*\sd="([^"]+)"',
-                  MAESTRO.read_text(encoding="utf-8")).group(1)
-    return [(float(a), float(b)) for a, b in re.findall(r"(-?[\d.]+) (-?[\d.]+)", d)]
+    texto = MAESTRO.read_text(encoding="utf-8")
+    d = re.search(r'id="logo-flecha"[^>]*\sd="([^"]+)"', texto).group(1)
+    ancho = float(re.search(r'viewBox="0 0 ([\d.]+)', texto).group(1))
+    puntos = [(float(a), float(b)) for a, b in re.findall(r"(-?[\d.]+) (-?[\d.]+)", d)]
+    return puntos, ancho * CORTE_REL
 
 
 def recorta_izquierda(poly, x_corte):
@@ -55,7 +60,8 @@ def recorta_izquierda(poly, x_corte):
 
 
 def main() -> None:
-    p = recorta_izquierda(flecha(), CORTE_X)
+    puntos, corte = flecha()
+    p = recorta_izquierda(puntos, corte)
     xs = [q[0] for q in p]
     ys = [q[1] for q in p]
     lado = max(max(xs) - min(xs), max(ys) - min(ys)) * MARGEN
