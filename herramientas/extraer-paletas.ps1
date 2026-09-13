@@ -27,9 +27,6 @@ $PROYECTOS = @(
     @{ slug = 'cantabria-23';   portada = 7  }
     @{ slug = 'ruitoque';       portada = 1  }
     @{ slug = 'lebrija';        portada = 1  }
-    @{ slug = 'cocina-comedor'; portada = 1  }
-    @{ slug = 'snacks';         portada = 1  }
-    @{ slug = 'estudio-solar';  portada = 1  }
 )
 
 $tmp = Join-Path $env:TEMP 'stick-paleta.rgb'

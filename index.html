@@ -579,129 +579,6 @@ body.bloqueado .masa { animation-play-state:paused; }
   border:1px solid rgba(255,255,255,.42); border-radius:999px; padding:.55rem 1.1rem;
   background:rgba(255,255,255,.09); backdrop-filter:blur(12px); }
 
-/* ============ Boton de indice — pildora liquida =============== */
-/* ===== HERRAMIENTAS =====
-   El protagonista es el LOGO, no una captura de pantalla. Cada app tiene su
-   icono monocromo a 2000px; recortado al contenido y con el fondo vuelto
-   transparente, se puede teñir desde el CSS y pesa 3 KB en vez de 30.
-
-   Dos gradas: las cuatro del oficio con ficha completa, y las tres de fuera
-   en una tira compacta. Mezclarlas haria pensar que una app de gimnasio pesa
-   lo mismo que una de calculo estructural. */
-.suite-entrada {
-  max-width:46ch; color:var(--tenue); font-size:1.02rem; line-height:1.55;
-  padding:0 0 clamp(1.4rem,3.4vh,2.4rem);
-}
-.suite {
-  display:grid; gap:clamp(.9rem,1.8vw,1.4rem);
-  grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
-}
-.herram {
-  position:relative; display:flex; flex-direction:column; overflow:hidden;
-  border-radius:20px; border:1px solid var(--v-borde); background:var(--v-fondo);
-  backdrop-filter:var(--v-blur); box-shadow:var(--v-filo), var(--v-sombra);
-  opacity:0; transform:translateY(22px);
-  transition:opacity .75s var(--salida), transform .85s var(--salida),
-             border-color .5s, box-shadow .6s;
-}
-.suite.visible .herram { opacity:1; transform:none; }
-.suite.visible .herram:nth-child(2) { transition-delay:.08s }
-.suite.visible .herram:nth-child(3) { transition-delay:.16s }
-.suite.visible .herram:nth-child(4) { transition-delay:.24s }
-.herram:hover { border-color:var(--linea-fuerte); box-shadow:var(--v-filo), 0 30px 70px -30px rgba(0,0,0,.9); }
-
-/* El escudo: el campo donde vive el logo. El resplandor detras sale del acento
-   y crece al señalar, que es todo el movimiento que necesita. */
-.herram-escudo {
-  position:relative; aspect-ratio:16/11; display:grid; place-items:center;
-  background:
-    radial-gradient(66% 82% at 50% 46%, rgba(196,178,140,.12) 0%, transparent 70%),
-    linear-gradient(160deg, rgba(255,255,255,.045) 0%, transparent 58%),
-    var(--base);
-  border-bottom:1px solid var(--linea);
-  overflow:hidden;
-}
-.herram-escudo::after {
-  /* Barrido de luz, muy tenue, que cruza al señalar la tarjeta */
-  content:''; position:absolute; inset:0; pointer-events:none;
-  background:linear-gradient(100deg, transparent 38%, rgba(255,255,255,.07) 50%, transparent 62%);
-  transform:translateX(-120%);
-  transition:transform 1.15s var(--salida);
-}
-.herram:hover .herram-escudo::after { transform:translateX(120%); }
-.herram-escudo img {
-  width:clamp(66px, 36%, 112px); height:auto; display:block;
-  opacity:.9; transform:scale(.97);
-  transition:opacity .6s var(--suave), transform 1s var(--salida);
-}
-.herram:hover .herram-escudo img { opacity:1; transform:scale(1.04); }
-/* ATLAS no tiene icono todavia: va con su inicial en la tipografia de la marca */
-.herram-inicial {
-  font-size:clamp(2.9rem,6.4vw,4.1rem); font-weight:300; letter-spacing:.06em;
-  color:var(--tinta); opacity:.86; line-height:1;
-  transition:opacity .6s var(--suave), transform 1s var(--salida);
-}
-.herram:hover .herram-inicial { opacity:1; transform:scale(1.04); }
-
-.herram-cuerpo { padding:1.1rem 1.25rem 1.35rem; display:flex; flex-direction:column; gap:.5rem; flex:1; }
-.herram-alto { display:flex; align-items:baseline; gap:.6rem; }
-.herram-num { font-family:var(--mono); font-size:.58rem; letter-spacing:.2em; color:var(--debil); }
-.herram h3 { font-size:1.1rem; letter-spacing:-.01em; }
-.herram-que { font-family:var(--mono); font-size:.58rem; letter-spacing:.2em;
-  text-transform:uppercase; color:#c4b28c; }
-.herram p { color:var(--tenue); font-size:.9rem; line-height:1.52; flex:1; }
-.herram-pie { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.4rem; }
-.herram-chip {
-  font-family:var(--mono); font-size:.54rem; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--tenue); border:1px solid var(--linea); border-radius:999px; padding:.3rem .6rem;
-}
-.herram-chip.vivo { color:var(--tinta); border-color:var(--linea-fuerte); }
-.herram-chip.vivo::before {
-  content:''; display:inline-block; width:5px; height:5px; border-radius:50%;
-  background:#6ee7a8; margin-right:.42rem; vertical-align:middle;
-}
-
-/* La tira de las tres de fuera del oficio */
-.suite-otras {
-  margin-top:clamp(1.1rem,2.4vw,1.7rem);
-  display:grid; gap:clamp(.7rem,1.5vw,1rem);
-  grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));
-}
-.otra {
-  display:flex; align-items:center; gap:.85rem;
-  padding:.85rem 1rem; border-radius:14px;
-  border:1px solid var(--v-borde); background:var(--v-fondo);
-  opacity:0; transform:translateY(16px);
-  transition:opacity .7s var(--salida), transform .8s var(--salida), border-color .5s;
-}
-.suite.visible ~ .suite-otras .otra,
-.suite-otras.visible .otra { opacity:1; transform:none; }
-.suite-otras.visible .otra:nth-child(2) { transition-delay:.07s }
-.suite-otras.visible .otra:nth-child(3) { transition-delay:.14s }
-.otra:hover { border-color:var(--linea-fuerte); }
-.otra img { width:30px; height:30px; object-fit:contain; opacity:.72; flex:none;
-  transition:opacity .5s var(--suave); }
-.otra:hover img { opacity:1; }
-.otra-txt { display:flex; flex-direction:column; gap:.12rem; min-width:0; }
-.otra-nom { font-size:.88rem; letter-spacing:-.005em; }
-.otra-que { font-family:var(--mono); font-size:.54rem; letter-spacing:.16em;
-  text-transform:uppercase; color:var(--debil); }
-
-.suite-mas {
-  padding:clamp(1.2rem,3vh,1.9rem) 0 0; color:var(--debil);
-  font-family:var(--mono); font-size:.6rem; letter-spacing:.16em; text-transform:uppercase;
-}
-
-@media (max-width:700px){
-  .suite { grid-template-columns:1fr 1fr; gap:.7rem; }
-  .herram-cuerpo { padding:.9rem 1rem 1.1rem; }
-  .herram p { font-size:.84rem; }
-  .herram-escudo { aspect-ratio:16/10; }
-}
-@media (max-width:430px){
-  .suite { grid-template-columns:1fr; }
-}
-
 /* ============ Reel ============================================
    El cartel es un boton, no un <video> con `poster`: asi el navegador
    no reserva decodificador ni empieza a negociar el archivo, y los 15 MB
@@ -1185,13 +1062,6 @@ body.bloqueado .masa { animation-play-state:paused; }
 .tira-extra figure:hover img { transform:scale(1.05); }
 
 /* --- Recorrido ------------------------------------------------ */
-.ficha-recorrido { max-width:1400px; margin:0 auto; padding:clamp(2.6rem,6vh,4.5rem) var(--margen) 0; }
-.ficha-recorrido .rotulo { font-family:var(--mono); font-size:.58rem; letter-spacing:.24em; text-transform:uppercase;
-  color:var(--debil); margin-bottom:1rem; display:flex; align-items:center; gap:.8rem; }
-.ficha-recorrido .rotulo::after { content:''; flex:1; height:1px; background:var(--linea); }
-.ficha-recorrido .marco { width:100%; aspect-ratio:16/9; overflow:hidden; border-radius:18px;
-  background:rgba(0,0,0,.5); }
-.ficha-recorrido video { width:100%; height:100%; object-fit:contain; background:#000; }
 
 /* Un pie de pagina discreto, no dos tarjetas que compiten con los
    renders: lo ultimo que se ve de un proyecto debe ser el proyecto. */
@@ -1483,7 +1353,6 @@ body.bloqueado .masa { animation-play-state:paused; }
     <a href="#inicio" data-reiniciar>Inicio</a>
     <a href="#proyectos">Proyectos</a>
     <a href="#reel">Reel</a>
-    <a href="#suite">Herramientas</a>
     <a href="#sobre">Sobre mí</a>
     <a href="#contacto">Contacto</a>
   </nav>
@@ -1582,34 +1451,11 @@ body.bloqueado .masa { animation-play-state:paused; }
           </svg>
         </span>
         <span class="reel-pie">
-          <span class="mono">44 s · 1080p · Con sonido</span>
+          <span class="mono">44 s · Hasta 1440p · Con sonido</span>
           <span class="mono reel-descarga-aviso">Toque para reproducir</span>
         </span>
       </button>
     </div>
-  </div>
-</section>
-
-<!-- ===================== SUITE =====================
-     Las herramientas que Kevin escribió para su propio trabajo. Van DESPUÉS
-     del reel y ANTES de Sobre mí: primero se ve la obra, luego lo que hizo
-     para resolverla, y al final quién es. -->
-<section class="seccion" id="suite">
-  <div class="seccion-cuerpo acolchado">
-    <div class="cabeza">
-      <div>
-        <div class="etiqueta revelar"><span>Herramientas</span></div>
-        <h2 class="palabras" data-texto="Siete aplicaciones propias."></h2>
-      </div>
-    </div>
-
-    <p class="suite-entrada asoma">Siete aplicaciones, escritas para resolver cosas que aparecieron
-       trabajando. Cuatro son de obra y las uso en proyectos reales.</p>
-
-    <div class="suite" id="suite-rejilla"></div>
-
-    <div class="etiqueta suite-mas">Fuera del oficio</div>
-    <div class="suite-otras" id="suite-otras"></div>
   </div>
 </section>
 
@@ -1633,9 +1479,7 @@ body.bloqueado .masa { animation-play-state:paused; }
              Universidad Pontificia Bolivariana de Bucaramanga. Empezó dibujando proyectos de otros
              con <strong>VISUAL 3D STUDIO</strong>; desde agosto de 2026 el trabajo va bajo
              <strong>STICK INDUSTRIES</strong>.</p>
-          <p>Va a obra varias veces por semana: replanteo, control de material y cuadrilla. Las
-             aplicaciones de la sección anterior empezaron casi todas por un problema que apareció
-             en una de esas visitas.</p>
+          <p>Va a obra varias veces por semana: replanteo, control de material y cuadrilla.</p>
         </div>
 
         <div class="bio-trayecto asoma" style="--r:.12s">
@@ -1761,14 +1605,13 @@ const CONTACTO = {
    PORTAFOLIO : los cuatro de PRINCIPALES abren la vitrina y los de
    SECUNDARIOS completan el indice.
 
-   NO HAY CAMPO `video`. Los seis recorridos siguen en assets/video/ y en el
-   repositorio, pero NINGUNA ficha los muestra: todos llevan quemada en el
-   cuadro la marca de BELVAL o la de VISUAL 3D STUDIO —en Ruitoque y en el
-   Lote 23, a pantalla completa— y los de La Punta van rotulados con nombres
-   propios de los clientes. Un portafolio que ensena el trabajo de Kevin
-   firmado por otra oficina se contradice a si mismo, y los nombres de
-   terceros no se publican. Devolverlos es volver a poner `video:'<clave>'`
-   en el proyecto que toque, cuando exista un recorrido limpio.
+   NO HAY CAMPO `video`. Los seis recorridos se retiraron del sitio y se
+   borraron del repositorio el 2026-09-13: todos llevaban quemada en el
+   cuadro la marca de BELVAL o la de VISUAL 3D STUDIO, y los de La Punta iban
+   rotulados con nombres propios de los clientes. Un portafolio que ensena el
+   trabajo de Kevin firmado por otra oficina se contradice a si mismo. Traer
+   un recorrido limpio exige volver a escribir el bloque de la ficha que lo
+   muestra: ni el codigo ni su CSS existen ya.
 
    slug    identificador del proyecto (define el enlace directo)
    arch    prefijo de los archivos de render en assets/renders
@@ -2102,84 +1945,6 @@ document.getElementById('cifras').innerHTML = [
   ['Ubicaciones', new Set(TODOS.map(p => p.coord.join())).size],
 ].map(([rotulo, n]) => `
   <div class="cifra"><b>${n}</b><span>${rotulo}</span></div>`).join('');
-
-/* =================================================================
-   LAS HERRAMIENTAS
-
-   Tres de las siete de la suite: las que resuelven obra. Las otras
-   cuatro —finanzas, inversiones, entrenamiento— quedan mencionadas al
-   pie, porque en un portafolio de ingenieria civil desenfocan.
-
-   Las imagenes son capturas REALES de cada aplicacion corriendo, no
-   maquetas: se toman con `herramientas/capturar-suite.mjs`.
-   ================================================================= */
-/* Las siete aplicaciones. El icono es el de la propia app, recortado y con el
-   fondo transparente por herramientas/preparar-suite.py — el mismo archivo que
-   lleva instalada en el telefono, no una version dibujada aparte.
-
-   ATLAS todavia no tiene icono: va con su inicial hasta que lo tenga. */
-const UTILES_SUITE = [
-  { clave:'atlas', nombre:'ATLAS', que:'Cálculo estructural', inicial:'A',
-    texto:'Se dibuja la planta sobre una rejilla de ejes y los elementos se nombran como en obra: ' +
-          'V-1, VT-3, C-2. Resuelve las cargas del Título B, predimensiona vigas, viguetas y ' +
-          'columnas, y exporta la memoria en PDF con el artículo de la NSR-10 bajo cada resultado.',
-    chips:['Escritorio', 'NSR-10'], estado:'En construcción' },
-
-  { clave:'aros', nombre:'STICK AROS', que:'Control de obra',
-    texto:'Avance por frentes, asistencia de cuadrilla, materiales y archivo de documentos. ' +
-          'Lleva hoy el Lote 23 de Villas de Cantabria, con 41 documentos cargados desde el sitio.',
-    chips:['Web', 'Asistida por IA'], estado:'En uso' },
-
-  { clave:'quantity', nombre:'STICK QUANTITY', que:'Cantidades de obra',
-    texto:'Mampostería, columnas y despiece de acero. Se ingresan las medidas del elemento y ' +
-          'devuelve la cantidad de material a pedir, con el porcentaje de desperdicio aplicado.',
-    chips:['Web', 'Un solo archivo'], estado:'En uso' },
-
-  { clave:'projects', nombre:'STICK PROJECTS', que:'Finanzas de obra',
-    texto:'Contratos, abonos, gastos y colaboradores de cada proyecto, con el corte de cuentas ' +
-          'por obra y por cliente. Varias personas sobre la misma empresa, cada una con su permiso.',
-    chips:['Web', 'Multiusuario'], estado:'En uso' }
-];
-
-/* Las tres de fuera del oficio. Van en una tira compacta: cuentan que las
-   herramientas no se acaban en la obra, sin robarle sitio a las que si lo son. */
-const OTRAS_SUITE = [
-  { clave:'budgets', nombre:'STICK BUDGETS', que:'Finanzas personales' },
-  { clave:'assets',  nombre:'STICK ASSETS',  que:'Inversiones' },
-  { clave:'fit',     nombre:'STICK FIT',     que:'Entrenamiento' }
-];
-
-/* OJO: este bloque vive dentro de una plantilla de texto. No escribir comillas
-   invertidas aqui dentro — una sola cierra la cadena antes de tiempo. */
-document.getElementById('suite-rejilla').innerHTML = UTILES_SUITE.map((u, i) => `
-  <article class="herram">
-    <div class="herram-escudo">
-      ${u.inicial
-        ? `<span class="herram-inicial">${u.inicial}</span>`
-        : `<img src="assets/suite/${u.clave}.webp" alt="Icono de ${u.nombre}" decoding="async" width="512" height="512">`}
-    </div>
-    <div class="herram-cuerpo">
-      <div class="herram-alto">
-        <span class="herram-num">${String(i + 1).padStart(2, '0')}</span>
-        <h3>${u.nombre}</h3>
-      </div>
-      <div class="herram-que">${u.que}</div>
-      <p>${u.texto}</p>
-      <div class="herram-pie">
-        <span class="herram-chip vivo">${u.estado}</span>
-        ${u.chips.map(c => `<span class="herram-chip">${c}</span>`).join('')}
-      </div>
-    </div>
-  </article>`).join('');
-
-document.getElementById('suite-otras').innerHTML = OTRAS_SUITE.map(o => `
-  <div class="otra">
-    <img src="assets/suite/${o.clave}.webp" alt="Icono de ${o.nombre}" decoding="async" width="512" height="512">
-    <div class="otra-txt">
-      <span class="otra-nom">${o.nombre}</span>
-      <span class="otra-que">${o.que}</span>
-    </div>
-  </div>`).join('');
 
 rueda.innerHTML = HITOS.map(h => `
   <div class="hito">
@@ -2833,7 +2598,21 @@ let reelVideo = null;
 function abrirReel() {
   if (reelVideo) return;
   reelVideo = document.createElement('video');
-  reelVideo.src = 'assets/video/reel.mp4';
+  /* Dos calidades del mismo reel. Una pantalla que pinta 1700 px o mas de
+     ancho real —un portatil retina, un monitor 1440p o 4K— recibe el de
+     2560x1440; un telefono o un portatil normal, el de 1080p, que pesa la
+     mitad. Se decide aqui y no con <source media>, que los navegadores no
+     respetan de forma fiable para video. */
+  const pixelesReales = Math.max(screen.width, screen.height) * (devicePixelRatio || 1);
+  reelVideo.src = pixelesReales >= 1700 && Math.min(screen.width, screen.height) >= 700
+    ? 'assets/video/reel-1440.mp4'
+    : 'assets/video/reel.mp4';
+  /* Si la de 1440p no llega a cargar, cae a la de 1080p en vez de dejar el
+     reproductor en negro. */
+  reelVideo.addEventListener('error', function caer() {
+    reelVideo.removeEventListener('error', caer);
+    if (!reelVideo.src.endsWith('/reel.mp4')) { reelVideo.src = 'assets/video/reel.mp4'; reelVideo.play().catch(() => {}); }
+  });
   reelVideo.poster = 'assets/video/reel-poster.webp';
   reelVideo.controls = true;
   reelVideo.playsInline = true;
@@ -2893,7 +2672,7 @@ const barra     = document.getElementById('barra');
 const menu      = document.getElementById('menu');
 const gota      = document.getElementById('gota');
 const campo     = document.querySelector('.campo');
-const secciones = [...document.querySelectorAll('#proyectos, #reel, #suite, #sobre, #contacto')];
+const secciones = [...document.querySelectorAll('#proyectos, #reel, #sobre, #contacto')];
 const enlacesMenu = [...document.querySelectorAll('.menu a')];
 const laminaImg = document.getElementById('render-inicio');
 
@@ -2978,7 +2757,7 @@ const observador = new IntersectionObserver(en => {
     else if (e.intersectionRatio === 0) e.target.classList.remove('visible', 'viva');
   });
 }, { threshold:[0, .12], rootMargin:'0px 0px -60px 0px' });
-document.querySelectorAll('.revelar, .palabras, .enlaces, .flujo, .cabeza, .suite, .suite-otras')
+document.querySelectorAll('.revelar, .palabras, .enlaces, .flujo, .cabeza')
   .forEach(el => observador.observe(el));
 
 /* `.asoma` va con un observador mas permisivo: el de arriba exige que

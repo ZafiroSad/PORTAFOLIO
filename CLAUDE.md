@@ -8,9 +8,30 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v19 — los logos de las apps, los textos sin tic y el reel rehecho.**
+**v19.1 — sin la sección de apps, el repositorio limpio y el reel a 1440p.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v19.1 — 2026-09-13
+
+- **La sección Herramientas sale del sitio**, por decisión del Señor Stick:
+  la va a replantear con un prompt propio. Se quitaron su HTML, CSS, JS, el
+  enlace del menú y los iconos. **Se conserva `herramientas/preparar-suite.py`**,
+  que regenera los seis iconos desde los `LOGO.png` de cada app en un segundo.
+  La frase de la bio que remitía a «la sección anterior» también sale.
+- **Los textos quedan como están** hasta que llegue su prompt para ellos.
+- **Peso muerto borrado** (el sitio pasa de 163 a ~89 MB): los seis
+  recorridos con sus pósters, las familias de renders que ningún proyecto
+  usaba (`cocina-comedor`, `estudio-solar`, `snacks`), `coincafex-07` (una
+  lámina, no un render) y `coincafex-08` (nombre del cliente), más las cinco
+  reglas `.ficha-recorrido` y un encabezado CSS huérfano.
+  **Siguen en el historial de git**: quien tenga la URL de un commit viejo
+  puede verlos. Sacarlos de ahí exige reescribir el historial y forzar el
+  push — no se ha hecho.
+- **El reel, en dos calidades.** El master 16:9 ahora es 2560×1440 con
+  fotogramas JPEG al 100 %. El sitio sirve `reel-1440.mp4` a pantallas que
+  pintan 1700 px o más y `reel.mp4` (1080p) al resto; si la de 1440p falla,
+  cae sola a la otra. Detalle en la decisión 25 del proyecto de video.
 
 ### v19 — la revisión del 2026-09-12
 
@@ -87,10 +108,9 @@ Lo que trae la v18 sobre la v16.4:
 Pendientes:
 1. Verificar en un **teléfono real** (lo automatizado cubre el encuadre, no
    el tacto ni el rendimiento en gama media)
-0. **Borrar el peso muerto del repositorio público** (~71 MB): los seis
-   recorridos de `assets/video/` que salieron de las fichas con sus pósters, y
-   `coincafex-08`, que ya no se enlaza pero sigue siendo accesible por URL
-   directa con el nombre del cliente. Requiere autorización: es borrado.
+0. **Rehacer la sección de apps y los textos** con los prompts del Señor Stick.
+0. **Historial de git**: los archivos borrados en la v19.1 siguen en commits
+   viejos. Purgarlos exige reescribir el historial y forzar el push.
 2. La hoja de vida en PDF **sí** lleva el teléfono y el correo en claro, y
    vive en un repositorio público. Es su función —una hoja de vida sin
    teléfono no sirve—, pero conviene saberlo
