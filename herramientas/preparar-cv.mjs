@@ -123,7 +123,7 @@ function hoja(d) {
      Fluyendo, el numero de hojas lo decide el contenido, que es lo correcto.
      (Sin comillas invertidas en estos comentarios: este bloque vive dentro
      de un template string y una sola lo cerraria antes de tiempo.) */
-  body { width:210mm; padding:14mm 15mm 10mm;
+  body { width:210mm; padding:12mm 15mm 8mm;
          font-family:var(--sans); color:var(--tinta); font-size:9.1pt; line-height:1.5;
          -webkit-print-color-adjust:exact; print-color-adjust:exact; }
 
@@ -137,21 +137,21 @@ function hoja(d) {
               color:var(--suave); white-space:nowrap; }
   .contacto b { color:var(--tinta); font-weight:400; }
 
-  .perfil { margin:4mm 0 4mm; font-size:10.4pt; line-height:1.55; max-width:158mm; }
+  .perfil { margin:3.2mm 0 3.2mm; font-size:10.4pt; line-height:1.55; max-width:158mm; }
   .perfil strong { font-weight:700; }
 
   /* SIN break-inside aqui. Con el, el segundo bloque no cabia entero en lo
      que quedaba de hoja y saltaba completo a una segunda, dejando un tercio
      de la primera en blanco. Lo que no debe partirse es cada seccion. */
   .rejilla { display:grid; grid-template-columns:1fr 1fr; gap:9mm; align-items:start; }
-  .columna { display:flex; flex-direction:column; gap:5mm; }
+  .columna { display:flex; flex-direction:column; gap:4mm; }
   section { break-inside:avoid; }
   h2 { font-family:var(--mono); font-size:7.4pt; letter-spacing:.26em; text-transform:uppercase;
        color:var(--arena); padding-bottom:1.6mm; margin-bottom:3.4mm;
        border-bottom:.6pt solid var(--linea); }
 
   ul { list-style:none; }
-  li { margin-bottom:3mm; break-inside:avoid; }
+  li { margin-bottom:2.4mm; break-inside:avoid; }
   .linea { display:flex; align-items:baseline; gap:2.4mm; }
   .titulo { font-weight:700; font-size:9.6pt; }
   .estado { font-family:var(--mono); font-size:6.6pt; letter-spacing:.14em; text-transform:uppercase;

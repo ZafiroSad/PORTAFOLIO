@@ -8,9 +8,46 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v18.1 — logo nuevo, textos sin relleno, herramientas y el reel con ritmo.**
+**v19 — los logos de las apps, los textos sin tic y el reel rehecho.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v19 — la revisión del 2026-09-12
+
+El Señor Stick rechazó la v18 entera: «Terrible todo, el video mal hecho,
+menos organizado, los textos tmb genericos, lo de las apps quiero ver los
+logos mejor». Las tres cosas eran ciertas y se arreglaron así:
+
+- **Las apps se ven por su logo, no por una captura.** Cada una guarda su
+  `LOGO.png` a 2000×2000 —icono blanco sobre gris 31— y `preparar-suite.py` lo
+  recorta al contenido, le calcula el alfa y lo deja en WebP de 2-9 KB. Antes
+  la sección mostraba tres capturas de pantalla de 30 KB donde el logo no
+  aparecía por ningún lado.
+- **Los iconos se igualan por ÁREA, no por lado.** Normalizando por el lado
+  mayor, la mancuerna de FIT —que es 2,2 veces más ancha que alta— quedaba con
+  menos de la mitad de altura que el resto y desaparecía en la rejilla.
+- **Son siete apps, no tres.** Cuatro de obra con ficha completa (ATLAS, AROS,
+  QUANTITY, PROJECTS) y tres de fuera en una tira compacta (BUDGETS, ASSETS,
+  FIT). ATLAS va con su inicial hasta que tenga icono.
+- **Los textos pierden el tic.** El problema no era cliché frase a frase: era
+  que **todos** cerraban con una sentencia ingeniosa — «Medir en el sitio lo
+  que otro dibujó en el escritorio», «Revit como herramienta de coordinación,
+  no de dibujo», «Lo que hoy resuelvo con tablas, entenderlo desde donde
+  sale». Diez hitos, diez aforismos. Cuando todo suena a frase de autor, nada
+  informa. Reescritos la bio, seis hitos del trayecto, las tres etapas del
+  flujo y el título de la sección.
+- **El reel, rehecho entero** (V4, 44 s). Los seis defectos y su arreglo están
+  en el `CLAUDE.md` del proyecto de video.
+- **`coincafex-08` fuera de la galería**: lleva quemado el nombre propio del
+  cliente bajo el logo del local. El archivo sigue en el repositorio aunque ya
+  no se enlaza — ver pendientes. El archivo total del sitio pasa de 97 a **96
+  imágenes**, y la cifra se recalcula sola porque se cuenta del catálogo.
+- **Tres reglas CSS muertas corregidas**: `.util h3`, `.util p` y
+  `.suite.visible .util:nth-child(3)` habían quedado con el nombre viejo tras
+  un renombrado, así que no aplicaban a nada.
+- **`servir.py`**, el servidor local con soporte de Range. Existía en la
+  sesión anterior pero se había quedado fuera del repositorio, y sin él ningún
+  `<video>` reproduce en local.
 
 Lo que trae la v18 sobre la v16.4:
 
@@ -21,7 +58,7 @@ Lo que trae la v18 sobre la v16.4:
   `.vcf` se arma en el navegador en vez de vivir como archivo en el repo.
 - **El reel**, sección propia entre Proyectos y Sobre mí: **45 s** con los
   cinco proyectos, cada uno abierto por su cartela y con una cifra
-  sobreimpresa, y doce imágenes armándose en mosaico antes del cierre. Con
+  sobreimpresa (rehecho en la v19), y doce imágenes armándose en mosaico antes del cierre. Con
   música compuesta sobre el propio corte.
 - **Herramientas**, sección nueva: las tres apps de la suite que resuelven
   obra, con capturas reales de cada una corriendo.
@@ -50,6 +87,10 @@ Lo que trae la v18 sobre la v16.4:
 Pendientes:
 1. Verificar en un **teléfono real** (lo automatizado cubre el encuadre, no
    el tacto ni el rendimiento en gama media)
+0. **Borrar el peso muerto del repositorio público** (~71 MB): los seis
+   recorridos de `assets/video/` que salieron de las fichas con sus pósters, y
+   `coincafex-08`, que ya no se enlaza pero sigue siendo accesible por URL
+   directa con el nombre del cliente. Requiere autorización: es borrado.
 2. La hoja de vida en PDF **sí** lleva el teléfono y el correo en claro, y
    vive en un repositorio público. Es su función —una hoja de vida sin
    teléfono no sirve—, pero conviene saberlo

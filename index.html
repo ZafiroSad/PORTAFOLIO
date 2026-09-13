@@ -580,54 +580,77 @@ body.bloqueado .masa { animation-play-state:paused; }
   background:rgba(255,255,255,.09); backdrop-filter:blur(12px); }
 
 /* ============ Boton de indice — pildora liquida =============== */
-/* ============ Suite ===========================================
-   Las tarjetas de las herramientas. Cada una es una captura real de la
-   aplicacion corriendo, recortada a la zona que cuenta algo, con el texto
-   debajo sobre vidrio. La imagen entra velada y se destapa al señalar: en
-   reposo el bloque se lee como un objeto, no como una galeria de pantallas. */
+/* ===== HERRAMIENTAS =====
+   El protagonista es el LOGO, no una captura de pantalla. Cada app tiene su
+   icono monocromo a 2000px; recortado al contenido y con el fondo vuelto
+   transparente, se puede teñir desde el CSS y pesa 3 KB en vez de 30.
+
+   Dos gradas: las cuatro del oficio con ficha completa, y las tres de fuera
+   en una tira compacta. Mezclarlas haria pensar que una app de gimnasio pesa
+   lo mismo que una de calculo estructural. */
 .suite-entrada {
-  max-width:44ch; color:var(--tenue); font-size:1.02rem; line-height:1.55;
+  max-width:46ch; color:var(--tenue); font-size:1.02rem; line-height:1.55;
   padding:0 0 clamp(1.4rem,3.4vh,2.4rem);
 }
 .suite {
-  display:grid; gap:clamp(1rem,2vw,1.6rem);
-  grid-template-columns:repeat(auto-fit, minmax(290px, 1fr));
+  display:grid; gap:clamp(.9rem,1.8vw,1.4rem);
+  grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
 }
 .herram {
   position:relative; display:flex; flex-direction:column; overflow:hidden;
   border-radius:20px; border:1px solid var(--v-borde); background:var(--v-fondo);
   backdrop-filter:var(--v-blur); box-shadow:var(--v-filo), var(--v-sombra);
-  /* Entra desde abajo, revelandose: el mismo gesto de las hojas de la vitrina */
-  opacity:0; transform:translateY(26px); clip-path:inset(0 0 12% 0 round 20px);
-  transition:opacity .8s var(--salida), transform .9s var(--salida),
-             clip-path .9s var(--salida), border-color .5s, box-shadow .6s;
+  opacity:0; transform:translateY(22px);
+  transition:opacity .75s var(--salida), transform .85s var(--salida),
+             border-color .5s, box-shadow .6s;
 }
-.suite.visible .herram { opacity:1; transform:none; clip-path:inset(0 0 0 0 round 20px); }
-.suite.visible .herram:nth-child(2) { transition-delay:.09s }
-.suite.visible .util:nth-child(3) { transition-delay:.18s }
+.suite.visible .herram { opacity:1; transform:none; }
+.suite.visible .herram:nth-child(2) { transition-delay:.08s }
+.suite.visible .herram:nth-child(3) { transition-delay:.16s }
+.suite.visible .herram:nth-child(4) { transition-delay:.24s }
 .herram:hover { border-color:var(--linea-fuerte); box-shadow:var(--v-filo), 0 30px 70px -30px rgba(0,0,0,.9); }
 
-.herram-lamina { position:relative; aspect-ratio:16/10; overflow:hidden; background:var(--base); }
-.herram-lamina img {
-  width:100%; height:100%; object-fit:cover; object-position:left top; display:block;
-  /* Velada en reposo para que el bloque no lea como un muro de capturas */
-  opacity:.62; filter:saturate(.85);
-  transition:opacity .7s var(--suave), filter .7s var(--suave), transform 1.2s var(--salida);
+/* El escudo: el campo donde vive el logo. El resplandor detras sale del acento
+   y crece al señalar, que es todo el movimiento que necesita. */
+.herram-escudo {
+  position:relative; aspect-ratio:16/11; display:grid; place-items:center;
+  background:
+    radial-gradient(66% 82% at 50% 46%, rgba(196,178,140,.12) 0%, transparent 70%),
+    linear-gradient(160deg, rgba(255,255,255,.045) 0%, transparent 58%),
+    var(--base);
+  border-bottom:1px solid var(--linea);
+  overflow:hidden;
 }
-.herram:hover .herram-lamina img { opacity:1; filter:none; transform:scale(1.035); }
-.herram-lamina::after {
+.herram-escudo::after {
+  /* Barrido de luz, muy tenue, que cruza al señalar la tarjeta */
   content:''; position:absolute; inset:0; pointer-events:none;
-  background:linear-gradient(to top, var(--base-2) 0%, transparent 42%);
+  background:linear-gradient(100deg, transparent 38%, rgba(255,255,255,.07) 50%, transparent 62%);
+  transform:translateX(-120%);
+  transition:transform 1.15s var(--salida);
 }
+.herram:hover .herram-escudo::after { transform:translateX(120%); }
+.herram-escudo img {
+  width:clamp(66px, 36%, 112px); height:auto; display:block;
+  opacity:.9; transform:scale(.97);
+  transition:opacity .6s var(--suave), transform 1s var(--salida);
+}
+.herram:hover .herram-escudo img { opacity:1; transform:scale(1.04); }
+/* ATLAS no tiene icono todavia: va con su inicial en la tipografia de la marca */
+.herram-inicial {
+  font-size:clamp(2.9rem,6.4vw,4.1rem); font-weight:300; letter-spacing:.06em;
+  color:var(--tinta); opacity:.86; line-height:1;
+  transition:opacity .6s var(--suave), transform 1s var(--salida);
+}
+.herram:hover .herram-inicial { opacity:1; transform:scale(1.04); }
 
-.herram-cuerpo { padding:1.15rem 1.3rem 1.4rem; display:flex; flex-direction:column; gap:.55rem; }
-.herram-alto { display:flex; align-items:baseline; gap:.7rem; }
+.herram-cuerpo { padding:1.1rem 1.25rem 1.35rem; display:flex; flex-direction:column; gap:.5rem; flex:1; }
+.herram-alto { display:flex; align-items:baseline; gap:.6rem; }
 .herram-num { font-family:var(--mono); font-size:.58rem; letter-spacing:.2em; color:var(--debil); }
-.util h3 { font-size:1.12rem; letter-spacing:-.01em; }
+.herram h3 { font-size:1.1rem; letter-spacing:-.01em; }
 .herram-que { font-family:var(--mono); font-size:.58rem; letter-spacing:.2em;
   text-transform:uppercase; color:#c4b28c; }
-.util p { color:var(--tenue); font-size:.92rem; line-height:1.5; }
-.herram-pie { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.35rem; }
+.herram p { color:var(--tenue); font-size:.9rem; line-height:1.52; flex:1; }
+.herram-pie { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.4rem; }
 .herram-chip {
   font-family:var(--mono); font-size:.54rem; letter-spacing:.14em; text-transform:uppercase;
   color:var(--tenue); border:1px solid var(--linea); border-radius:999px; padding:.3rem .6rem;
@@ -638,14 +661,45 @@ body.bloqueado .masa { animation-play-state:paused; }
   background:#6ee7a8; margin-right:.42rem; vertical-align:middle;
 }
 
+/* La tira de las tres de fuera del oficio */
+.suite-otras {
+  margin-top:clamp(1.1rem,2.4vw,1.7rem);
+  display:grid; gap:clamp(.7rem,1.5vw,1rem);
+  grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));
+}
+.otra {
+  display:flex; align-items:center; gap:.85rem;
+  padding:.85rem 1rem; border-radius:14px;
+  border:1px solid var(--v-borde); background:var(--v-fondo);
+  opacity:0; transform:translateY(16px);
+  transition:opacity .7s var(--salida), transform .8s var(--salida), border-color .5s;
+}
+.suite.visible ~ .suite-otras .otra,
+.suite-otras.visible .otra { opacity:1; transform:none; }
+.suite-otras.visible .otra:nth-child(2) { transition-delay:.07s }
+.suite-otras.visible .otra:nth-child(3) { transition-delay:.14s }
+.otra:hover { border-color:var(--linea-fuerte); }
+.otra img { width:30px; height:30px; object-fit:contain; opacity:.72; flex:none;
+  transition:opacity .5s var(--suave); }
+.otra:hover img { opacity:1; }
+.otra-txt { display:flex; flex-direction:column; gap:.12rem; min-width:0; }
+.otra-nom { font-size:.88rem; letter-spacing:-.005em; }
+.otra-que { font-family:var(--mono); font-size:.54rem; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--debil); }
+
 .suite-mas {
-  padding:clamp(1.4rem,3.4vh,2.2rem) 0 0; color:var(--debil);
+  padding:clamp(1.2rem,3vh,1.9rem) 0 0; color:var(--debil);
   font-family:var(--mono); font-size:.6rem; letter-spacing:.16em; text-transform:uppercase;
 }
 
 @media (max-width:700px){
+  .suite { grid-template-columns:1fr 1fr; gap:.7rem; }
+  .herram-cuerpo { padding:.9rem 1rem 1.1rem; }
+  .herram p { font-size:.84rem; }
+  .herram-escudo { aspect-ratio:16/10; }
+}
+@media (max-width:430px){
   .suite { grid-template-columns:1fr; }
-  .herram-lamina { aspect-ratio:16/9; }
 }
 
 /* ============ Reel ============================================
@@ -1528,7 +1582,7 @@ body.bloqueado .masa { animation-play-state:paused; }
           </svg>
         </span>
         <span class="reel-pie">
-          <span class="mono">45 s · 1080p · Con sonido</span>
+          <span class="mono">44 s · 1080p · Con sonido</span>
           <span class="mono reel-descarga-aviso">Toque para reproducir</span>
         </span>
       </button>
@@ -1545,15 +1599,17 @@ body.bloqueado .masa { animation-play-state:paused; }
     <div class="cabeza">
       <div>
         <div class="etiqueta revelar"><span>Herramientas</span></div>
-        <h2 class="palabras" data-texto="Lo que faltaba."></h2>
+        <h2 class="palabras" data-texto="Siete aplicaciones propias."></h2>
       </div>
     </div>
 
-    <p class="suite-entrada asoma">Cada una salió de un problema que apareció trabajando y que
-       ningún programa resolvía como hacía falta. Están en uso.</p>
+    <p class="suite-entrada asoma">Siete aplicaciones, escritas para resolver cosas que aparecieron
+       trabajando. Cuatro son de obra y las uso en proyectos reales.</p>
 
     <div class="suite" id="suite-rejilla"></div>
-    <p class="suite-mas asoma">Y otras cuatro fuera del oficio: finanzas, inversiones y entrenamiento.</p>
+
+    <div class="etiqueta suite-mas">Fuera del oficio</div>
+    <div class="suite-otras" id="suite-otras"></div>
   </div>
 </section>
 
@@ -1571,13 +1627,15 @@ body.bloqueado .masa { animation-play-state:paused; }
 
       <div class="bio">
         <div class="asoma">
-          <p class="destacado">Un render no empieza en la imagen: empieza en el modelo. Lo que no
-             está resuelto ahí, la imagen lo esconde.</p>
-          <p><strong>Kevin Stick Gil Arévalo.</strong> Estudia ingeniería civil en la Universidad
-             Pontificia Bolivariana de Bucaramanga; lleva nueve semestres. Empezó dibujando proyectos
-             de otros con <strong>VISUAL 3D STUDIO</strong>, y ese trabajo sigue hoy bajo
+          <p class="destacado">Modelo el proyecto completo en tres dimensiones, y del mismo archivo
+             salen las imágenes, los planos y las cantidades de material.</p>
+          <p><strong>Kevin Stick Gil Arévalo.</strong> Noveno semestre de ingeniería civil en la
+             Universidad Pontificia Bolivariana de Bucaramanga. Empezó dibujando proyectos de otros
+             con <strong>VISUAL 3D STUDIO</strong>; desde agosto de 2026 el trabajo va bajo
              <strong>STICK INDUSTRIES</strong>.</p>
-          <p>Va a obra varias veces por semana. Es el único sitio donde se sabe si el dibujo aguanta.</p>
+          <p>Va a obra varias veces por semana: replanteo, control de material y cuadrilla. Las
+             aplicaciones de la sección anterior empezaron casi todas por un problema que apareció
+             en una de esas visitas.</p>
         </div>
 
         <div class="bio-trayecto asoma" style="--r:.12s">
@@ -1749,7 +1807,10 @@ const SECUNDARIOS = [
   { slug:'coincafex', arch:'coincafex', titulo:'Coincafex', tipo:'Sede corporativa',
     grupo:'corporativo', lugar:'Girón, zona industrial', anio:'2026', estado:'Terminado',
     coord:[7.07,-73.17],
-    portada:3, piezas:[3,8,10,5,6,2,4], extra:[1,9],
+    /* Sin la 8: lleva quemado el nombre propio del cliente bajo el logo del
+       local, y el resto del portafolio ya se limpio de marcas y nombres
+       ajenos. La 7 tampoco esta: es una lamina de presentacion, no un render. */
+    portada:3, piezas:[3,10,5,6,2,4], extra:[1,9],
     texto:'La intervención envuelve una bodega existente con una piel metálica microperforada que unifica el volumen y oculta la cubierta. Adentro, las oficinas se resolvieron con luz cálida rasante y madera para que el interior no leyera como industrial.' },
 
   { slug:'casa-campo', arch:'casa-will', titulo:'Casa Campo', tipo:'Vivienda campestre',
@@ -1804,7 +1865,7 @@ const HITOS = [
 
   { anio:'2023', escudo:null, sigla:'OBRA',
     titulo:'Ayudante de obra', estado:null,
-    detalle:'Replanteo, control de material y cuadrilla. Medir en el sitio lo que otro dibujó en el escritorio.' },
+    detalle:'Replanteo, control de material y manejo de cuadrilla en obra de vivienda.' },
 
   { anio:'2026', escudo:null, sigla:'SSI',
     titulo:'Congreso XOpen Internacional', estado:null,
@@ -1812,11 +1873,11 @@ const HITOS = [
 
   { anio:'2026', escudo:'assets/logos/upb.webp', sigla:'UPB',
     titulo:'Representante estudiantil', estado:'Facultad',
-    detalle:'Llevar a la Facultad lo que el salón no dice en clase. UPB Bucaramanga.' },
+    detalle:'Elegido por sus compañeros ante la Facultad de Ingeniería Civil. UPB Bucaramanga.' },
 
   { anio:'2026', escudo:'assets/logos/uis.webp', sigla:'UIS',
     titulo:'Modelado BIM y gestión de la construcción', estado:null,
-    detalle:'Revit como herramienta de coordinación, no de dibujo. Centro de Estudios de Ingeniería Civil, UIS.' },
+    detalle:'Revit y coordinación de modelos. Centro de Estudios de Ingeniería Civil, UIS.' },
 
   { anio:'2026', escudo:'assets/marca/v3s.png', sigla:'V3S',
     titulo:'VISUAL 3D STUDIO', estado:'Fundador',
@@ -1824,7 +1885,7 @@ const HITOS = [
 
   { anio:'2026', escudo:'assets/marca/isotipo-claro.svg', sigla:'SI',
     titulo:'STICK INDUSTRIES', estado:'Actual',
-    detalle:'El mismo trabajo, con nombre propio. Render, planos, y las herramientas de cálculo y control de obra que hacían falta y no existían.' },
+    detalle:'Render, planos y modelado para arquitectos y constructoras, más las siete aplicaciones propias de cálculo, obra y finanzas.' },
 
   { anio:'2026', escudo:'assets/logos/upb.webp', sigla:'UPB',
     titulo:'Especialización en Vías Terrestres', estado:'Cursando',
@@ -1832,7 +1893,7 @@ const HITOS = [
 
   { anio:'Próximo', escudo:null, sigla:'···',
     titulo:'Especialización en Estructuras', estado:'Proyectada',
-    detalle:'Lo que hoy resuelvo con tablas, entenderlo desde donde sale.' }
+    detalle:'Diseño sismorresistente y cimentaciones, que es la base sobre la que está escrito ATLAS.' }
 ];
 
 /* Los logos no van en rejilla ni en cajas: forman una constelacion
@@ -1851,9 +1912,9 @@ const UTILES = [
 ];
 
 const ETAPAS = [
-  { n:'01', t:'Modelo',         d:'El proyecto se levanta con los espesores, los apoyos y las cotas con que se va a construir.' },
-  { n:'02', t:'Representación', d:'Del mismo modelo salen las imágenes y los recorridos. Nada se dibuja aparte.' },
-  { n:'03', t:'Apoyo',          d:'Cálculo, revisión y automatización de lo repetitivo alrededor del proyecto.' }
+  { n:'01', t:'Modelo',         d:'El proyecto se levanta en tres dimensiones con las medidas con que se va a construir, en Revit o SketchUp según el encargo.' },
+  { n:'02', t:'Representación', d:'Del mismo archivo salen las imágenes fijas y los recorridos, renderizados en D5 o Twinmotion.' },
+  { n:'03', t:'Apoyo',          d:'Cálculo estructural, cantidades de material y control de obra con las aplicaciones propias.' }
 ];
 
 let PALETAS = {};
@@ -2052,32 +2113,50 @@ document.getElementById('cifras').innerHTML = [
    Las imagenes son capturas REALES de cada aplicacion corriendo, no
    maquetas: se toman con `herramientas/capturar-suite.mjs`.
    ================================================================= */
+/* Las siete aplicaciones. El icono es el de la propia app, recortado y con el
+   fondo transparente por herramientas/preparar-suite.py — el mismo archivo que
+   lleva instalada en el telefono, no una version dibujada aparte.
+
+   ATLAS todavia no tiene icono: va con su inicial hasta que lo tenga. */
 const UTILES_SUITE = [
-  { clave:'atlas', nombre:'ATLAS', que:'Cálculo estructural',
-    texto:'Se dibuja la planta sobre una rejilla de ejes y cada viga llega con su ' +
-          'predimensionamiento resuelto y el artículo de la NSR-10 que lo respalda.',
+  { clave:'atlas', nombre:'ATLAS', que:'Cálculo estructural', inicial:'A',
+    texto:'Se dibuja la planta sobre una rejilla de ejes y los elementos se nombran como en obra: ' +
+          'V-1, VT-3, C-2. Resuelve las cargas del Título B, predimensiona vigas, viguetas y ' +
+          'columnas, y exporta la memoria en PDF con el artículo de la NSR-10 bajo cada resultado.',
     chips:['Escritorio', 'NSR-10'], estado:'En construcción' },
 
   { clave:'aros', nombre:'STICK AROS', que:'Control de obra',
-    texto:'Avance por frentes, asistencia, materiales y bitácora. Se usa en obra, donde la ' +
-          'señal es mala: por eso gasta lo mínimo en datos.',
+    texto:'Avance por frentes, asistencia de cuadrilla, materiales y archivo de documentos. ' +
+          'Lleva hoy el Lote 23 de Villas de Cantabria, con 41 documentos cargados desde el sitio.',
     chips:['Web', 'Asistida por IA'], estado:'En uso' },
 
   { clave:'quantity', nombre:'STICK QUANTITY', que:'Cantidades de obra',
-    texto:'Mampostería, columnas y despiece de acero. Entran las medidas y sale la cantidad ' +
-          'a pedir, con el desperdicio ya incluido.',
-    chips:['Web', 'Código abierto'], estado:'En uso' },
+    texto:'Mampostería, columnas y despiece de acero. Se ingresan las medidas del elemento y ' +
+          'devuelve la cantidad de material a pedir, con el porcentaje de desperdicio aplicado.',
+    chips:['Web', 'Un solo archivo'], estado:'En uso' },
+
+  { clave:'projects', nombre:'STICK PROJECTS', que:'Finanzas de obra',
+    texto:'Contratos, abonos, gastos y colaboradores de cada proyecto, con el corte de cuentas ' +
+          'por obra y por cliente. Varias personas sobre la misma empresa, cada una con su permiso.',
+    chips:['Web', 'Multiusuario'], estado:'En uso' }
 ];
 
+/* Las tres de fuera del oficio. Van en una tira compacta: cuentan que las
+   herramientas no se acaban en la obra, sin robarle sitio a las que si lo son. */
+const OTRAS_SUITE = [
+  { clave:'budgets', nombre:'STICK BUDGETS', que:'Finanzas personales' },
+  { clave:'assets',  nombre:'STICK ASSETS',  que:'Inversiones' },
+  { clave:'fit',     nombre:'STICK FIT',     que:'Entrenamiento' }
+];
+
+/* OJO: este bloque vive dentro de una plantilla de texto. No escribir comillas
+   invertidas aqui dentro — una sola cierra la cadena antes de tiempo. */
 document.getElementById('suite-rejilla').innerHTML = UTILES_SUITE.map((u, i) => `
   <article class="herram">
-    <div class="herram-lamina">
-      <!-- Sin carga diferida: dentro de una tarjeta que arranca con opacidad
-           cero y recortada, Chrome no llegaba a dispararla nunca y las tres se
-           quedaban en blanco. Son 60 KB entre las tres.
-           (Aqui dentro no caben comillas invertidas: este bloque vive en un
-           template string y una sola lo cierra antes de tiempo.) -->
-      <img src="assets/suite/${u.clave}.webp" alt="${u.nombre} en uso" decoding="async">
+    <div class="herram-escudo">
+      ${u.inicial
+        ? `<span class="herram-inicial">${u.inicial}</span>`
+        : `<img src="assets/suite/${u.clave}.webp" alt="Icono de ${u.nombre}" decoding="async" width="512" height="512">`}
     </div>
     <div class="herram-cuerpo">
       <div class="herram-alto">
@@ -2091,8 +2170,16 @@ document.getElementById('suite-rejilla').innerHTML = UTILES_SUITE.map((u, i) => 
         ${u.chips.map(c => `<span class="herram-chip">${c}</span>`).join('')}
       </div>
     </div>
-  </article>`).join('')
-;
+  </article>`).join('');
+
+document.getElementById('suite-otras').innerHTML = OTRAS_SUITE.map(o => `
+  <div class="otra">
+    <img src="assets/suite/${o.clave}.webp" alt="Icono de ${o.nombre}" decoding="async" width="512" height="512">
+    <div class="otra-txt">
+      <span class="otra-nom">${o.nombre}</span>
+      <span class="otra-que">${o.que}</span>
+    </div>
+  </div>`).join('');
 
 rueda.innerHTML = HITOS.map(h => `
   <div class="hito">
@@ -2891,7 +2978,7 @@ const observador = new IntersectionObserver(en => {
     else if (e.intersectionRatio === 0) e.target.classList.remove('visible', 'viva');
   });
 }, { threshold:[0, .12], rootMargin:'0px 0px -60px 0px' });
-document.querySelectorAll('.revelar, .palabras, .enlaces, .flujo, .cabeza, .suite')
+document.querySelectorAll('.revelar, .palabras, .enlaces, .flujo, .cabeza, .suite, .suite-otras')
   .forEach(el => observador.observe(el));
 
 /* `.asoma` va con un observador mas permisivo: el de arriba exige que
