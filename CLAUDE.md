@@ -12,6 +12,21 @@ CV interactiva y portafolio de visualización arquitectónica.
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
 
+### Purga del historial — 2026-09-13
+
+Autorizada por el Señor Stick. Con `git filter-repo` se reescribieron los 46
+commits conservando **solo las rutas que existen hoy**: salen del historial
+las 300 rutas borradas en algún momento —los recorridos, los fotogramas de
+«proceso», las familias de renders sin proyecto, `coincafex-07/08`, las
+capturas de las apps y la tarjeta `kevin-gil.vcf` con el teléfono en claro—,
+y además las **ocho versiones anteriores del reel** que seguían guardadas bajo
+el mismo nombre. El árbol del último commit quedó idéntico (mismo hash) y
+cambiaron los hashes de todos los commits; cualquier otro clon del repositorio
+queda desfasado y hay que volver a clonarlo.
+
+Respaldo previo completo en `C:\Users\kevin\Downloads\respaldo-portafolio-git\portafolio-antes-de-purga.bundle` (333 MB, verificado). Se restaura con
+`git clone` sobre ese archivo.
+
 ### v19.1 — 2026-09-13
 
 - **La sección Herramientas sale del sitio**, por decisión del Señor Stick:
@@ -109,8 +124,11 @@ Pendientes:
 1. Verificar en un **teléfono real** (lo automatizado cubre el encuadre, no
    el tacto ni el rendimiento en gama media)
 0. **Rehacer la sección de apps y los textos** con los prompts del Señor Stick.
-0. **Historial de git**: los archivos borrados en la v19.1 siguen en commits
-   viejos. Purgarlos exige reescribir el historial y forzar el push.
+0. **Copias en caché de GitHub.** El historial se purgó el 2026-09-13 (ver
+   abajo), pero GitHub sigue sirviendo los commits viejos a quien tenga su
+   hash exacto, hasta que su recolector los elimine. Para forzarlo hay que
+   pedirlo a GitHub Support citando los hashes, o borrar y recrear el
+   repositorio.
 2. La hoja de vida en PDF **sí** lleva el teléfono y el correo en claro, y
    vive en un repositorio público. Es su función —una hoja de vida sin
    teléfono no sirve—, pero conviene saberlo
