@@ -8,9 +8,44 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v19.2 — los textos del Señor Stick: descripción y trayecto.**
+**v19.3 — la suite propia vuelve al sitio, en tarjetas y en voz baja.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v19.3 — 2026-09-14
+
+Las apps vuelven, pero no como en la v19. Pedido del Señor Stick: «que sea
+muy sutil, y solo para mostrar que yo he creado esas aplicaciones».
+
+- **Van en Sobre mí, debajo del flujo**, no en sección propia ni en el menú.
+  Sostienen una frase de la biografía —«desarrollo aplicaciones y
+  herramientas propias»— y ese es todo el peso que piden.
+- **Tarjeta = icono, nombre y una línea.** Sin capturas, sin enlaces, sin
+  botón. La v19 ponía fichas con pantallazos de 30 KB y desenfocaba un
+  portafolio de ingeniería civil.
+- **Dos pesos.** ATLAS, AROS y QUANTITY abren en un renglón de tres tarjetas
+  porque son las de obra; PROJECTS, ASSETS, BUDGETS y FIT van debajo en una
+  tira al 70 % de opacidad que se enciende al pasar por encima.
+- **El resplandor es blanco para todas.** Los logos de software de arriba
+  llevan el color de cada marca porque ese color existe. Inventarle uno a
+  cada app propia sería decorar con algo que no es cierto.
+- **Si falta el icono, va la inicial.** Las seis declaran su ruta en
+  `assets/suite/` aunque el archivo no esté, y un `onerror` las deja en su
+  letra mientras tanto. ATLAS es el único con `null` de verdad: no tiene
+  icono dibujado, así que su «A» no es un respaldo sino lo definitivo.
+
+**Faltan tres iconos: `quantity`, `budgets` y `fit`.** Los `LOGO.png` de
+origen viven en el computador de Kevin (`01. STICK SUITE`), no en el
+repositorio. Se recuperaron de Drive los de AROS, PROJECTS y ASSETS y se
+procesaron con los mismos parámetros del script; los otros tres no se
+pudieron traer íntegros desde aquí. **Se arreglan con un comando:**
+
+```powershell
+python herramientas/preparar-suite.py
+```
+
+Escribe los seis en `assets/suite/` y las tarjetas los toman solas — el
+`index.html` ya apunta a esas rutas y no hay que tocar una línea.
 
 ### v19.2 — 2026-09-14
 
@@ -193,7 +228,7 @@ PORTAFOLIO/
 ├── compartir/                   tarjeta .vcf, QR, hoja de vida y reel vertical
 ├── assets/
 │   ├── marca/                   logo, isotipo, favicons e imagen de compartir
-│   ├── suite/                   capturas de las apps (las toma capturar-suite.mjs)
+│   ├── suite/                   iconos de las apps (los escribe preparar-suite.py)
 │   ├── logos/                   logos de software y escudos de formación
 │   ├── renders/                 imágenes en 1600 y 2560 px
 │   ├── video/                   6 recorridos, el reel y sus fotogramas de portada
@@ -257,12 +292,13 @@ Todo se recorre desplazando. El menú salta con un desplazamiento animado.
    pulsarlo, el video se abre en una capa **y arranca con sonido**. El
    `<video>` **no existe** hasta ese momento: lo crea el JS y lo destruye al
    cerrar.
-4. **Herramientas** — las tres apps de la suite que resuelven obra: ATLAS,
-   AROS y QUANTITY, con una captura real de cada una.
-5. **Sobre mí** — biografía; el trayecto como **rueda** —el hito del centro
+4. **Sobre mí** — biografía; el trayecto como **rueda** —el hito del centro
    va entero, con luz propia, y los vecinos se reducen según su distancia—;
-   y abajo las herramientas **por etapa**: Modelo, Representación, Apoyo.
-6. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail, Instagram y la
+   las herramientas **por etapa**: Modelo, Representación, Apoyo; y al pie
+   **la suite propia**, tres tarjetas de obra y una tira con las otras
+   cuatro. La sección de Herramientas dejó de existir en la v19.1: las apps
+   viven aquí, en voz baja.
+5. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail, Instagram y la
    tarjeta `.vcf`. Sin texto de venta.
 
 ### Lenguaje visual

@@ -732,6 +732,84 @@ body.bloqueado .masa { animation-play-state:paused; }
 .util:hover b { color:var(--tenue); }
 @media (max-width:900px){ .flujo { grid-template-columns:1fr; gap:1.8rem } }
 
+/* LA SUITE — las aplicaciones propias
+   Mismo lenguaje que la tira de software de arriba: silueta con resplandor
+   por `drop-shadow` sobre el PNG —asi toma la forma del icono y no la de
+   una caja— y el rotulo en mono debajo. Lo que cambia es el peso: esto va
+   DESPUES del flujo y mas callado, porque en un portafolio de ingenieria
+   civil las apps acompanan, no encabezan.
+
+   EL RESPLANDOR ES BLANCO PARA TODAS. Los logos de software de arriba
+   llevan el color de cada marca porque ese color existe; inventarle uno a
+   cada app propia seria decorar con algo que no es cierto. */
+.apps { margin-top:clamp(1.1rem,2.4vh,1.8rem); padding-top:clamp(1rem,2vh,1.5rem);
+  border-top:1px solid var(--linea); }
+.apps .etiqueta { margin-bottom:clamp(.8rem,1.6vh,1.1rem); }
+
+.apps-clave { display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(.6rem,1.4vw,1rem); }
+.app { display:flex; flex-direction:column; align-items:center; text-align:center; gap:.5rem;
+  padding:clamp(.85rem,1.7vh,1.15rem) .75rem;
+  border:1px solid rgba(255,255,255,.07); border-radius:14px;
+  background:rgba(255,255,255,.022);
+  opacity:0; transform:translateY(18px);
+  transition:opacity .8s var(--suave), transform .9s var(--salida),
+             background .45s var(--suave), border-color .45s var(--suave); }
+.apps.visible .app { opacity:1; transform:none; }
+.apps.visible .app:nth-child(2) { transition-delay:.08s }
+.apps.visible .app:nth-child(3) { transition-delay:.16s }
+.app:hover { background:rgba(255,255,255,.045); border-color:rgba(255,255,255,.13); }
+
+/* La caja del icono mide siempre lo mismo, lleve dibujo o inicial: sin
+   esto las tarjetas de la fila no alinean su nombre a la misma altura. */
+.icono-app { width:38px; height:38px; display:grid; place-items:center; flex:none; }
+.icono-app img { width:100%; height:100%; object-fit:contain;
+  filter:drop-shadow(0 0 9px rgba(255,255,255,.2)) drop-shadow(0 0 20px rgba(255,255,255,.09));
+  transition:filter .5s var(--suave), transform .55s var(--resorte); }
+.app:hover .icono-app img, .mini:hover .icono-app img {
+  transform:scale(1.08);
+  filter:drop-shadow(0 0 15px rgba(255,255,255,.42)) drop-shadow(0 0 34px rgba(255,255,255,.2)); }
+/* Sin icono dibujado, la inicial. Una letra honesta antes que un hueco. */
+.icono-app i { font-family:var(--mono); font-style:normal; font-size:1.1rem;
+  color:var(--n-200); opacity:.7; letter-spacing:.02em; }
+
+.app b, .mini b { font-family:var(--mono); font-size:.55rem; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--tenue); font-weight:400; }
+.app em { font-style:normal; font-size:.73rem; line-height:1.45; color:var(--debil);
+  max-width:24ch; }
+.app .texto { display:flex; flex-direction:column; align-items:center; gap:.3rem; min-width:0; }
+
+/* LAS OTRAS CUATRO — una tira, no tarjetas. Son ciertas y suman, pero no
+   son de obra: si compitieran en tamano con ATLAS o QUANTITY dirian algo
+   que no es. Van al 70 % y se encienden al pasar por encima. */
+.apps-resto { display:flex; flex-wrap:wrap; gap:clamp(.8rem,2.2vw,1.8rem);
+  margin-top:clamp(.85rem,1.7vh,1.15rem); padding-top:clamp(.75rem,1.5vh,1rem);
+  border-top:1px solid rgba(255,255,255,.055); }
+.mini { display:flex; align-items:center; gap:.6rem; min-width:0;
+  opacity:0; transform:translateY(12px);
+  transition:opacity .7s var(--suave), transform .8s var(--salida); }
+.apps.visible .mini { opacity:.7; transform:none; }
+.apps.visible .mini:nth-child(2) { transition-delay:.06s }
+.apps.visible .mini:nth-child(3) { transition-delay:.12s }
+.apps.visible .mini:nth-child(4) { transition-delay:.18s }
+.mini:hover { opacity:1; }
+.mini .icono-app { width:22px; height:22px; }
+.mini .icono-app i { font-size:.8rem; }
+.mini .texto { display:flex; flex-direction:column; gap:.1rem; min-width:0; }
+.mini em { font-style:normal; font-size:.68rem; line-height:1.35; color:var(--debil); }
+
+@media (max-width:760px){
+  .apps-clave { grid-template-columns:minmax(0,1fr); gap:.55rem; }
+  /* Apilada, la tarjeta deja de ser un cuadro centrado y pasa a ser una
+     fila: el icono a la izquierda y el texto al lado, que es como se lee
+     una lista en un telefono. */
+  .app { flex-direction:row; align-items:center; text-align:left; gap:.75rem;
+    padding:.8rem .9rem; }
+  .app .texto { align-items:flex-start; gap:.15rem; }
+  .app em { max-width:none; }
+  .apps-resto { gap:.7rem 1.4rem; }
+}
+
 .sobre-contenido { position:relative; z-index:1; }
 .bio { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); gap:clamp(1.6rem,5vw,4.5rem); align-items:center; }
 @media (max-width:960px){ .bio { grid-template-columns:1fr; gap:2.5rem } }
@@ -1323,6 +1401,8 @@ body.bloqueado .masa { animation-play-state:paused; }
   .titular::after { animation:none; opacity:0 }
   .inicio-aparte, .baja, .mas-filo .marca-mas { opacity:1 }
   .etapa { opacity:1 !important; transform:none !important }
+  .app   { opacity:1 !important; transform:none !important }
+  .mini  { opacity:.7 !important; transform:none !important }
   .mas-filo .raya { transform:none }
   .galeria figure, .hoja, .tira-extra figure { clip-path:none !important; opacity:1 !important; transform:none !important; }
   .ficha-portada-texto h2 span, .ficha .entra { transform:none; opacity:1; filter:none }
@@ -1500,6 +1580,8 @@ body.bloqueado .masa { animation-play-state:paused; }
       <div class="cifras asoma" id="cifras"></div>
 
       <div class="flujo" id="flujo"></div>
+
+      <div class="apps" id="apps"></div>
     </div>
 
   </div>
@@ -1757,6 +1839,42 @@ const UTILES = [
   { nombre:'Twinmotion',  logo:'assets/logos/twinmotion.webp', color:'236,240,248', etapa:1, negativo:true },
   { nombre:'Claude Code', logo:'assets/logos/claudecode.webp', color:'217,119,87',  etapa:2 },
   { nombre:'ChatGPT',     logo:'assets/logos/chatgpt.webp',    color:'116,170,156', etapa:2, negativo:true }
+];
+
+/* LA SUITE — las aplicaciones propias.
+
+   Esto NO es una vitrina de producto: es la prueba de una frase de la
+   biografia. Por eso cada app trae lo justo —icono, nombre y una linea— y
+   ni una captura, ni un enlace, ni un boton. La version de la v19 ponia
+   fichas grandes con pantallazos y desenfocaba un portafolio de ingenieria
+   civil; aqui pesa lo que debe pesar.
+
+   Las tres de `obra` abren la fila porque son las que sostienen el
+   argumento. Las otras cuatro van en una tira mas tenue.
+
+   El icono lo escribe `herramientas/preparar-suite.py` desde el LOGO.png
+   de cada app, que vive en el computador de Kevin y no en el repositorio.
+   Por eso las seis declaran su ruta aunque el archivo todavia no este: el
+   `onerror` las deja en la INICIAL mientras falte, y el dia que se corra
+   el script aparecen solas sin tocar una linea de aqui. ATLAS es el unico
+   con `null` de verdad — no tiene icono dibujado, asi que su inicial no es
+   un respaldo sino lo definitivo por ahora. */
+const APPS = [
+  { nombre:'ATLAS',    icono:null,
+    que:'Cálculo estructural según la NSR-10.',       obra:true },
+  { nombre:'AROS',     icono:'assets/suite/aros.webp',
+    que:'Residencia y supervisión de obra.',          obra:true },
+  { nombre:'QUANTITY', icono:'assets/suite/quantity.webp',
+    que:'Cantidades de obra y despiece de acero.',    obra:true },
+
+  { nombre:'PROJECTS', icono:'assets/suite/projects.webp',
+    que:'Contratos y finanzas por proyecto.' },
+  { nombre:'ASSETS',   icono:'assets/suite/assets.webp',
+    que:'Portafolio de inversiones.' },
+  { nombre:'BUDGETS',  icono:'assets/suite/budgets.webp',
+    que:'Finanzas personales.' },
+  { nombre:'FIT',      icono:'assets/suite/fit.webp',
+    que:'Entrenamiento de fuerza.' }
 ];
 
 const ETAPAS = [
@@ -2032,6 +2150,34 @@ document.getElementById('flujo').innerHTML = ETAPAS.map((e, k) => `
 /* =================================================================
    CONTACTO
    ================================================================= */
+/* --- La suite propia ------------------------------------------- */
+/* La marca de cada app: su icono si `preparar-suite.py` ya lo escribio, y
+   si no, la inicial. El `onerror` cubre el otro caso —el archivo declarado
+   pero ausente—, porque un icono roto en una tarjeta se ve peor que una
+   letra puesta a proposito. */
+const marcaApp = (a) => `
+  <span class="icono-app">${a.icono
+    ? `<img src="${a.icono}" alt="" loading="lazy" decoding="async"
+            onerror="this.replaceWith(Object.assign(document.createElement('i'),{textContent:'${a.nombre[0]}'}))">`
+    : `<i>${a.nombre[0]}</i>`}</span>`;
+
+document.getElementById('apps').innerHTML = `
+  <div class="etiqueta revelar"><span>Aplicaciones propias</span></div>
+  <div class="apps-clave">
+    ${APPS.filter(a => a.obra).map(a => `
+      <div class="app">
+        ${marcaApp(a)}
+        <span class="texto"><b>${a.nombre}</b><em>${a.que}</em></span>
+      </div>`).join('')}
+  </div>
+  <div class="apps-resto">
+    ${APPS.filter(a => !a.obra).map(a => `
+      <span class="mini">
+        ${marcaApp(a)}
+        <span class="texto"><b>${a.nombre}</b><em>${a.que}</em></span>
+      </span>`).join('')}
+  </div>`;
+
 const IG_SVG = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>';
 const WA_SVG = '<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 01-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.2 8.2 0 015.83 2.42 8.18 8.18 0 012.41 5.82c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.43.06-.65.31-.22.25-.85.83-.85 2.03s.87 2.35.99 2.51c.12.17 1.71 2.61 4.15 3.66.58.25 1.03.4 1.39.51.58.19 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29z"/></svg>';
 const MAIL_SVG = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="M3 7l9 6 9-6"/></svg>';
@@ -2762,7 +2908,7 @@ const observador = new IntersectionObserver(en => {
     else if (e.intersectionRatio === 0) e.target.classList.remove('visible', 'viva');
   });
 }, { threshold:[0, .12], rootMargin:'0px 0px -60px 0px' });
-document.querySelectorAll('.revelar, .palabras, .enlaces, .flujo, .cabeza')
+document.querySelectorAll('.revelar, .palabras, .enlaces, .flujo, .apps, .cabeza')
   .forEach(el => observador.observe(el));
 
 /* `.asoma` va con un observador mas permisivo: el de arriba exige que
