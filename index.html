@@ -1473,13 +1473,17 @@ body.bloqueado .masa { animation-play-state:paused; }
 
       <div class="bio">
         <div class="asoma">
-          <p class="destacado">Modelo el proyecto completo en tres dimensiones, y del mismo archivo
-             salen las imágenes, los planos y las cantidades de material.</p>
-          <p><strong>Kevin Stick Gil Arévalo.</strong> Noveno semestre de ingeniería civil en la
-             Universidad Pontificia Bolivariana de Bucaramanga. Empezó dibujando proyectos de otros
-             con <strong>VISUAL 3D STUDIO</strong>; desde agosto de 2026 el trabajo va bajo
-             <strong>STICK INDUSTRIES</strong>.</p>
-          <p>Va a obra varias veces por semana: replanteo, control de material y cuadrilla.</p>
+          <p class="destacado">Diseño para construir, no solo para impresionar.</p>
+          <p>No separo la arquitectura de la ingeniería ni la técnica de la tecnología. Cada
+             proyecto parte de <strong>un único modelo digital</strong> del que se generan las
+             visualizaciones, los planos y la información necesaria para construir con precisión.</p>
+          <p>Mi trabajo combina ingeniería civil, criterio estructural y sensibilidad arquitectónica
+             para que la estética y la viabilidad técnica avancen en la misma dirección.
+             Paralelamente, desarrollo aplicaciones y herramientas propias que optimizan mi flujo de
+             trabajo y me permiten ofrecer soluciones más eficientes que las de un proceso
+             convencional.</p>
+          <p>No busco únicamente representar proyectos. Busco comprenderlos, optimizarlos y hacerlos
+             mejores antes de que lleguen a la obra.</p>
         </div>
 
         <div class="bio-trayecto asoma" style="--r:.12s">
@@ -1704,31 +1708,32 @@ const HITOS = [
 
   { anio:'2022', escudo:'assets/logos/upb.webp', sigla:'UPB',
     titulo:'Ingeniería Civil', estado:'9 semestres',
-    detalle:'Universidad Pontificia Bolivariana, seccional Bucaramanga. Promedio ponderado 4.2 / 5.' },
+    detalle:'Universidad Pontificia Bolivariana, seccional Bucaramanga. Promedio ponderado 4.3 / 5.' },
 
   { anio:'2023', escudo:null, sigla:'OBRA',
     titulo:'Ayudante de obra', estado:null,
     detalle:'Replanteo, control de material y manejo de cuadrilla en obra de vivienda.' },
 
-  { anio:'2026', escudo:null, sigla:'SSI',
+  { anio:'2025', escudo:null, sigla:'SSI',
     titulo:'Congreso XOpen Internacional', estado:null,
-    detalle:'Sociedad Santandereana de Ingeniería. Competencia de puentes: diseñar uno, construirlo y cargarlo hasta que falla.' },
+    detalle:'Sociedad Santandereana de Ingeniería. Participación en la competencia de puentes.' },
+
+  { anio:'2025', escudo:'assets/logos/uis.webp', sigla:'UIS',
+    titulo:'Curso de Modelado BIM y Gestión de la Construcción a través de Autodesk REVIT',
+    estado:'50 horas',
+    detalle:'Asociación Centro de Estudios de Ingeniería Civil UIS.' },
 
   { anio:'2026', escudo:'assets/logos/upb.webp', sigla:'UPB',
     titulo:'Representante estudiantil', estado:'Facultad',
-    detalle:'Elegido por sus compañeros ante la Facultad de Ingeniería Civil. UPB Bucaramanga.' },
-
-  { anio:'2026', escudo:'assets/logos/uis.webp', sigla:'UIS',
-    titulo:'Modelado BIM y gestión de la construcción', estado:null,
-    detalle:'Revit y coordinación de modelos. Centro de Estudios de Ingeniería Civil, UIS.' },
+    detalle:null },
 
   { anio:'2026', escudo:'assets/marca/v3s.png', sigla:'V3S',
     titulo:'VISUAL 3D STUDIO', estado:'Fundador',
-    detalle:'Estudio propio de render y planos para arquitectos y constructoras. Cerrado en agosto de 2026, con el trabajo entregado.' },
+    detalle:'Estudio propio de render y modelado para arquitectos y constructoras.' },
 
   { anio:'2026', escudo:'assets/marca/isotipo-claro.svg', sigla:'SI',
     titulo:'STICK INDUSTRIES', estado:'Actual',
-    detalle:'Render, planos y modelado para arquitectos y constructoras, más las siete aplicaciones propias de cálculo, obra y finanzas.' },
+    detalle:'Marca personal con la que continúa el trabajo de VISUAL 3D STUDIO: modelado, render y planos, más las aplicaciones propias de cálculo y control de obra.' },
 
   { anio:'2026', escudo:'assets/logos/upb.webp', sigla:'UPB',
     titulo:'Especialización en Vías Terrestres', estado:'Cursando',
@@ -1736,7 +1741,7 @@ const HITOS = [
 
   { anio:'Próximo', escudo:null, sigla:'···',
     titulo:'Especialización en Estructuras', estado:'Proyectada',
-    detalle:'Diseño sismorresistente y cimentaciones, que es la base sobre la que está escrito ATLAS.' }
+    detalle:'Diseño sismorresistente y cimentaciones: el cálculo que ATLAS automatiza, para poder ampliarlo y responder por sus resultados.' }
 ];
 
 /* Los logos no van en rejilla ni en cajas: forman una constelacion
@@ -1952,7 +1957,7 @@ rueda.innerHTML = HITOS.map(h => `
     <div>
       <div class="anio mono">${h.anio}</div>
       <h4>${h.titulo}${h.estado ? `<span class="marca-estado">${h.estado}</span>` : ''}</h4>
-      <p>${h.detalle}</p>
+      ${h.detalle ? `<p>${h.detalle}</p>` : ''}
     </div>
   </div>`).join('');
 

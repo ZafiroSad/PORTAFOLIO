@@ -76,7 +76,7 @@ function hoja(d) {
           ${h.estado ? `<span class="estado">${esc(h.estado)}</span>` : ''}
           <span class="anio">${esc(h.anio)}</span>
         </div>
-        <p>${esc(h.detalle)}</p>
+        ${h.detalle ? `<p>${esc(h.detalle)}</p>` : ''}
       </li>`;
 
   const porEtapa = d.ETAPAS.map((e, i) => `
@@ -195,15 +195,15 @@ function hoja(d) {
     </div>
   </header>
 
-  <p class="perfil">Un render no empieza en la imagen: empieza en el modelo. Los espesores y los
-     apoyos que se ven en pantalla son los mismos que después se replantean en obra, y
-     <strong>varias visitas a obra por semana</strong> son las que enseñan dónde se separan.</p>
+  <p class="perfil">Diseño para construir, no solo para impresionar. Cada proyecto parte de
+     <strong>un único modelo digital</strong> del que salen las visualizaciones, los planos y la
+     información necesaria para construir con precisión.</p>
 
   <div class="cifras">
     <div class="cifra"><b>${d.PROYECTOS.length}</b><span>Proyectos</span></div>
     <div class="cifra"><b>${totalPiezas}</b><span>Imágenes</span></div>
     <div class="cifra"><b>9</b><span>Semestres</span></div>
-    <div class="cifra"><b>4.2</b><span>Promedio / 5</span></div>
+    <div class="cifra"><b>4.3</b><span>Promedio / 5</span></div>
   </div>
 
   <!-- DOS COLUMNAS, no dos rejillas apiladas. Trayectoria es mas corta que

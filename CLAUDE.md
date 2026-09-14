@@ -8,9 +8,50 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v19.1 — sin la sección de apps, el repositorio limpio y el reel a 1440p.**
+**v19.2 — los textos del Señor Stick: descripción y trayecto.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v19.2 — 2026-09-14
+
+Llegó el prompt de los textos que la v19.1 dejó pendientes. Van tal cual los
+escribió, y el trayecto se corrigió hito por hito.
+
+- **La biografía es la suya, palabra por palabra.** Cuatro párrafos que abren
+  con «Diseño para construir, no solo para impresionar». Sale la versión
+  anterior entera, y con ella la frase del noveno semestre y la de las visitas
+  a obra: lo que dice de sí mismo lo dice él.
+- **El promedio sube a 4.3**, en el sitio y en la hoja de vida.
+- **El curso de la UIS lleva el nombre del certificado.** Se leyó el propio
+  diploma (`02. CERTIFICADOS/Kevin_Gil - ASCEIC - Curso_Revit - 2025.pdf`, en
+  su Drive): «Curso de Modelado BIM y Gestión de la Construcción a través de
+  Autodesk REVIT», de la **Asociación Centro de Estudios de Ingeniería Civil
+  UIS**, 50 horas. El nombre del sitio era una paráfrasis.
+- **Dos años corregidos, y el orden con ellos.** El certificado está expedido
+  el 18 de septiembre de **2025**, no 2026; y su propia hoja de vida fecha el
+  congreso XOpen en 2025. Los dos hitos pasan a 2025 y el curso se coloca
+  después del congreso, como en la hoja de vida. La rueda dice que va en orden
+  cronológico: con un 2026 delante de un 2025 dejaba de ser cierto.
+- **Un hito puede no llevar descripción.** «Representante estudiantil» se queda
+  solo con el título, por decisión suya. La rueda y la hoja de vida imprimían
+  `<p>${detalle}</p>` sin mirar: con `detalle:null` habrían escrito la palabra
+  **null** en la página. Las dos plantillas ahora lo comprueban.
+- **XOpen, VISUAL y STICK**, reescritos: el congreso dice que participó en la
+  competencia de puentes y nada más; VISUAL es estudio propio de render y
+  modelado, sin la nota de su cierre; y STICK INDUSTRIES se presenta como la
+  marca personal con la que continúa ese trabajo.
+- **ATLAS entra en el hito de Estructuras por la razón, no de adorno**: la
+  especialización es para poder ampliar el cálculo que la aplicación automatiza
+  y responder por sus resultados.
+
+**La hoja de vida en PDF hay que reimprimirla en el computador de Kevin**
+(`node herramientas/preparar-cv.mjs`). Aquí no está instalada Century Gothic,
+que es la tipografía de la marca, así que lo impreso desde este contenedor sale
+con otra letra y con otra paginación —el PDF **sin tocar** también salía a dos
+hojas—. El `compartir/kevin-gil-cv.pdf` del repositorio sigue siendo el
+anterior: dice 4.2 y lleva el perfil viejo hasta que se vuelva a correr. El
+párrafo de perfil nuevo es 31 caracteres **más corto** que el que sustituye,
+así que la hoja única no debería estar en riesgo, pero conviene mirarlo.
 
 ### Purga del historial — 2026-09-13
 
