@@ -756,14 +756,16 @@ body.bloqueado .masa { animation-play-state:paused; }
 
 /* Rectangulares hacia abajo, como los accesos de Contacto: el icono arriba,
    el nombre y su dato abajo, y aire entre medias. */
-/* CENTRADO, no `space-between`. Los accesos de Contacto solo llevan icono y
-   rotulo, asi que separarlos contra los extremos los equilibra; estas llevan
-   tres lineas de texto y el mismo reparto dejaba un hueco muerto en mitad de
-   la tarjeta. Centrado el bloque entero, la tarjeta se lee llena. */
+/* LA PROPORCION MANDA. La v21 puso un icono de 54 px en una tarjeta de 214,
+   y por eso seguia leyendose vacia aunque la tarjeta fuera bonita: no
+   sobraba espacio en la seccion, sobraba DENTRO de cada pieza. Aqui la
+   tarjeta encoge y el icono crece hasta que el contenido la llena de verdad.
+   Centrado, no `space-between`: con tres lineas de texto, separarlas contra
+   los extremos volvia a abrir el hueco en mitad. */
 .app-tarjeta { position:relative; display:flex; flex-direction:column;
-  align-items:center; justify-content:center; gap:1rem;
-  min-height:clamp(178px,22vh,214px);
-  padding:1.5rem 1.1rem; border-radius:26px; overflow:hidden; text-align:center;
+  align-items:center; justify-content:center; gap:.7rem;
+  min-height:clamp(146px,17vh,166px);
+  padding:1.15rem .9rem; border-radius:22px; overflow:hidden; text-align:center;
   opacity:0; transform:translateY(26px);
   transition:opacity .8s var(--suave), transform .55s var(--salida),
              border-color .45s var(--suave), box-shadow .5s var(--suave); }
@@ -787,33 +789,42 @@ body.bloqueado .masa { animation-play-state:paused; }
   animation-delay:var(--d,0s); }
 @keyframes respiraClave { from { opacity:.6 } to { opacity:1 } }
 
-/* El icono en su propia pastilla, como el de los accesos: sin ella la
-   silueta flotaba suelta y la tarjeta se leia a medio terminar. */
-.icono-app { width:54px; height:54px; border-radius:18px; display:grid; place-items:center;
-  flex:none; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
-  transition:transform .6s var(--resorte), background .45s var(--suave),
-             border-color .45s var(--suave); }
-.clave .icono-app { background:rgba(255,255,255,.11); border-color:rgba(255,255,255,.22); }
-.app-tarjeta:hover .icono-app { transform:translateY(-2px) scale(1.07);
-  background:rgba(255,255,255,.16); border-color:rgba(255,255,255,.34); }
-.icono-app img { width:28px; height:28px; object-fit:contain;
-  filter:drop-shadow(0 0 9px rgba(255,255,255,.28)); }
-.clave .icono-app img { filter:drop-shadow(0 0 13px rgba(255,255,255,.5)); }
+/* EL ICONO SIN PASTILLA Y GRANDE. La v21 lo metio en un cuadradito de 54 px
+   como los accesos de Contacto, y ahi el icono es un glifo de interfaz; este
+   es la MARCA de la app y tiene que mandar en la tarjeta. Ademas contradecia
+   una decision ya tomada para los logos de software: el resplandor sale de
+   `drop-shadow` sobre el PNG, asi que toma la silueta del logo y no la de un
+   contenedor. A este tamaño se sostiene solo. */
+.icono-app { width:clamp(58px,5.4vw,74px); height:clamp(58px,5.4vw,74px);
+  display:grid; place-items:center; flex:none;
+  transition:transform .6s var(--resorte); }
+.app-tarjeta:hover .icono-app { transform:translateY(-3px) scale(1.07); }
+.icono-app img { width:100%; height:100%; object-fit:contain;
+  filter:drop-shadow(0 0 12px rgba(255,255,255,.26)) drop-shadow(0 0 30px rgba(255,255,255,.1));
+  transition:filter .5s var(--suave); }
+.clave .icono-app img {
+  filter:drop-shadow(0 0 16px rgba(255,255,255,.5)) drop-shadow(0 0 38px rgba(255,255,255,.22)); }
+.app-tarjeta:hover .icono-app img {
+  filter:drop-shadow(0 0 20px rgba(255,255,255,.6)) drop-shadow(0 0 44px rgba(255,255,255,.28)); }
 /* Sin icono dibujado, la inicial. Una letra honesta antes que un hueco. */
-.icono-app i { font-family:var(--mono); font-style:normal; font-size:1.15rem;
-  color:var(--n-200); opacity:.8; letter-spacing:.02em; }
+.icono-app i { font-family:var(--mono); font-style:normal;
+  font-size:clamp(1.9rem,2.6vw,2.5rem); color:var(--n-200); opacity:.85;
+  letter-spacing:.02em; }
 .clave .icono-app i { opacity:1; text-shadow:0 0 14px rgba(255,255,255,.35); }
 
 /* `.app-pie` y no `.pie`: esa clase YA ERA el pie de pagina del sitio, con
    su `border-top` y su tipografia mono. Reusar el nombre dibujaba una linea
    dentro de cada tarjeta, pasaba el texto a monoespaciada y estiraba la
    tarjeta de 232 a 332 px. */
-.app-tarjeta .app-pie { display:flex; flex-direction:column; gap:.4rem; }
+.app-tarjeta .app-pie { display:flex; flex-direction:column; gap:.28rem; }
 .app-tarjeta .val { display:block; font-size:1rem; font-weight:500; letter-spacing:-.01em;
   color:var(--tinta); }
-.app-tarjeta .que { display:block; font-size:.74rem; line-height:1.4; color:var(--debil);
-  min-height:2.8em; }
+/* SIN alto reservado. Se puso para que las descripciones de una linea no
+   dejaran su tarjeta mas baja que las de dos — pero la rejilla ya estira
+   todas las de una fila a la misma altura, asi que lo unico que hacia era
+   dejar una linea vacia en cada tarjeta de la fila de arriba, donde todas
+   caben en una. */
+.app-tarjeta .que { display:block; font-size:.72rem; line-height:1.35; color:var(--debil); }
 .app-tarjeta .rot { display:block; font-family:var(--mono); font-size:.55rem;
   letter-spacing:.2em; text-transform:uppercase; color:var(--debil); }
 

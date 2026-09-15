@@ -8,9 +8,34 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v21 — la suite rehecha sobre `.vidrio`, el componente del sistema.**
+**v22 — la suite, en proporción: icono grande y tarjeta apretada.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v22 — 2026-09-16
+
+La v21 arregló el material pero no la proporción. El Señor Stick: «no me gusta
+que se vea tan grande la tarjeta, la app pequeña; dame una vista que se vea
+viva, llena, no vacía».
+
+- **No sobraba espacio en la sección: sobraba DENTRO de cada pieza.** Un icono
+  de 54 px en una tarjeta de 214 deja aire por todas partes por bonita que sea
+  la tarjeta. La tarjeta baja a ~166 px de alto y el icono sube a 74: ahora el
+  contenido la llena.
+- **Fuera la pastilla del icono.** La v21 lo metió en un cuadradito de 54 px
+  copiando los accesos de Contacto — pero ahí el icono es un glifo de
+  interfaz, y este es la MARCA de la app y tiene que mandar. Además
+  contradecía una decisión ya tomada para los logos de software: *el
+  resplandor sale de `drop-shadow` sobre el PNG, así que toma la silueta del
+  logo y no la de un contenedor*. A 74 px se sostiene solo.
+- **Se quitó el alto reservado de la descripción.** Estaba para que una
+  descripción de una línea no dejara su tarjeta más baja que las de dos, pero
+  **la rejilla ya estira todas las de una fila a la misma altura**. Lo único
+  que hacía era dejar una línea vacía en cada tarjeta de la fila de arriba,
+  donde todas caben en una.
+
+Medido a 1440, 1024 y 560 px: sin desbordes ni scroll horizontal. Tarjeta
+425×189 e icono 74 en escritorio; 245×173 e icono 58 en estrecho.
 
 ### v21 — 2026-09-16
 
