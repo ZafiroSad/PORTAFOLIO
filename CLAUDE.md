@@ -31,6 +31,43 @@ v19.4** aunque su commit diga v19.2 (el historial publicado no se reescribe).
   segunda hoja. Se bajó el margen entre renglones de 2,4 a 1,8 mm y el del pie
   de 5 a 3 mm; vuelve a una hoja, comprobado contando páginas del PDF.
 
+### v20 — 2026-09-15
+
+El Señor Stick vio la v19.3 publicada y pidió lo contrario de lo que había
+pedido el día antes: «una sección que se llame la Stick Suite donde las apps
+se vean con más protagonismo, en tarjetas cuadradas… las otras apps resáltalas
+todas iguales pero las 3 principales primero, con un efecto de brillo».
+
+- **Sección propia, con entrada en el menú.** Sale de dentro de Sobre mí y
+  pasa a ser `#suite`, entre Sobre mí y Contacto. Ese orden es deliberado:
+  primero el trabajo, luego quién lo hace, y entonces las herramientas que se
+  escribió para hacerlo. Puesta antes se leería como un catálogo de software.
+- **Las siete miden IGUAL, en tarjeta cuadrada** (`aspect-ratio:1`). La v19.3
+  tenía dos pesos —tarjeta contra tira— y eso decía que cuatro de ellas
+  importaban menos. Ahora lo único que separa a las de obra es **el orden y el
+  brillo**: se leen primero y se encienden, pero ninguna se encoge.
+- **El brillo son tres capas que no cambian el tamaño**: halo radial detrás
+  del icono, filo más claro, y un `box-shadow` que respira cada 6,5 s. Se hace
+  con `box-shadow` y un pseudoelemento y **no** con `filter` sobre la tarjeta,
+  porque el filtro emborronaría también el texto.
+- **Flex y no rejilla.** Con cuatro columnas y siete piezas sobraba una celda.
+  Con `flex-wrap` y `justify-content:center`, las dos filas quedan centradas
+  una sobre otra —tres arriba, cuatro abajo— y no hay hueco. El corte que las
+  separa es un elemento de verdad (`.suite-corte`), porque un `::after` no
+  puede ser hijo flex; por debajo de 700 px se apaga, que ahí caben dos por
+  fila y forzarlo dejaría una colgando.
+- **La descripción reserva dos líneas aunque ocupe una.** La tarjeta centra su
+  contenido, así que «Finanzas personales.» subía menos y dejaba su icono y su
+  nombre 7 px por debajo de los vecinos. Medido y corregido con `min-height`.
+- El menú pasa de cinco entradas a seis. Medido: a 520 px la marca son 121 px
+  y el menú 307, sobre 481 disponibles — cabe sin desbordar.
+
+**Ojo al medir con pantallazos en este contenedor:** el Chrome headless captura
+**antes de que los WebP de los iconos decodifiquen**, y la sección sale con las
+tarjetas vacías. Pasó tres veces y las tres eran falsa alarma — medidos, los
+`<img>` daban `naturalWidth` 512 y `complete:true`. Para ver la sección de
+verdad hay que incrustar los iconos como `data:` URI en una copia de prueba.
+
 ### v19.3 — 2026-09-14
 
 Las apps vuelven, pero no como en la v19. Pedido del Señor Stick: «que sea
@@ -316,11 +353,10 @@ Todo se recorre desplazando. El menú salta con un desplazamiento animado.
    cerrar.
 4. **Sobre mí** — biografía; el trayecto como **rueda** —el hito del centro
    va entero, con luz propia, y los vecinos se reducen según su distancia—;
-   las herramientas **por etapa**: Modelo, Representación, Apoyo; y al pie
-   **la suite propia**, tres tarjetas de obra y una tira con las otras
-   cuatro. La sección de Herramientas dejó de existir en la v19.1: las apps
-   viven aquí, en voz baja.
-5. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail, Instagram y la
+   y las herramientas **por etapa**: Modelo, Representación, Apoyo.
+5. **La STICK SUITE** — las siete aplicaciones propias en tarjeta cuadrada,
+   todas del mismo tamaño. Las tres de obra van primero y con brillo.
+6. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail, Instagram y la
    tarjeta `.vcf`. Sin texto de venta.
 
 ### Lenguaje visual
@@ -370,12 +406,11 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
   cambió por el icono de cada app, y la v19.3 quitó del todo la idea de
   enseñar la interfaz. `capturar-suite.mjs` —el script de puppeteer que tomaba
   esas capturas— ya no existe en el repositorio.
-- **Entran las siete, en dos pesos.** ATLAS, AROS y QUANTITY en tarjeta,
-  porque son las de obra y son las que sostienen el argumento; PROJECTS,
-  ASSETS, BUDGETS y FIT en una tira más tenue debajo. La v19 solo dejaba
-  entrar a las de obra y mencionaba el resto en una línea; el Señor Stick
-  pidió verlas todas, y en dos pesos siguen sin desenfocar un portafolio de
-  ingeniería civil.
+- **Entran las siete y TODAS MIDEN IGUAL.** Esto ha ido y venido: la v19 solo
+  dejaba entrar a las de obra, la v19.3 las puso todas pero en dos pesos, y la
+  v20 las iguala. Lo que distingue a ATLAS, AROS y QUANTITY es que van
+  **primero y con brillo**, no que sean más grandes — una tarjeta más pequeña
+  decía que esas cuatro importaban menos, y no es lo que se quiere decir.
 - **Un icono que falta no deja un hueco: deja su inicial.** Los `LOGO.png` de
   origen viven fuera del repositorio, así que el sitio declara la ruta de los
   seis aunque el archivo no esté y un `onerror` pone la letra mientras tanto.

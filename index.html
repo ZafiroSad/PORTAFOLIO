@@ -732,82 +732,104 @@ body.bloqueado .masa { animation-play-state:paused; }
 .util:hover b { color:var(--tenue); }
 @media (max-width:900px){ .flujo { grid-template-columns:1fr; gap:1.8rem } }
 
-/* LA SUITE — las aplicaciones propias
-   Mismo lenguaje que la tira de software de arriba: silueta con resplandor
-   por `drop-shadow` sobre el PNG —asi toma la forma del icono y no la de
-   una caja— y el rotulo en mono debajo. Lo que cambia es el peso: esto va
-   DESPUES del flujo y mas callado, porque en un portafolio de ingenieria
-   civil las apps acompanan, no encabezan.
+/* LA STICK SUITE — seccion propia
+   La v19.3 las puso en voz baja dentro de Sobre mi. El Señor Stick lo vio y
+   pidio lo contrario: seccion con su nombre y las apps con protagonismo. Asi
+   que salen de ahi y vienen aqui, en tarjeta CUADRADA.
 
-   EL RESPLANDOR ES BLANCO PARA TODAS. Los logos de software de arriba
-   llevan el color de cada marca porque ese color existe; inventarle uno a
-   cada app propia seria decorar con algo que no es cierto. */
-.apps { margin-top:clamp(1.1rem,2.4vh,1.8rem); padding-top:clamp(1rem,2vh,1.5rem);
-  border-top:1px solid var(--linea); }
-.apps .etiqueta { margin-bottom:clamp(.8rem,1.6vh,1.1rem); }
+   LAS SIETE MIDEN IGUAL. Antes habia dos pesos —tarjeta contra tira— y eso
+   decia que cuatro de ellas importaban menos. Ahora el orden y el brillo son
+   lo unico que separa a las de obra: se leen primero y se encienden, pero
+   ninguna se encoge. */
+.suite-entrada { color:var(--tenue); font-size:.92rem; line-height:1.55; max-width:52ch;
+  margin:0 auto clamp(1.4rem,3vh,2.2rem); text-align:center; }
 
-.apps-clave { display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:clamp(.6rem,1.4vw,1rem); }
-.app { display:flex; flex-direction:column; align-items:center; text-align:center; gap:.5rem;
-  padding:clamp(.85rem,1.7vh,1.15rem) .75rem;
-  border:1px solid rgba(255,255,255,.07); border-radius:14px;
-  background:rgba(255,255,255,.022);
-  opacity:0; transform:translateY(18px);
+/* Flex y no grid: con `justify-content:center` las dos filas quedan
+   centradas cada una sobre la otra —tres arriba, cuatro abajo— sin que
+   sobre una celda vacia, que es lo que pasaba con una rejilla de cuatro
+   columnas y siete piezas. */
+.suite { display:flex; flex-wrap:wrap; justify-content:center;
+  gap:clamp(.65rem,1.5vw,1.05rem); }
+/* El corte obliga a que las de obra se queden solas en su fila. Por debajo
+   de 700 px se apaga: ahi caben dos por fila y forzarlo dejaria una sola
+   colgando. */
+.suite-corte { flex-basis:100%; height:0; margin:0; padding:0; }
+@media (max-width:700px){ .suite-corte { display:none } }
+
+.suite-app { position:relative; width:clamp(128px,15.5vw,176px); aspect-ratio:1;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:.55rem; padding:clamp(.7rem,1.6vh,1rem) .7rem; overflow:hidden;
+  border:1px solid rgba(255,255,255,.085); border-radius:18px;
+  background:rgba(255,255,255,.025);
+  opacity:0; transform:translateY(22px) scale(.97);
   transition:opacity .8s var(--suave), transform .9s var(--salida),
              background .45s var(--suave), border-color .45s var(--suave); }
-.apps.visible .app { opacity:1; transform:none; }
-.apps.visible .app:nth-child(2) { transition-delay:.08s }
-.apps.visible .app:nth-child(3) { transition-delay:.16s }
-.app:hover { background:rgba(255,255,255,.045); border-color:rgba(255,255,255,.13); }
+.suite.visible .suite-app { opacity:1; transform:none; }
+.suite.visible .suite-app:nth-child(2) { transition-delay:.07s }
+.suite.visible .suite-app:nth-child(3) { transition-delay:.14s }
+.suite.visible .suite-app:nth-child(5) { transition-delay:.21s }
+.suite.visible .suite-app:nth-child(6) { transition-delay:.27s }
+.suite.visible .suite-app:nth-child(7) { transition-delay:.33s }
+.suite.visible .suite-app:nth-child(8) { transition-delay:.39s }
+.suite-app:hover { background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.17); }
 
-/* La caja del icono mide siempre lo mismo, lleve dibujo o inicial: sin
-   esto las tarjetas de la fila no alinean su nombre a la misma altura. */
-.icono-app { width:38px; height:38px; display:grid; place-items:center; flex:none; }
+/* EL BRILLO DE LAS DE OBRA. Tres capas que se suman y ninguna cambia el
+   tamaño: un halo radial por detras del icono, el filo mas claro y un
+   respirar muy lento del resplandor. Se hace con `box-shadow` y un
+   pseudoelemento, no con `filter` sobre la tarjeta, porque el filtro
+   emborronaria tambien el texto. */
+.suite-app.clave { border-color:rgba(255,255,255,.2);
+  background:rgba(255,255,255,.045);
+  box-shadow:0 0 0 1px rgba(255,255,255,.05) inset,
+             0 10px 34px -14px rgba(255,255,255,.34);
+  animation:respiraClave 6.5s var(--suave) infinite alternate;
+  animation-delay:var(--d,0s); }
+.suite-app.clave::before { content:''; position:absolute; inset:-30% -30% 40% -30%;
+  background:radial-gradient(ellipse at 50% 40%, rgba(255,255,255,.16), transparent 68%);
+  pointer-events:none; }
+@keyframes respiraClave {
+  from { box-shadow:0 0 0 1px rgba(255,255,255,.05) inset,
+                    0 10px 30px -16px rgba(255,255,255,.26) }
+  to   { box-shadow:0 0 0 1px rgba(255,255,255,.08) inset,
+                    0 12px 40px -12px rgba(255,255,255,.46) } }
+.suite-app.clave:hover { border-color:rgba(255,255,255,.3);
+  background:rgba(255,255,255,.075); }
+
+/* La caja del icono mide siempre lo mismo, lleve dibujo o inicial: sin esto
+   las tarjetas no alinean su nombre a la misma altura. */
+.icono-app { position:relative; z-index:1;
+  width:clamp(42px,5vw,58px); height:clamp(42px,5vw,58px);
+  display:grid; place-items:center; flex:none; }
 .icono-app img { width:100%; height:100%; object-fit:contain;
-  filter:drop-shadow(0 0 9px rgba(255,255,255,.2)) drop-shadow(0 0 20px rgba(255,255,255,.09));
+  filter:drop-shadow(0 0 10px rgba(255,255,255,.2)) drop-shadow(0 0 24px rgba(255,255,255,.08));
   transition:filter .5s var(--suave), transform .55s var(--resorte); }
-.app:hover .icono-app img, .mini:hover .icono-app img {
-  transform:scale(1.08);
-  filter:drop-shadow(0 0 15px rgba(255,255,255,.42)) drop-shadow(0 0 34px rgba(255,255,255,.2)); }
+.clave .icono-app img {
+  filter:drop-shadow(0 0 14px rgba(255,255,255,.42)) drop-shadow(0 0 34px rgba(255,255,255,.2)); }
+.suite-app:hover .icono-app img { transform:scale(1.09);
+  filter:drop-shadow(0 0 18px rgba(255,255,255,.5)) drop-shadow(0 0 40px rgba(255,255,255,.24)); }
 /* Sin icono dibujado, la inicial. Una letra honesta antes que un hueco. */
-.icono-app i { font-family:var(--mono); font-style:normal; font-size:1.1rem;
-  color:var(--n-200); opacity:.7; letter-spacing:.02em; }
+.icono-app i { font-family:var(--mono); font-style:normal;
+  font-size:clamp(1.25rem,1.7vw,1.6rem); color:var(--n-200); opacity:.72;
+  letter-spacing:.02em; }
+.clave .icono-app i { opacity:.9; text-shadow:0 0 16px rgba(255,255,255,.3); }
 
-.app b, .mini b { font-family:var(--mono); font-size:.55rem; letter-spacing:.18em;
-  text-transform:uppercase; color:var(--tenue); font-weight:400; }
-.app em { font-style:normal; font-size:.73rem; line-height:1.45; color:var(--debil);
-  max-width:24ch; }
-.app .texto { display:flex; flex-direction:column; align-items:center; gap:.3rem; min-width:0; }
+.suite-app b { position:relative; z-index:1;
+  font-family:var(--mono); font-size:.57rem; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--tenue); font-weight:400; }
+.clave b { color:var(--n-200); }
+/* DOS LINEAS DE ALTO AUNQUE SOBRE UNA. La tarjeta centra su contenido, asi
+   que una descripcion de una sola linea —«Finanzas personales.»— subia menos
+   y dejaba su icono y su nombre 7 px por debajo de los vecinos. Reservando
+   el alto de dos lineas, las siete alinean por icono y por rotulo. */
+.suite-app em { position:relative; z-index:1; font-style:normal;
+  font-size:.7rem; line-height:1.35; color:var(--debil); text-align:center;
+  padding:0 .1rem; min-height:2.7em; }
 
-/* LAS OTRAS CUATRO — una tira, no tarjetas. Son ciertas y suman, pero no
-   son de obra: si compitieran en tamano con ATLAS o QUANTITY dirian algo
-   que no es. Van al 70 % y se encienden al pasar por encima. */
-.apps-resto { display:flex; flex-wrap:wrap; gap:clamp(.8rem,2.2vw,1.8rem);
-  margin-top:clamp(.85rem,1.7vh,1.15rem); padding-top:clamp(.75rem,1.5vh,1rem);
-  border-top:1px solid rgba(255,255,255,.055); }
-.mini { display:flex; align-items:center; gap:.6rem; min-width:0;
-  opacity:0; transform:translateY(12px);
-  transition:opacity .7s var(--suave), transform .8s var(--salida); }
-.apps.visible .mini { opacity:.7; transform:none; }
-.apps.visible .mini:nth-child(2) { transition-delay:.06s }
-.apps.visible .mini:nth-child(3) { transition-delay:.12s }
-.apps.visible .mini:nth-child(4) { transition-delay:.18s }
-.mini:hover { opacity:1; }
-.mini .icono-app { width:22px; height:22px; }
-.mini .icono-app i { font-size:.8rem; }
-.mini .texto { display:flex; flex-direction:column; gap:.1rem; min-width:0; }
-.mini em { font-style:normal; font-size:.68rem; line-height:1.35; color:var(--debil); }
-
-@media (max-width:760px){
-  .apps-clave { grid-template-columns:minmax(0,1fr); gap:.55rem; }
-  /* Apilada, la tarjeta deja de ser un cuadro centrado y pasa a ser una
-     fila: el icono a la izquierda y el texto al lado, que es como se lee
-     una lista en un telefono. */
-  .app { flex-direction:row; align-items:center; text-align:left; gap:.75rem;
-    padding:.8rem .9rem; }
-  .app .texto { align-items:flex-start; gap:.15rem; }
-  .app em { max-width:none; }
-  .apps-resto { gap:.7rem 1.4rem; }
+@media (max-width:700px){
+  .suite-entrada { font-size:.88rem; }
+  .suite { gap:.6rem; }
+  .suite-app { width:clamp(140px,43vw,168px); }
+}
 }
 
 .sobre-contenido { position:relative; z-index:1; }
@@ -1401,8 +1423,7 @@ body.bloqueado .masa { animation-play-state:paused; }
   .titular::after { animation:none; opacity:0 }
   .inicio-aparte, .baja, .mas-filo .marca-mas { opacity:1 }
   .etapa { opacity:1 !important; transform:none !important }
-  .app   { opacity:1 !important; transform:none !important }
-  .mini  { opacity:.7 !important; transform:none !important }
+  .suite-app { opacity:1 !important; transform:none !important; animation:none !important }
   .mas-filo .raya { transform:none }
   .galeria figure, .hoja, .tira-extra figure { clip-path:none !important; opacity:1 !important; transform:none !important; }
   .ficha-portada-texto h2 span, .ficha .entra { transform:none; opacity:1; filter:none }
@@ -1434,6 +1455,7 @@ body.bloqueado .masa { animation-play-state:paused; }
     <a href="#proyectos">Proyectos</a>
     <a href="#reel">Reel</a>
     <a href="#sobre">Sobre mí</a>
+    <a href="#suite">Suite</a>
     <a href="#contacto">Contacto</a>
   </nav>
 </header>
@@ -1580,10 +1602,29 @@ body.bloqueado .masa { animation-play-state:paused; }
       <div class="cifras asoma" id="cifras"></div>
 
       <div class="flujo" id="flujo"></div>
-
-      <div class="apps" id="apps"></div>
     </div>
 
+  </div>
+</section>
+
+<!-- ===================== LA STICK SUITE =====================
+     Va DESPUES de Sobre mi y antes de Contacto: primero el trabajo, luego
+     quien lo hace, y entonces las herramientas que se escribio para hacerlo.
+     Puesta antes, se leeria como un catalogo de software y este sigue siendo
+     un portafolio de ingenieria civil. -->
+<section class="seccion" id="suite">
+  <div class="seccion-cuerpo acolchado">
+    <div class="cabeza">
+      <div>
+        <div class="etiqueta revelar"><span>Software propio</span></div>
+        <h2 class="palabras" data-texto="La STICK SUITE."></h2>
+      </div>
+    </div>
+
+    <p class="suite-entrada asoma">Siete aplicaciones escritas para resolver lo que el trabajo
+       pedía y no existía. Las tres primeras resuelven obra.</p>
+
+    <div class="suite" id="suite-rejilla"></div>
   </div>
 </section>
 
@@ -2150,33 +2191,31 @@ document.getElementById('flujo').innerHTML = ETAPAS.map((e, k) => `
 /* =================================================================
    CONTACTO
    ================================================================= */
-/* --- La suite propia ------------------------------------------- */
-/* La marca de cada app: su icono si `preparar-suite.py` ya lo escribio, y
-   si no, la inicial. El `onerror` cubre el otro caso —el archivo declarado
-   pero ausente—, porque un icono roto en una tarjeta se ve peor que una
-   letra puesta a proposito. */
+/* --- LA STICK SUITE -------------------------------------------- */
+/* La marca de cada app: su icono si `preparar-suite.py` ya lo escribio, y si
+   no, la inicial. El `onerror` cubre el otro caso —el archivo declarado pero
+   ausente—, porque un icono roto en una tarjeta se ve peor que una letra
+   puesta a proposito. */
 const marcaApp = (a) => `
   <span class="icono-app">${a.icono
     ? `<img src="${a.icono}" alt="" loading="lazy" decoding="async"
             onerror="this.replaceWith(Object.assign(document.createElement('i'),{textContent:'${a.nombre[0]}'}))">`
     : `<i>${a.nombre[0]}</i>`}</span>`;
 
-document.getElementById('apps').innerHTML = `
-  <div class="etiqueta revelar"><span>Aplicaciones propias</span></div>
-  <div class="apps-clave">
-    ${APPS.filter(a => a.obra).map(a => `
-      <div class="app">
-        ${marcaApp(a)}
-        <span class="texto"><b>${a.nombre}</b><em>${a.que}</em></span>
-      </div>`).join('')}
-  </div>
-  <div class="apps-resto">
-    ${APPS.filter(a => !a.obra).map(a => `
-      <span class="mini">
-        ${marcaApp(a)}
-        <span class="texto"><b>${a.nombre}</b><em>${a.que}</em></span>
-      </span>`).join('')}
+const tarjetaApp = (a, i) => `
+  <div class="suite-app${a.obra ? ' clave' : ''}" style="--d:${(i * .8).toFixed(1)}s">
+    ${marcaApp(a)}
+    <b>${a.nombre}</b>
+    <em>${a.que}</em>
   </div>`;
+
+/* Las de obra van primero y luego el corte, para que se queden solas en su
+   fila. El corte es un elemento de verdad y no un `::after`, porque un
+   pseudoelemento no puede ser hijo flex del contenedor. */
+document.getElementById('suite-rejilla').innerHTML =
+  APPS.filter(a => a.obra).map(tarjetaApp).join('')
+  + '<span class="suite-corte" aria-hidden="true"></span>'
+  + APPS.filter(a => !a.obra).map(tarjetaApp).join('');
 
 const IG_SVG = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>';
 const WA_SVG = '<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 01-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.2 8.2 0 015.83 2.42 8.18 8.18 0 012.41 5.82c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.43.06-.65.31-.22.25-.85.83-.85 2.03s.87 2.35.99 2.51c.12.17 1.71 2.61 4.15 3.66.58.25 1.03.4 1.39.51.58.19 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29z"/></svg>';
@@ -2826,7 +2865,7 @@ const barra     = document.getElementById('barra');
 const menu      = document.getElementById('menu');
 const gota      = document.getElementById('gota');
 const campo     = document.querySelector('.campo');
-const secciones = [...document.querySelectorAll('#proyectos, #reel, #sobre, #contacto')];
+const secciones = [...document.querySelectorAll('#proyectos, #reel, #sobre, #suite, #contacto')];
 const enlacesMenu = [...document.querySelectorAll('.menu a')];
 const laminaImg = document.getElementById('render-inicio');
 
@@ -2911,7 +2950,7 @@ const observador = new IntersectionObserver(en => {
     else if (e.intersectionRatio === 0) e.target.classList.remove('visible', 'viva');
   });
 }, { threshold:[0, .12], rootMargin:'0px 0px -60px 0px' });
-document.querySelectorAll('.revelar, .palabras, .enlaces, .flujo, .apps, .cabeza')
+document.querySelectorAll('.revelar, .palabras, .enlaces, .flujo, .suite, .cabeza')
   .forEach(el => observador.observe(el));
 
 /* `.asoma` va con un observador mas permisivo: el de arriba exige que
