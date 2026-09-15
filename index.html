@@ -741,14 +741,17 @@ body.bloqueado .masa { animation-play-state:paused; }
    decia que cuatro de ellas importaban menos. Ahora el orden y el brillo son
    lo unico que separa a las de obra: se leen primero y se encienden, pero
    ninguna se encoge. */
+/* A LA IZQUIERDA, como el titular. La primera version centraba la entrada y
+   las tarjetas mientras la cabecera de la seccion seguia alineada a la
+   izquierda —como en todas las demas—, y el bloque quedaba colgando de un
+   titulo que no lo sostenia. */
 .suite-entrada { color:var(--tenue); font-size:.92rem; line-height:1.55; max-width:52ch;
-  margin:0 auto clamp(1.4rem,3vh,2.2rem); text-align:center; }
+  margin:0 0 clamp(1.4rem,3vh,2.2rem); }
 
-/* Flex y no grid: con `justify-content:center` las dos filas quedan
-   centradas cada una sobre la otra —tres arriba, cuatro abajo— sin que
-   sobre una celda vacia, que es lo que pasaba con una rejilla de cuatro
-   columnas y siete piezas. */
-.suite { display:flex; flex-wrap:wrap; justify-content:center;
+/* Flex y no rejilla: con cuatro columnas y siete piezas sobraba una celda
+   vacia. Asi las dos filas —tres arriba, cuatro abajo— arrancan las dos del
+   mismo borde izquierdo, el del titular, y no queda hueco. */
+.suite { display:flex; flex-wrap:wrap; justify-content:flex-start;
   gap:clamp(.65rem,1.5vw,1.05rem); }
 /* El corte obliga a que las de obra se queden solas en su fila. Por debajo
    de 700 px se apaga: ahi caben dos por fila y forzarlo dejaria una sola

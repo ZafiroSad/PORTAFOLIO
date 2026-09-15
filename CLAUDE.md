@@ -51,11 +51,16 @@ todas iguales pero las 3 principales primero, con un efecto de brillo».
   con `box-shadow` y un pseudoelemento y **no** con `filter` sobre la tarjeta,
   porque el filtro emborronaría también el texto.
 - **Flex y no rejilla.** Con cuatro columnas y siete piezas sobraba una celda.
-  Con `flex-wrap` y `justify-content:center`, las dos filas quedan centradas
-  una sobre otra —tres arriba, cuatro abajo— y no hay hueco. El corte que las
-  separa es un elemento de verdad (`.suite-corte`), porque un `::after` no
-  puede ser hijo flex; por debajo de 700 px se apaga, que ahí caben dos por
-  fila y forzarlo dejaría una colgando.
+  Con `flex-wrap`, las dos filas —tres arriba, cuatro abajo— arrancan del
+  mismo borde y no hay hueco. El corte que las separa es un elemento de verdad
+  (`.suite-corte`), porque un `::after` no puede ser hijo flex; por debajo de
+  700 px se apaga, que ahí caben dos por fila y forzarlo dejaría una colgando.
+- **TODO A LA IZQUIERDA, como el titular.** La primera versión centró la
+  entrada y las tarjetas mientras la cabecera de la sección seguía a la
+  izquierda —como en todas las demás—, y el bloque quedaba colgando de un
+  título que no lo sostenía: el «La STICK SUITE.» en el margen y las siete
+  tarjetas flotando en mitad de la página. Se ve en cuanto se mira la sección
+  entera, y no se veía mirando solo la rejilla.
 - **La descripción reserva dos líneas aunque ocupe una.** La tarjeta centra su
   contenido, así que «Finanzas personales.» subía menos y dejaba su icono y su
   nombre 7 px por debajo de los vecinos. Medido y corregido con `min-height`.
