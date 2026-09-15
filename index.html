@@ -732,114 +732,119 @@ body.bloqueado .masa { animation-play-state:paused; }
 .util:hover b { color:var(--tenue); }
 @media (max-width:900px){ .flujo { grid-template-columns:1fr; gap:1.8rem } }
 
-/* LA STICK SUITE — seccion propia
-   CONSTRUIDA SOBRE `.vidrio`, NO SOBRE UNA CAJA PROPIA. La primera version
-   se inventó un panel plano —borde de una opacidad y fondo liso— y por eso
-   se leía apagada al lado del resto del sitio: sin el filo especular, sin
-   el desenfoque de detrás y sin el reflejo que sigue al cursor. El sistema
-   ya tenía el componente resuelto en los cuatro accesos de Contacto; esto
-   es el mismo, con el mismo radio de 26 px y la misma altura.
+/* LA STICK SUITE — un banco, no una vitrina
+   ==================================================================
+   TRES INTENTOS DE REJILLA Y LOS TRES SE LEIAN VACIOS. Cuadrados de 176 px
+   (v20), tarjetas de vidrio de 214 (v21), las mismas apretadas a 166 (v22).
+   El fallo no era la medida: siete piezas pequeñas repartidas por un lienzo
+   grande SIEMPRE dejan mas fondo que contenido, y cambiar los numeros solo
+   movia el vacio de sitio.
 
-   Y OCUPA EL ANCHO ENTERO. Antes eran siete cuadrados de 176 px pegados al
-   margen izquierdo: medio lienzo quedaba vacío y la sección se sentía
-   muerta. Ahora son dos filas a sangre —tres arriba, cuatro abajo— que
-   llenan de borde a borde. Las de obra salen más anchas porque son tres
-   repartiéndose lo mismo que abajo se reparten cuatro; la ALTURA es la
-   misma en las siete, que era lo que había que respetar. */
+   Asi que manda UNA sola pieza. Un banco a lo ancho con la app abierta —su
+   icono a tamaño de verdad, su nombre y lo que resuelve— y debajo la tira de
+   las siete para cambiarla. El hueco desaparece porque ya no hay que
+   repartir: hay un elemento que ocupa, y una fila de teclas que lo maneja.
+
+   Y SE MUEVE SOLO. Pasa de app cada 5 s, se para en cuanto alguien la toca o
+   la enfoca con el teclado, y no arranca con `prefers-reduced-motion`. Eso
+   es lo que hacia falta para que no se sintiera muerta. */
 .suite-entrada { color:var(--tenue); font-size:.88rem; line-height:1.55; max-width:40ch;
   margin:0 0 .35rem; }
 
-.suite { display:flex; flex-direction:column; gap:clamp(.7rem,1.4vw,1.05rem); }
-.suite-fila { display:grid; gap:clamp(.7rem,1.4vw,1.05rem);
-  grid-template-columns:repeat(3,minmax(0,1fr)); }
-.suite-fila.resto { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.suite { display:flex; flex-direction:column; gap:clamp(.9rem,2vh,1.4rem); }
 
-/* Rectangulares hacia abajo, como los accesos de Contacto: el icono arriba,
-   el nombre y su dato abajo, y aire entre medias. */
-/* LA PROPORCION MANDA. La v21 puso un icono de 54 px en una tarjeta de 214,
-   y por eso seguia leyendose vacia aunque la tarjeta fuera bonita: no
-   sobraba espacio en la seccion, sobraba DENTRO de cada pieza. Aqui la
-   tarjeta encoge y el icono crece hasta que el contenido la llena de verdad.
-   Centrado, no `space-between`: con tres lineas de texto, separarlas contra
-   los extremos volvia a abrir el hueco en mitad. */
-.app-tarjeta { position:relative; display:flex; flex-direction:column;
-  align-items:center; justify-content:center; gap:.7rem;
-  min-height:clamp(146px,17vh,166px);
-  padding:1.15rem .9rem; border-radius:22px; overflow:hidden; text-align:center;
-  opacity:0; transform:translateY(26px);
-  transition:opacity .8s var(--suave), transform .55s var(--salida),
-             border-color .45s var(--suave), box-shadow .5s var(--suave); }
-.suite.visible .app-tarjeta { opacity:1; transform:none; }
-.suite-fila .app-tarjeta:nth-child(2) { transition-delay:.07s }
-.suite-fila .app-tarjeta:nth-child(3) { transition-delay:.14s }
-.suite-fila .app-tarjeta:nth-child(4) { transition-delay:.21s }
-.suite-fila.resto .app-tarjeta { transition-delay:.18s }
-.app-tarjeta:hover { transform:translateY(-6px); border-color:rgba(255,255,255,.28);
-  box-shadow:var(--v-filo), 0 30px 70px -32px rgba(255,255,255,.3),
-             0 20px 50px -30px rgba(0,0,0,.9); }
+/* --- el banco --- */
+.banco { position:relative; display:flex; align-items:center;
+  gap:clamp(1.4rem,4vw,3.4rem); padding:clamp(1.6rem,3.4vh,2.6rem) clamp(1.5rem,4vw,3rem);
+  border-radius:30px; overflow:hidden;
+  min-height:clamp(200px,28vh,258px); }
+/* LA MARCA A SANGRE POR LA DERECHA. Con el icono y el texto a la izquierda,
+   la mitad derecha del banco se quedaba vacia — el mismo fallo de las
+   rejillas, en pequeño. Se llena con el propio dibujo de la app, enorme,
+   saliendose del panel y casi apagado: no compite con el texto y da fondo a
+   lo que antes era hueco. Cambia con cada app, asi que el banco entero se
+   repinta al pasar. */
+.banco-fondo { position:absolute; right:-4%; top:50%; translate:0 -50%;
+  width:clamp(220px,30vw,400px); height:clamp(220px,30vw,400px);
+  object-fit:contain; opacity:.07; pointer-events:none; z-index:-1;
+  filter:blur(.3px);
+  animation:entraFondo 1.1s var(--salida) both; }
+@keyframes entraFondo {
+  from { opacity:0; transform:translateX(26px) } to { opacity:.07; transform:none } }
+.banco-fondo.inicial { display:grid; place-items:center; font-family:var(--mono);
+  font-size:clamp(11rem,20vw,17rem); font-style:normal; color:var(--tinta); }
+/* El icono a tamaño de marca. Sin caja: el resplandor sale de `drop-shadow`
+   sobre el PNG y toma la silueta del logo, como los logos de software. */
+.banco-marca { flex:none; width:clamp(92px,11vw,148px); height:clamp(92px,11vw,148px);
+  display:grid; place-items:center; }
+.banco-marca img { width:100%; height:100%; object-fit:contain;
+  filter:drop-shadow(0 0 22px rgba(255,255,255,.34)) drop-shadow(0 0 60px rgba(255,255,255,.16)); }
+.banco-marca i { font-family:var(--mono); font-style:normal;
+  font-size:clamp(3.4rem,6vw,5rem); color:var(--tinta); opacity:.9;
+  text-shadow:0 0 34px rgba(255,255,255,.34); }
+.banco-texto { min-width:0; }
+.banco-texto .n { display:block; font-size:clamp(1.5rem,3.1vw,2.4rem); font-weight:600;
+  letter-spacing:-.03em; line-height:1.05; color:var(--tinta); }
+.banco-texto .d { display:block; margin-top:.7rem; font-size:clamp(.9rem,1.35vw,1.05rem);
+  line-height:1.5; color:var(--n-200); max-width:46ch; }
+.banco-texto .m { display:inline-flex; align-items:center; gap:.55rem; margin-top:1rem;
+  font-family:var(--mono); font-size:.56rem; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--debil); }
+.banco-texto .m::before { content:''; width:16px; height:1px; background:var(--debil); }
+/* Al cambiar de app el contenido entra, no aparece de golpe. */
+.banco-marca, .banco-texto { animation:entraBanco .55s var(--salida) both; }
+@keyframes entraBanco { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:none } }
 
-/* EL BRILLO DE LAS DE OBRA. Mismo mecanismo que el `::before` de los accesos
-   de Contacto —un radial por detras— pero encendido de fijo en vez de solo
-   al pasar por encima, y respirando muy despacio. No toca el tamaño: las
-   siete miden igual de alto. */
-.app-tarjeta.clave { border-color:rgba(255,255,255,.2); }
-.app-tarjeta.clave::before { content:''; position:absolute; inset:0; border-radius:inherit;
-  z-index:-1; background:radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,.17), transparent 70%);
-  animation:respiraClave 6.5s var(--suave) infinite alternate;
-  animation-delay:var(--d,0s); }
-@keyframes respiraClave { from { opacity:.6 } to { opacity:1 } }
+/* --- la tira --- */
+.tira { display:flex; flex-wrap:wrap; gap:clamp(.45rem,1vw,.7rem); }
+.tecla { flex:1 1 0; min-width:74px; position:relative;
+  display:flex; flex-direction:column; align-items:center; gap:.5rem;
+  padding:clamp(.7rem,1.6vh,1rem) .5rem; border-radius:18px; cursor:pointer;
+  background:none; border:1px solid transparent; color:inherit; font:inherit;
+  transition:background .4s var(--suave), border-color .4s var(--suave); }
+.tecla .ic { width:clamp(26px,2.6vw,34px); height:clamp(26px,2.6vw,34px);
+  display:grid; place-items:center; }
+.tecla .ic img { width:100%; height:100%; object-fit:contain;
+  filter:drop-shadow(0 0 8px rgba(255,255,255,.16)); opacity:.55;
+  transition:opacity .4s var(--suave), filter .4s var(--suave); }
+.tecla .ic i { font-family:var(--mono); font-style:normal; font-size:1.05rem;
+  color:var(--n-200); opacity:.5; transition:opacity .4s var(--suave); }
+.tecla b { font-family:var(--mono); font-size:.52rem; letter-spacing:.17em;
+  text-transform:uppercase; color:var(--debil); font-weight:400;
+  transition:color .4s var(--suave); }
+.tecla:hover .ic img, .tecla:focus-visible .ic img { opacity:.85; }
+.tecla:hover .ic i, .tecla:focus-visible .ic i { opacity:.8; }
+.tecla:hover b, .tecla:focus-visible b { color:var(--tenue); }
+.tecla[aria-selected="true"] { background:rgba(255,255,255,.055);
+  border-color:rgba(255,255,255,.14); }
+.tecla[aria-selected="true"] .ic img { opacity:1;
+  filter:drop-shadow(0 0 13px rgba(255,255,255,.5)); }
+.tecla[aria-selected="true"] .ic i { opacity:1; }
+.tecla[aria-selected="true"] b { color:var(--tinta); }
+/* Las de obra, marcadas con un punto: es lo que las distingue en la tira
+   sin hacerlas mas grandes que las demas. */
+.tecla.clave::after { content:''; position:absolute; top:.5rem; right:.62rem;
+  width:4px; height:4px; border-radius:50%; background:var(--n-200); opacity:.5; }
+.tecla.clave[aria-selected="true"]::after { opacity:1;
+  box-shadow:0 0 8px rgba(255,255,255,.7); }
 
-/* EL ICONO SIN PASTILLA Y GRANDE. La v21 lo metio en un cuadradito de 54 px
-   como los accesos de Contacto, y ahi el icono es un glifo de interfaz; este
-   es la MARCA de la app y tiene que mandar en la tarjeta. Ademas contradecia
-   una decision ya tomada para los logos de software: el resplandor sale de
-   `drop-shadow` sobre el PNG, asi que toma la silueta del logo y no la de un
-   contenedor. A este tamaño se sostiene solo. */
-.icono-app { width:clamp(58px,5.4vw,74px); height:clamp(58px,5.4vw,74px);
-  display:grid; place-items:center; flex:none;
-  transition:transform .6s var(--resorte); }
-.app-tarjeta:hover .icono-app { transform:translateY(-3px) scale(1.07); }
-.icono-app img { width:100%; height:100%; object-fit:contain;
-  filter:drop-shadow(0 0 12px rgba(255,255,255,.26)) drop-shadow(0 0 30px rgba(255,255,255,.1));
-  transition:filter .5s var(--suave); }
-.clave .icono-app img {
-  filter:drop-shadow(0 0 16px rgba(255,255,255,.5)) drop-shadow(0 0 38px rgba(255,255,255,.22)); }
-.app-tarjeta:hover .icono-app img {
-  filter:drop-shadow(0 0 20px rgba(255,255,255,.6)) drop-shadow(0 0 44px rgba(255,255,255,.28)); }
-/* Sin icono dibujado, la inicial. Una letra honesta antes que un hueco. */
-.icono-app i { font-family:var(--mono); font-style:normal;
-  font-size:clamp(1.9rem,2.6vw,2.5rem); color:var(--n-200); opacity:.85;
-  letter-spacing:.02em; }
-.clave .icono-app i { opacity:1; text-shadow:0 0 14px rgba(255,255,255,.35); }
+.suite .banco, .suite .tira { opacity:0; transform:translateY(22px);
+  transition:opacity .8s var(--suave), transform .9s var(--salida); }
+.suite.visible .banco, .suite.visible .tira { opacity:1; transform:none; }
+.suite.visible .tira { transition-delay:.12s; }
 
-/* `.app-pie` y no `.pie`: esa clase YA ERA el pie de pagina del sitio, con
-   su `border-top` y su tipografia mono. Reusar el nombre dibujaba una linea
-   dentro de cada tarjeta, pasaba el texto a monoespaciada y estiraba la
-   tarjeta de 232 a 332 px. */
-.app-tarjeta .app-pie { display:flex; flex-direction:column; gap:.28rem; }
-.app-tarjeta .val { display:block; font-size:1rem; font-weight:500; letter-spacing:-.01em;
-  color:var(--tinta); }
-/* SIN alto reservado. Se puso para que las descripciones de una linea no
-   dejaran su tarjeta mas baja que las de dos — pero la rejilla ya estira
-   todas las de una fila a la misma altura, asi que lo unico que hacia era
-   dejar una linea vacia en cada tarjeta de la fila de arriba, donde todas
-   caben en una. */
-.app-tarjeta .que { display:block; font-size:.72rem; line-height:1.35; color:var(--debil); }
-.app-tarjeta .rot { display:block; font-family:var(--mono); font-size:.55rem;
-  letter-spacing:.2em; text-transform:uppercase; color:var(--debil); }
-
-/* Estrecho, las dos filas se funden en UNA rejilla. Con `3 + 4` repartidos
-   en dos columnas, la primera fila dejaba a QUANTITY sola y con un hueco al
-   lado a mitad de la lista. Con `display:contents` los envoltorios
-   desaparecen y las siete fluyen seguidas: la que sobra queda al final, que
-   es donde no molesta. */
-@media (max-width:900px){
-  .suite { display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:clamp(.6rem,2vw,.9rem); }
-  .suite-fila, .suite-fila.resto { display:contents; }
+@media (max-width:760px){
+  /* Apilado no hay lado derecho que llenar, y la marca de fondo se cruzaba
+     con el nombre y la descripcion. Fuera. */
+  .banco-fondo { display:none; }
+  .banco { flex-direction:column; text-align:center; gap:1.1rem;
+    padding:1.6rem 1.2rem; min-height:0; }
+  .banco-texto .d { max-width:none; }
+  .banco-texto .m { margin-top:.8rem; }
+  .banco-texto .m::before { display:none; }
+  .tecla { min-width:64px; }
+  .tecla b { font-size:.48rem; letter-spacing:.12em; }
 }
-@media (max-width:430px){
-  .suite { grid-template-columns:minmax(0,1fr); }
   .app-tarjeta { min-height:0; flex-direction:row; text-align:left; gap:1rem;
     padding:1.1rem 1.2rem; align-items:center; justify-content:flex-start; }
   .app-tarjeta .que { min-height:0; }
@@ -1438,8 +1443,8 @@ body.bloqueado .masa { animation-play-state:paused; }
   .titular::after { animation:none; opacity:0 }
   .inicio-aparte, .baja, .mas-filo .marca-mas { opacity:1 }
   .etapa { opacity:1 !important; transform:none !important }
-  .app-tarjeta { opacity:1 !important; transform:none !important }
-  .app-tarjeta.clave::before { animation:none !important; opacity:1 !important }
+  .banco, .tira { opacity:1 !important; transform:none !important }
+  .banco-marca, .banco-texto { animation:none !important }
   .mas-filo .raya { transform:none }
   .galeria figure, .hoja, .tira-extra figure { clip-path:none !important; opacity:1 !important; transform:none !important; }
   .ficha-portada-texto h2 span, .ficha .entra { transform:none; opacity:1; filter:none }
@@ -1643,7 +1648,10 @@ body.bloqueado .masa { animation-play-state:paused; }
          trabajo pedía y no existía. Las tres primeras resuelven obra.</p>
     </div>
 
-    <div class="suite" id="suite-rejilla"></div>
+    <div class="suite" id="suite-rejilla">
+      <div class="banco vidrio" id="suite-banco" role="tabpanel" aria-live="polite"></div>
+      <div class="tira" id="suite-tira" role="tablist" aria-label="Las siete aplicaciones"></div>
+    </div>
   </div>
 </section>
 
@@ -2204,31 +2212,81 @@ document.getElementById('flujo').innerHTML = ETAPAS.map((e, k) => `
    CONTACTO
    ================================================================= */
 /* --- LA STICK SUITE -------------------------------------------- */
-/* Cada tarjeta lleva `.vidrio`: es el componente del sistema, el mismo de
-   los accesos de Contacto. Escribirle un panel propio fue el error de la
-   primera version. */
-const marcaApp = (a) => `
-  <span class="icono-app">${a.icono
-    ? `<img src="${a.icono}" alt="" loading="lazy" decoding="async"
-            onerror="this.replaceWith(Object.assign(document.createElement('i'),{textContent:'${a.nombre[0]}'}))">`
-    : `<i>${a.nombre[0]}</i>`}</span>`;
+/* Un banco con la app abierta y una tira de siete teclas que lo cambia.
+   Las rejillas de la v20 a la v22 se leian vacias porque repartian siete
+   piezas pequeñas por un lienzo grande; aqui manda una sola pieza. */
+const bancoEl = document.getElementById('suite-banco');
+const tiraEl  = document.getElementById('suite-tira');
 
-const tarjetaApp = (a, i) => `
-  <div class="app-tarjeta vidrio${a.obra ? ' clave' : ''}" style="--d:${(i * .9).toFixed(1)}s">
-    ${marcaApp(a)}
-    <span class="app-pie">
-      <b class="val">${a.nombre}</b>
-      <span class="que">${a.que}</span>
-      <span class="rot">${a.plataforma}</span>
-    </span>
-  </div>`;
+/* El dibujo de cada app, o su inicial si todavia no tiene icono. `onerror`
+   cubre el archivo declarado pero ausente: un icono roto se ve peor que una
+   letra puesta a proposito. */
+const dibujo = (a, clase) => a.icono
+  ? `<img src="${a.icono}" alt="" decoding="async"
+          onerror="this.replaceWith(Object.assign(document.createElement('i'),{textContent:'${a.nombre[0]}'}))">`
+  : `<i>${a.nombre[0]}</i>`;
 
-/* Dos filas de verdad, no una sola con un corte: tres arriba y cuatro abajo,
-   cada una repartiendose el ancho entero. Asi no queda media pagina vacia a
-   la derecha ni una celda suelta al final. */
-document.getElementById('suite-rejilla').innerHTML =
-  `<div class="suite-fila">${APPS.filter(a => a.obra).map(tarjetaApp).join('')}</div>`
-  + `<div class="suite-fila resto">${APPS.filter(a => !a.obra).map(tarjetaApp).join('')}</div>`;
+tiraEl.innerHTML = APPS.map((a, i) => `
+  <button class="tecla${a.obra ? ' clave' : ''}" role="tab" type="button"
+          id="tecla-${i}" aria-controls="suite-banco" aria-selected="${i === 0}"
+          tabindex="${i === 0 ? 0 : -1}">
+    <span class="ic">${dibujo(a)}</span><b>${a.nombre}</b>
+  </button>`).join('');
+
+const teclas = [...tiraEl.querySelectorAll('.tecla')];
+let abierta = -1;
+
+function abrir(i) {
+  if (i === abierta) return;
+  abierta = i;
+  const a = APPS[i];
+  bancoEl.innerHTML = `
+    ${a.icono
+      ? `<img class="banco-fondo" src="${a.icono}" alt="" aria-hidden="true" decoding="async">`
+      : `<i class="banco-fondo inicial" aria-hidden="true">${a.nombre[0]}</i>`}
+    <span class="banco-marca">${dibujo(a)}</span>
+    <span class="banco-texto">
+      <b class="n">${a.nombre}</b>
+      <span class="d">${a.que}</span>
+      <span class="m">${a.plataforma}</span>
+    </span>`;
+  teclas.forEach((t, k) => {
+    t.setAttribute('aria-selected', k === i);
+    t.tabIndex = k === i ? 0 : -1;
+  });
+}
+
+/* Se pasa sola cada 5 s — es lo que hace que la seccion no se sienta
+   muerta— y se PARA en cuanto alguien la toca o la enfoca con el teclado:
+   quien ya esta mirando una app no quiere que se la cambien debajo. Con
+   `prefers-reduced-motion` no arranca. */
+let reloj = null;
+const parar = () => { clearInterval(reloj); reloj = null; };
+function andar() {
+  if (reloj || quieto()) return;
+  reloj = setInterval(() => abrir((abierta + 1) % APPS.length), 5000);
+}
+
+teclas.forEach((t, i) => {
+  t.addEventListener('click', () => { parar(); abrir(i); });
+  t.addEventListener('pointerenter', () => { parar(); abrir(i); });
+  t.addEventListener('focus', () => { parar(); abrir(i); });
+});
+/* Flechas para recorrerla con el teclado, como pide un `tablist`. */
+tiraEl.addEventListener('keydown', e => {
+  const paso = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+  if (!paso) return;
+  e.preventDefault();
+  parar();
+  teclas[(abierta + paso + APPS.length) % APPS.length].focus();
+});
+tiraEl.addEventListener('pointerleave', andar);
+
+abrir(0);
+/* No corre mientras la seccion no se ve: girar en balde cuesta un repintado
+   cada 5 s por nada. */
+new IntersectionObserver(en => { en[0].isIntersecting ? andar() : parar(); },
+  { threshold:.25 }).observe(document.getElementById('suite-rejilla'));
 
 const IG_SVG = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>';
 const WA_SVG = '<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 01-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.2 8.2 0 015.83 2.42 8.18 8.18 0 012.41 5.82c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.43.06-.65.31-.22.25-.85.83-.85 2.03s.87 2.35.99 2.51c.12.17 1.71 2.61 4.15 3.66.58.25 1.03.4 1.39.51.58.19 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29z"/></svg>';

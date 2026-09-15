@@ -8,9 +8,40 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v22 — la suite, en proporción: icono grande y tarjeta apretada.**
+**v23 — la suite deja de ser una rejilla: un banco y una tira de siete teclas.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v23 — 2026-09-16
+
+Tres intentos de rejilla y los tres se leyeron vacíos. El Señor Stick, sobre
+las tres alternativas que se le propusieron: «no me gusta ninguna, innova».
+
+**El fallo no era la medida.** Cuadrados de 176 px (v20), tarjetas de vidrio
+de 214 (v21), las mismas apretadas a 166 con el icono a 74 (v22): siete piezas
+pequeñas repartidas por un lienzo grande **siempre** dejan más fondo que
+contenido. Cambiar los números solo movía el vacío de sitio.
+
+- **Manda UNA sola pieza.** Un banco a lo ancho con la app abierta —su icono a
+  tamaño de marca, su nombre grande y lo que resuelve— y debajo una tira con
+  las siete para cambiarla. El hueco desaparece porque ya no hay que repartir.
+- **Y SE MUEVE SOLA.** Pasa de app cada 5 s. Se para en cuanto alguien la toca
+  o la enfoca con el teclado —a quien ya está leyendo una no se le cambia
+  debajo—, no arranca con `prefers-reduced-motion`, y **no corre mientras la
+  sección no se ve**: girar en balde cuesta un repintado cada 5 s por nada.
+- **La marca a sangre por la derecha.** Con el icono y el texto a la
+  izquierda, la mitad derecha del banco se quedaba vacía: el mismo fallo de
+  las rejillas, en pequeño. Se llena con el propio dibujo de la app, enorme,
+  saliéndose del panel y al 7 % de opacidad. Cambia con cada app. Apilado, en
+  el teléfono, se apaga: ahí no hay lado derecho que llenar y se cruzaba con
+  el texto.
+- **Las de obra se marcan con un punto en su tecla**, no haciéndolas más
+  grandes. Es lo único que las distingue en la tira.
+- Es un `tablist` de verdad: las flechas lo recorren y cada tecla es un
+  `button`, así que funciona con teclado.
+
+Medido a 1440, 1024 y 540 px: sin desbordes ni scroll horizontal, siete
+teclas y seis iconos cargados — ATLAS va con su letra, que es lo correcto.
 
 ### v22 — 2026-09-16
 
@@ -428,9 +459,9 @@ Todo se recorre desplazando. El menú salta con un desplazamiento animado.
 4. **Sobre mí** — biografía; el trayecto como **rueda** —el hito del centro
    va entero, con luz propia, y los vecinos se reducen según su distancia—;
    y las herramientas **por etapa**: Modelo, Representación, Apoyo.
-5. **La STICK SUITE** — las siete aplicaciones propias en tarjetas de
-   vidrio, en dos filas a sangre: tres de obra arriba, con brillo, y las
-   otras cuatro abajo. Misma altura las siete.
+5. **La STICK SUITE** — un banco a lo ancho con una aplicación abierta y una
+   tira de siete teclas que lo cambia. Pasa sola cada 5 s y se para al
+   tocarla. Las tres de obra llevan un punto en su tecla.
 6. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail, Instagram y la
    tarjeta `.vcf`. Sin texto de venta.
 
@@ -497,7 +528,14 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
   componente con filo especular, desenfoque y reflejo al cursor, y está en
   `.vidrio`. Antes de inventar una superficie, mirar si Contacto o la barra
   ya la tienen resuelta.
-- **Entran las siete y TODAS MIDEN IGUAL DE ALTO.** Esto ha ido y venido: la v19 solo
+- **UNA PIEZA QUE MANDA, NO SIETE REPARTIDAS.** Se probaron tres rejillas
+  —v20, v21 y v22— y las tres se leyeron vacías por la misma razón: repartir
+  siete piezas pequeñas por un lienzo ancho deja más fondo que contenido, y
+  ajustar las medidas solo mueve el hueco. La v23 lo invierte. Si algún día
+  se vuelve a una rejilla, que sea sabiendo esto.
+- **Entran las siete y TODAS MIDEN IGUAL DE ALTO.** *(Vale mientras haya
+  rejilla; desde la v23 la tira las trata igual y solo un punto marca las de
+  obra.)* Esto ha ido y venido: la v19 solo
   dejaba entrar a las de obra, la v19.3 las puso todas pero en dos pesos, y la
   v20 las iguala. Lo que distingue a ATLAS, AROS y QUANTITY es que van
   **primero y con brillo**, no que sean más grandes — una tarjeta más pequeña
