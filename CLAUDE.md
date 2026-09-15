@@ -406,6 +406,16 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
 
 ## Decisiones tomadas
 
+- **SE PUBLICA EN `main` CADA VEZ, sin esperar revisión.** Decidido por el
+  Señor Stick el 2026-09-16: «siempre que hagas algo quiero que publiques para
+  checar». Hasta entonces el trabajo se dejaba en la rama
+  `claude/perfil-profesional-arquitectura-00ml0t` y él la fusionaba en el PC,
+  que es lo que hacía que viera los cambios un día tarde. Ahora la rama se
+  fusiona y se empuja a `main` en la misma tanda, porque GitHub Pages sirve
+  `main` y sin eso no hay nada que revisar. **Sigue valiendo lo de siempre:
+  nada se publica sin haberlo medido o mirado renderizado antes** — publicar
+  rápido no es publicar a ciegas.
+
 - **Las apps se muestran por su ICONO, nunca por una captura.** La v18 ponía
   pantallazos de 30 KB donde el logo no salía por ningún lado; la v19 los
   cambió por el icono de cada app, y la v19.3 quitó del todo la idea de
