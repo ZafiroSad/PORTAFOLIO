@@ -8,9 +8,43 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v24 — el banco dice lo que cada app resuelve, y el avance se ve venir.**
+**v25 — la entrada deja de cortarse, y la suite pasa cada 7 s.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v25 — 2026-09-16
+
+- **LA ENTRADA SE CORTABA A SI MISMA.** El Señor Stick: «hace la animación, se
+  corta y se ve la página, que sea un poco más homogénea». La causa, medida:
+  la capa de bienvenida empezaba a disolverse **a los 2,75 s, con el barrido
+  especular todavía a mitad** —termina a los 3,05—, así que la marca se iba
+  antes de acabar su propio gesto.
+
+  La línea de tiempo, ahora, leída del navegador y no supuesta:
+
+  | | entra | sale |
+  |---|---|---|
+  | flecha | 0,12 | 1,37 |
+  | STICK | 0,50 | 1,50 |
+  | INDUSTRIES | 1,05 | 1,90 |
+  | brillo | 1,55 | **3,05** |
+  | logo y capa | **3,30** | 4,85 |
+  | titular de portada | 3,90 | 4,44 |
+
+  Tres cosas la vuelven homogénea: el brillo **termina** antes de que empiece
+  la salida, hay **un cuarto de segundo de respiro** con el logo completo y
+  quieto, y el titular de la portada **arranca con la capa aún puesta**, así
+  que no hay ni un instante de pantalla vacía esperando. La disolución además
+  pasa de 1,1 a 1,55 s, y el logo no se apaga: **se aleja y se desenfoca**.
+  Apagarse se lee como que algo se apagó; alejarse, como que la página viene
+  hacia delante.
+
+  El plazo de seguridad que retira la capa si su animación no llega a correr
+  sube de 5 000 a 6 400 ms, que es lo que ahora dura la coreografía más margen.
+- **El paso de la suite, de 5 a 7 s**, por petición suya. Se cambia en dos
+  sitios y hay que cambiarlos juntos: el `setInterval` y la duración de
+  `avanzaHilo`. Un hilo que llena antes o después de que pase la app delata
+  el desajuste.
 
 ### v24 — 2026-09-16
 

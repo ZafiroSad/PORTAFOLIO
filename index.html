@@ -314,7 +314,12 @@ body.bloqueado .masa { animation-play-state:paused; }
   position:fixed; inset:0; z-index:400;
   display:flex; align-items:center; justify-content:center;
   background:var(--base);
-  animation:disolverMarca 1.1s var(--salida) 2.75s forwards;
+  /* ARRANCA CUANDO EL BRILLO YA ACABO, no encima. Antes salia a los 2,75 s
+     con el barrido especular todavia a mitad de camino —termina a los 3,05—
+     asi que la marca se iba antes de terminar su propio gesto y la entrada
+     se sentia cortada. Ahora: el logo se completa, respira un cuarto de
+     segundo, y recien entonces se disuelve, mas despacio que antes. */
+  animation:disolverMarca 1.55s var(--suave) 3.3s forwards;
   /* NUNCA recibe el puntero. Es una capa de bienvenida que cubre la ventana
      entera con z-index 400: si su animacion no llega a correr —y no corre
      mientras la pestana esta en segundo plano, porque el navegador congela
@@ -326,7 +331,11 @@ body.bloqueado .masa { animation-play-state:paused; }
 /* El JS la retira del todo cuando acaba, o pasado un plazo si no acaba. */
 .mascara-marca.fuera { display:none; }
 
-.marca-entrada { width:min(66vw, 640px); position:relative; color:var(--tinta); }
+.marca-entrada { width:min(66vw, 640px); position:relative; color:var(--tinta);
+  /* Se aleja mientras se disuelve. Apagarse a secas se lee como que algo
+     se apago; alejarse se lee como que la pagina viene hacia delante. */
+  animation:alejarMarca 1.55s var(--salida) 3.3s forwards; }
+@keyframes alejarMarca { to { transform:scale(1.045); filter:blur(2px) } }
 .marca-entrada svg { display:block; width:100%; height:auto; overflow:visible; }
 
 /* La flecha llega desde la izquierda. Recorrido corto y deceleracion
@@ -745,7 +754,7 @@ body.bloqueado .masa { animation-play-state:paused; }
    las siete para cambiarla. El hueco desaparece porque ya no hay que
    repartir: hay un elemento que ocupa, y una fila de teclas que lo maneja.
 
-   Y SE MUEVE SOLO. Pasa de app cada 5 s, se para en cuanto alguien la toca o
+   Y SE MUEVE SOLO. Pasa de app cada 7 s, se para en cuanto alguien la toca o
    la enfoca con el teclado, y no arranca con `prefers-reduced-motion`. Eso
    es lo que hacia falta para que no se sintiera muerta. */
 .suite-entrada { color:var(--tenue); font-size:.88rem; line-height:1.55; max-width:40ch;
@@ -850,8 +859,10 @@ body.bloqueado .masa { animation-play-state:paused; }
 .tecla .hilo::before { content:''; position:absolute; inset:0; transform-origin:left;
   background:linear-gradient(90deg, rgba(255,255,255,.55), var(--tinta));
   box-shadow:0 0 8px rgba(255,255,255,.45); }
+/* El hilo dura lo que el reloj. Si se cambia uno hay que cambiar el otro:
+   un hilo que llena antes o despues de que pase la app delata el desajuste. */
 .tira:not(.parada) .tecla[aria-selected="true"] .hilo::before {
-  animation:avanzaHilo 5s linear both; }
+  animation:avanzaHilo 7s linear both; }
 @keyframes avanzaHilo { from { transform:scaleX(0) } to { transform:scaleX(1) } }
 
 .suite .banco, .suite .tira { opacity:0; transform:translateY(22px);
@@ -2001,7 +2012,10 @@ function repartir(el, texto, retraso, paso = .045) {
 }
 /* La entrada ya no reparte letras: dibuja el logo, y su coreografia vive
    entera en el CSS (.marca-entrada). Aqui solo queda el titular. */
-repartir(document.getElementById('titular'), 'PORTAFOLIO', 3.45, .06);
+/* Arranca CON la capa todavia puesta, no despues: las letras suben
+   mientras la marca se disuelve, y por ese solape no hay un instante en que
+   la pantalla este vacia esperando. */
+repartir(document.getElementById('titular'), 'PORTAFOLIO', 3.9, .06);
 
 /* La capa de bienvenida se retira del DOM cuando su animacion termina — y
    tambien si NO termina. Chrome congela las animaciones de una pestana en
@@ -2017,7 +2031,7 @@ repartir(document.getElementById('titular'), 'PORTAFOLIO', 3.45, .06);
   let reloj = null;
   const armar = () => {
     if (document.hidden || reloj) return;
-    reloj = setTimeout(retirar, 5000);   // la coreografia acaba a los 3,85 s
+    reloj = setTimeout(retirar, 6400);   // la coreografia acaba a los 4,85 s
   };
   document.addEventListener('visibilitychange', armar);
   armar();
@@ -2302,7 +2316,7 @@ function abrir(i) {
   });
 }
 
-/* Se pasa sola cada 5 s — es lo que hace que la seccion no se sienta
+/* Se pasa sola cada 7 s — es lo que hace que la seccion no se sienta
    muerta— y se PARA en cuanto alguien la toca o la enfoca con el teclado:
    quien ya esta mirando una app no quiere que se la cambien debajo. Con
    `prefers-reduced-motion` no arranca. */
@@ -2315,7 +2329,7 @@ function andar() {
      y no a mitad de camino. */
   const h = teclas[abierta]?.querySelector('.hilo');
   if (h) h.replaceWith(h.cloneNode(true));
-  reloj = setInterval(() => abrir((abierta + 1) % APPS.length), 5000);
+  reloj = setInterval(() => abrir((abierta + 1) % APPS.length), 7000);
 }
 
 teclas.forEach((t, i) => {
