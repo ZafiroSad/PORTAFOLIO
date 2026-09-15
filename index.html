@@ -290,73 +290,95 @@ body.bloqueado .masa { animation-play-state:paused; }
 }
 .menu a:hover { color:var(--tinta); }
 .menu a.activo { color:var(--tinta); }
-/* ============ EN EL TELEFONO, EL MENU SE VA ABAJO ==============
-   MEDIDO A 390 px: la barra mide 353 y el menu necesita 368 con sus seis
-   entradas, asi que CONTACTO se salia por el borde. No se veia antes porque
-   el Chrome headless de la maquina de trabajo no baja de 500 px de ancho;
-   se vio montando la pagina dentro de un iframe de 390, donde las media
-   queries responden al ancho del marco.
+/* ============ EN EL TELEFONO NO HAY BARRA ARRIBA ================
+   MEDIDO A 390 px: la barra de arriba mide 353 y el menu necesita 368 con
+   sus seis entradas, asi que CONTACTO se salia por el borde. No se vio
+   antes porque el Chrome headless de la maquina de trabajo no baja de
+   500 px; se vio montando la pagina dentro de un iframe de 390, donde las
+   media queries responden al ancho del marco.
 
-   La salida no es apretar la tipografia hasta que quepa —a .45rem ya no se
-   lee— sino mover el menu donde el pulgar llega: una barra flotante abajo.
-   Arriba queda solo la marca, que es la firma y el modo de volver al inicio.
-
-   ES EL MISMO GESTO DE LA BARRA DE ESCRITORIO, no un patron prestado: alli
-   una gota de vidrio se desliza bajo el enlace activo; aqui la gota ES el
-   enlace activo, que se ensancha y descubre su nombre mientras los demas se
-   quedan en su icono. Un solo idioma en las dos pantallas. */
+   La v27 dejo arriba la marca sola y bajo el menu. Aqui se cierra el
+   movimiento: ARRIBA NO QUEDA NADA. La barra entera se retira y la unica
+   navegacion del telefono es el dock de abajo, que es como se navega en
+   toda la familia STICK. La firma no se pierde: la lleva la portada, el
+   pie y Sobre mi.
+   ================================================================= */
 @media (max-width:700px){
-  .barra { padding:0 .4rem 0 .85rem; }
-  .marca span.rotulo { font-size:.55rem; letter-spacing:.14em; }
-  .menu { display:none; }
-  .barra { justify-content:flex-start; width:auto; left:var(--margen); transform:none; }
-  .barra.compacta { --k:1; opacity:1; transform:none; }
+  .barra { display:none; }
+  .menu  { display:none; }
 }
+
+/* ============ EL DOCK — CALCADO DE STICK BUDGETS ================
+   STICK BUDGETS es la referencia visual de la familia, y su regla sobre
+   esto no admite matices: LA NAVEGACION INFERIOR JAMAS LLEVA TEXTO. Solo
+   iconos, en cualquier ancho y en cualquier estado, la seccion activa
+   incluida. El nombre va en `aria-label` y en `title`: el lector de
+   pantalla lo anuncia igual y el puntero fino muestra el rotulo, asi que
+   no se pierde informacion — solo deja de ocupar sitio. Y un dock de solo
+   iconos MIDE LO MISMO en cualquier pantalla, que es lo que lo hace
+   identico entre las apps.
+
+   Esto retira lo que hacia la v27, que era justo lo contrario: la activa
+   se ensanchaba y descubria su nombre. Se veia bien y estaba fuera de la
+   norma.
+
+   Lo que marca la activa es la PILDORA QUE VIAJA: un solo objeto de
+   vidrio que se desliza de un icono al siguiente. Es el mismo gesto de la
+   gota de la barra de escritorio y el mismo de toda la familia (alli
+   `layoutId` con muelle de .42 s; aqui, sin framework, una transicion de
+   .42 s con `--resorte`, que es el mismo rebote corto).
+   ================================================================= */
 .fono-nav {
-  position:fixed; z-index:120; left:50%; transform:translateX(-50%);
-  /* El hueco de abajo del telefono —la barra de gestos— se respeta con
-     `env()`. Sin eso, en un iPhone la barra queda debajo del indicador y se
-     toca a medias. */
+  position:fixed; z-index:120; left:50%;
+  /* `translate3d` y no `translateX`: el componente Z, aunque valga 0, manda
+     la barra a su propia capa de composicion de la GPU desde el principio.
+     Sin eso, en Safari de iOS un `position:fixed` con `backdrop-filter` se
+     DESPRENDE durante un scroll rapido y viaja con el contenido hasta que
+     el scroll para. Esta documentado en STICK BUDGETS con captura del
+     Señor Stick, y este dock reune las dos condiciones exactas. */
+  transform:translate3d(-50%, 0, 0); will-change:transform;
+  /* El hueco de gestos del telefono se respeta con `env()`. Sin eso, en un
+     iPhone el dock queda debajo del indicador y se toca a medias. */
   bottom:calc(.7rem + env(safe-area-inset-bottom, 0px));
-  width:min(calc(100% - 1.4rem), 430px);
-  display:flex; align-items:center; justify-content:space-between;
-  gap:.15rem; padding:.34rem; border-radius:999px;
+  width:min(calc(100% - 1.4rem), 400px);
+  display:flex; align-items:center;
+  padding:.34rem; border-radius:999px;
   transition:transform .45s var(--salida), opacity .35s var(--suave); }
 /* Con una capa abierta —ficha, indice, visor, reel— se retira: esas cubren
-   la ventana entera y la barra quedaria flotando sobre ellas. */
-body.bloqueado .fono-nav { transform:translateX(-50%) translateY(140%); opacity:0; }
-/* Solo en el telefono. VA DESPUES de la regla que la dibuja: las dos tienen
-   la misma especificidad y decide el orden — declarada antes, no ganaba y la
-   barra salia tambien en escritorio. */
+   la ventana entera y el dock quedaria flotando sobre ellas. */
+body.bloqueado .fono-nav { transform:translate3d(-50%, 140%, 0); opacity:0; }
+/* Solo en el telefono. VA DESPUES de la regla que lo dibuja: las dos tienen
+   la misma especificidad y decide el orden — declarada antes, no ganaba y
+   el dock salia tambien en escritorio. */
 @media (min-width:701px){ .fono-nav { display:none; } }
 
-.fono-nav a {
-  position:relative; flex:none; display:flex; align-items:center; gap:.4rem;
-  height:40px; padding:0 .62rem; border-radius:999px;
-  color:var(--debil); text-decoration:none;
-  transition:color .4s var(--suave), background .45s var(--suave),
-             box-shadow .45s var(--suave), padding .45s var(--salida); }
-.fono-nav svg { width:19px; height:19px; flex:none; display:block; }
-/* El nombre esta SIEMPRE en el DOM y solo se descubre: animar un ancho
-   maximo no obliga a rehacer la maquetacion de toda la barra en cada
-   cuadro, y el lector de pantalla lo lee igual aunque se vea recortado. */
-.fono-nav a b {
-  font-family:var(--mono); font-size:.5rem; letter-spacing:.13em;
-  text-transform:uppercase; font-weight:400; white-space:nowrap;
-  max-width:0; opacity:0; overflow:hidden;
-  transition:max-width .45s var(--salida), opacity .35s var(--suave); }
-.fono-nav a.activo {
-  color:var(--tinta); padding:0 .78rem;
+.fono-nav .gota-fono {
+  position:absolute; top:.34rem; bottom:.34rem; left:0; width:0;
+  border-radius:999px;
   background:rgba(255,255,255,.12);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22); }
-.fono-nav a.activo b { max-width:7rem; opacity:1; }
-.fono-nav a:active { color:var(--tinta); }
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22);
+  opacity:0; pointer-events:none;
+  transition:transform .42s var(--resorte), width .42s var(--resorte),
+             opacity .35s var(--suave); }
+.fono-nav.viva .gota-fono { opacity:1; }
 
-@media (max-width:360px){
-  .fono-nav a { padding:0 .5rem; }
-  .fono-nav a.activo { padding:0 .6rem; }
-  .fono-nav a b { font-size:.46rem; letter-spacing:.08em; }
-}
+/* `flex:1 1 0` y no un ancho por contenido: con solo iconos, todos miden
+   igual y el dock reparte su ancho en seis partes exactas. Eso es lo que
+   hace que la pildora viaje a saltos regulares y que el area tocable sea
+   la misma en las seis. */
+.fono-nav a {
+  position:relative; z-index:1;
+  flex:1 1 0; display:flex; align-items:center; justify-content:center;
+  height:44px; border-radius:999px;
+  color:var(--debil); text-decoration:none;
+  transition:color .35s var(--suave); }
+.fono-nav svg { width:20px; height:20px; display:block; }
+.fono-nav a.activo { color:var(--tinta); }
+.fono-nav a:active { color:var(--tinta); }
+/* Guarda de hover tactil, tambien regla de la familia: en el telefono el
+   navegador dispara un hover falso al tocar y el reflejo de `.vidrio` se
+   queda encendido donde se poso el dedo. */
+@media (hover:none){ .fono-nav.vidrio:hover::after { opacity:0; } }
 
 
 .avance { position:fixed; top:0; left:0; right:0; height:1.5px; z-index:121;
@@ -1529,16 +1551,36 @@ body.bloqueado .fono-nav { transform:translateX(-50%) translateY(140%); opacity:
   .visor-cerrar { top:.7rem; right:.7rem; }
 }
 
-/* Pantallas muy estrechas: el rótulo se va, el isotipo se queda.
-   Antes desaparecía la marca entera y el sitio se quedaba sin firma fija
-   en el teléfono; la flecha sola cabe de sobra y basta para reconocerla. */
-@media (max-width:400px){
-  .barra { padding:0 .4rem 0 .7rem; }
-  .marca span.rotulo { display:none; }
-  .marca { gap:0; }
-  /* Solo se ajusta el ancho: el alto tocable se hereda del bloque de
-     arriba. Rebajarlo aqui era lo que dejaba los enlaces en 32 px. */
-  .menu a { font-size:.54rem; padding-left:.6rem; padding-right:.6rem; }
+/* Con la barra de arriba retirada, las secciones RECUPERAN ese alto. Iba
+   reservado con `padding-top:calc(var(--barra) + .5rem)` para no quedar
+   debajo de ella; sin barra, ese hueco se queda vacio sobre el titular.
+
+   VA AQUI, DESPUES del bloque de 760 px, y no arriba con las demas reglas
+   del telefono: las dos declaran el mismo `padding-top` sobre el mismo
+   selector, asi que a igual especificidad gana la que va ultima. Puesta
+   antes no habria hecho nada — es el mismo tropiezo de la v27, cuatro
+   veces en una tanda.
+
+   El bloque de 400 px que habia aqui se retira entero: ajustaba el relleno
+   de `.barra`, escondia el rotulo de la marca y apretaba `.menu a`, y las
+   tres cosas estan ahora en `display:none` desde los 700. Eran reglas
+   muertas.
+   ================================================================= */
+@media (max-width:700px){
+  .seccion { padding-top:1.1rem; }
+  /* La portada se lleva la pantalla entera: ya no hay barra que esquivar. */
+  .inicio  { padding-top:0; }
+  /* Sin barra que descontar. La holgura del dock la pone el
+     `padding-bottom` de `.seccion-cuerpo`, no este alto. */
+  #contacto { min-height:100svh; }
+  /* El aviso «Desplace» se va. MEDIDO a 390, 360 y 320: iba de 766 a 822 y
+     el dock de 776 a 833 — su hilo cruzaba el vidrio por detras. No se
+     recoloca, se retira: es una ayuda de escritorio (en un telefono nadie
+     duda de que la pagina se desplaza) y su sitio, el centro del borde de
+     abajo, es exactamente donde ahora vive la navegacion. La firma «Kevin
+     Gil — Bucaramanga» SI se queda: acaba en 760 y libra el dock por 16 px.
+     `.inicio-texto` no necesita holgura por lo mismo. */
+  .baja { display:none; }
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -2126,15 +2168,20 @@ document.querySelectorAll('.palabras').forEach(t => {
 });
 
 /* =================================================================
-   LA BARRA DE ABAJO — solo en el telefono
+   EL DOCK DEL TELEFONO — la unica navegacion que queda ahi
 
    No tiene lista propia: la escribe a partir de los enlaces de la barra de
-   arriba, asi que añadir o quitar una seccion se hace en un solo sitio y las
-   dos barras quedan iguales por construccion.
+   escritorio, asi que añadir o quitar una seccion se hace en un solo sitio
+   y las dos quedan iguales por construccion — aunque en el telefono esa
+   barra ya no se vea.
 
-   Los iconos son trazo, del mismo grosor que los del resto del sitio.
+   Los iconos son trazo, del mismo grosor que los del resto del sitio, y van
+   SOLOS: la regla de la familia STICK es que la navegacion inferior jamas
+   lleva texto. El nombre viaja en `aria-label` y en `title`, asi que el
+   lector de pantalla lo anuncia y el puntero fino lo muestra.
+
    `Inicio` ya existe como enlace con `data-reiniciar`, y ese atributo se
-   copia para que abajo haga lo mismo que arriba.
+   copia para que aqui haga lo mismo que alli.
    ================================================================= */
 const DIBUJOS = {
   '#inicio':    '<path d="M3 10.6 12 3.6l9 7v9.2a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
@@ -2147,14 +2194,17 @@ const DIBUJOS = {
 /* Se consulta la barra de arriba directamente y no la constante
    `enlacesMenu`: esa se declara bastante mas abajo, y usarla aqui la dejaria
    en su zona muerta — un `ReferenceError` en carga. */
-document.getElementById('fono-nav').innerHTML = [...document.querySelectorAll('.menu a')].map(a => {
-  const href = a.getAttribute('href');
-  return `<a href="${href}"${a.hasAttribute('data-reiniciar') ? ' data-reiniciar' : ''}>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
-         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${DIBUJOS[href] || ''}</svg>
-    <b>${a.textContent.trim()}</b>
-  </a>`;
-}).join('');
+document.getElementById('fono-nav').innerHTML =
+  '<span class="gota-fono" id="gota-fono"></span>' +
+  [...document.querySelectorAll('.menu a')].map(a => {
+    const href = a.getAttribute('href');
+    const nombre = a.textContent.trim();
+    return `<a href="${href}"${a.hasAttribute('data-reiniciar') ? ' data-reiniciar' : ''}
+      aria-label="${nombre}" title="${nombre}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${DIBUJOS[href] || ''}</svg>
+    </a>`;
+  }).join('');
 
 /* =================================================================
    VIDRIO — el reflejo sigue al cursor
@@ -3116,7 +3166,10 @@ const barra     = document.getElementById('barra');
 const menu      = document.getElementById('menu');
 const gota      = document.getElementById('gota');
 const campo     = document.querySelector('.campo');
-const secciones = [...document.querySelectorAll('#proyectos, #reel, #sobre, #suite, #contacto')];
+/* `#inicio` entra en la lista: sin el, arriba del todo NINGUNA seccion
+   estaba activa y el dock del telefono —que ahora es la unica navegacion
+   que hay ahi— se quedaba sin pildora justo en lo primero que se ve. */
+const secciones = [...document.querySelectorAll('#inicio, #proyectos, #reel, #sobre, #suite, #contacto')];
 /* Las dos barras —la de arriba y la del telefono— se resaltan juntas: una
    sola lista y un solo sitio donde decidir cual esta activa. */
 const enlacesMenu = [...document.querySelectorAll('.menu a, .fono-nav a')];
@@ -3133,8 +3186,35 @@ function moverGota(a) {
   gota.style.transform = `translateX(${a.offsetLeft}px)`;
   menu.classList.add('viva');
 }
-enlacesMenu.forEach(a => a.addEventListener('pointerenter', () => moverGota(a)));
+/* Solo los enlaces de la barra de arriba: la gota vive dentro de `.menu` y
+   mide contra el, asi que pasarle un enlace del dock la dejaba corrida. */
+document.querySelectorAll('.menu a').forEach(a => a.addEventListener('pointerenter', () => moverGota(a)));
 menu.addEventListener('pointerleave', () => moverGota(document.querySelector('.menu a.activo')));
+
+/* La misma idea abajo, con dos diferencias: la pildora del dock NO sigue al
+   puntero —en el telefono no hay puntero que seguir— sino solo a la seccion
+   activa, y se coloca con `translate3d` para que viaje en la capa de la GPU,
+   igual que el dock entero. */
+const fonoNav  = document.getElementById('fono-nav');
+const gotaFono = document.getElementById('gota-fono');
+function moverGotaFono() {
+  const a = fonoNav.querySelector('a.activo');
+  /* `offsetWidth` 0 significa que el dock esta oculto (escritorio): no hay
+     nada que medir, y medirlo dejaria la pildora en 0 para cuando se vuelva
+     a ver. */
+  if (!a || !a.offsetWidth) { fonoNav.classList.remove('viva'); return; }
+  gotaFono.style.width = `${a.offsetWidth}px`;
+  gotaFono.style.transform = `translate3d(${a.offsetLeft}px, 0, 0)`;
+  fonoNav.classList.add('viva');
+}
+
+/* Un solo sitio decide cual esta activa, y lo usan el scroll y la pasada
+   inicial. */
+function resaltar(activa) {
+  enlacesMenu.forEach(a => a.classList.toggle('activo', a.getAttribute('href') === '#' + activa));
+  moverGota(document.querySelector('.menu a.activo'));
+  moverGotaFono();
+}
 
 function moverParallax(raiz, alto) {
   raiz.querySelectorAll('[data-parallax]').forEach(el => {
@@ -3175,8 +3255,7 @@ addEventListener('scroll', () => {
     // cada cuadro obligaba a medir el menu sin que nada hubiera cambiado.
     if (activa !== seccionActiva) {
       seccionActiva = activa;
-      enlacesMenu.forEach(a => a.classList.toggle('activo', a.getAttribute('href') === '#' + activa));
-      moverGota(document.querySelector('.menu a.activo'));
+      resaltar(activa);
     }
 
     pedirGiro();
@@ -3190,7 +3269,20 @@ ficha.addEventListener('scroll', () => {
 }, { passive:true });
 addEventListener('resize', () => {
   if (capaIndice.classList.contains('abierta')) ajustarRejilla();
+  /* Al cruzar los 700 px el dock aparece o desaparece, y al girar el
+     telefono cambia su ancho: las dos cosas mueven la pildora de sitio. */
+  moverGotaFono();
 });
+
+/* Una pasada al cargar. Sin ella nada esta activo hasta el primer
+   desplazamiento, y en el telefono eso es un dock sin pildora en la primera
+   pantalla — que es justo donde mas se mira. */
+(function primerResalte() {
+  let activa = '';
+  secciones.forEach(s => { if (s.getBoundingClientRect().top <= innerHeight * .4) activa = s.id; });
+  seccionActiva = activa;
+  resaltar(activa);
+})();
 
 /* Van Y VUELVEN. Antes cada bloque se animaba una sola vez y al subir
    de nuevo ya estaba puesto; ahora se rearma al salir de pantalla, asi

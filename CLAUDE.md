@@ -8,9 +8,83 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v27 — el menú del teléfono se va abajo, donde llega el pulgar.**
+**v28 — en el teléfono no hay barra arriba, y el dock es el de la familia.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v28 — 2026-09-16
+
+«Desde celular quita entonces la parte de arriba y que la barra de navegación
+sea tal cual la del UI system, debe ser como la de STICK BUDGETS.»
+
+La v27 movió el menú abajo pero dejó la marca arriba, y se inventó un gesto
+propio para la activa. Las dos cosas se corrigen leyendo la fuente en vez de
+suponer: **la bitácora de STICK BUDGETS tiene una entrada con el título «La
+barra de navegación jamás lleva texto»**, del 2026-08-24, y es regla del Señor
+Stick para toda la familia.
+
+- **ARRIBA NO QUEDA NADA.** `.barra` entera a `display:none` por debajo de
+  700 px. La firma no se pierde: la lleva la portada, el pie y Sobre mí.
+- **El dock es solo iconos, en cualquier estado — la sección activa
+  incluida.** Eso retira justo lo que hacía la v27, que era lo contrario: la
+  activa se ensanchaba y descubría su nombre. Se veía bien y estaba fuera de
+  la norma. El nombre va ahora en `aria-label` y `title`, así que el lector
+  de pantalla lo anuncia igual y el puntero fino lo muestra — no se pierde
+  información, solo deja de ocupar sitio. Y un dock de solo iconos **mide lo
+  mismo en cualquier pantalla**, que es lo que lo hace idéntico entre las
+  apps.
+- **Lo que marca la activa es la píldora que viaja**, que también es de la
+  familia: allí `layoutId` de Motion con muelle de .42 s; aquí, sin
+  framework, un solo objeto de vidrio con transición de .42 s y `--resorte`,
+  que es el mismo rebote corto. Es además el mismo gesto que la gota de la
+  barra de escritorio.
+- **`translate3d(-50%,0,0)` y no `translateX`**, con `will-change`. El
+  componente Z, aunque valga 0, manda el dock a su propia capa de la GPU.
+  Sin eso, en Safari de iOS un `position:fixed` con `backdrop-filter` se
+  **desprende** durante un scroll rápido y viaja con el contenido: está
+  documentado en BUDGETS con captura del Señor Stick, y este dock reúne las
+  dos condiciones exactas. No se puede reproducir aquí —es del compositor de
+  WebKit— pero se comprobó que no rompe el centrado.
+- **Guarda de hover táctil**, también regla de la familia: en el teléfono el
+  navegador dispara un hover falso al tocar y el reflejo de `.vidrio` se
+  quedaba encendido donde se posó el dedo.
+
+**Dos cosas que solo se vieron mirando la página entera, no el dock:**
+
+1. **«Desplace» cruzaba el vidrio.** Medido a 390, 360 y 320: el aviso iba de
+   766 a 822 y el dock de 776 a 833. No se recoloca, se retira en el
+   teléfono: es una ayuda de escritorio —ahí nadie duda de que la página se
+   desplaza— y su sitio, el centro del borde de abajo, es exactamente donde
+   ahora vive la navegación. La firma «Kevin Gil — Bucaramanga» **sí** se
+   queda: acaba en 760 y libra el dock por 16 px.
+2. **Las secciones reservaban el alto de una barra que ya no está.** El
+   `padding-top:calc(var(--barra) + .5rem)` dejaba 68 px vacíos sobre cada
+   titular. Baja a 1,1 rem, y la portada se lleva la pantalla entera
+   (`padding-top:0`). **Esa regla va DESPUÉS del bloque de 760 px**, no con
+   las demás del teléfono: declaran el mismo `padding-top` sobre el mismo
+   selector y a igual especificidad gana la última — el mismo tropiezo que
+   costó cuatro correcciones en la v27.
+
+**De paso, un fallo que venía de antes: arriba del todo no había ninguna
+sección activa.** El vigía no miraba `#inicio`, así que la gota de escritorio
+se apagaba en la portada y el dock —que ahora es la única navegación del
+teléfono— salía sin píldora justo en lo primero que se ve. `#inicio` entra en
+la lista y hay una pasada al cargar, porque sin desplazar no se dispara nada.
+
+Se retiró entero el bloque de `@media (max-width:400px)`: ajustaba el relleno
+de `.barra`, escondía el rótulo de la marca y apretaba `.menu a`, y las tres
+cosas están ahora en `display:none` desde los 700. Eran reglas muertas.
+
+**Medido a 390, 360 y 320 px** en el marco de 390: barra y menú en `none`,
+seis iconos, **ningún texto visible** en el dock y los seis `aria-label` y
+`title` puestos; los iconos miden igual (59, 54 y 47 px) y suman menos que el
+dock (292,9 sobre 298 en el peor caso); sin desbordamiento horizontal. La
+píldora viaja en saltos regulares de 59 px y solo la activa se enciende
+(#f7f8fa contra #797d8a). Nada queda debajo del vidrio: las cinco secciones
+cierran entre 744 y 751 con el dock en 776. Con una capa abierta el dock se va
+a 856 con opacidad 0. El corte es limpio en 700/701, el toque salta de verdad
+(0 → 5 446 en Contacto → 844 en Proyectos) y en escritorio —1440, 1024, 760 y
+701— no cambia nada salvo que ahora «Inicio» sale resaltado en la portada.
 
 ### v27 — 2026-09-16
 
@@ -598,8 +672,9 @@ Todo se recorre desplazando. El menú salta con un desplazamiento animado.
    tira de siete teclas que lo cambia. Pasa sola cada 7 s y se para al
    tocarla. Las tres de obra llevan un punto en su tecla.
 
-**En el teléfono el menú no está arriba: está abajo**, en una barra de vidrio
-flotante donde llega el pulgar. Arriba queda solo la marca.
+**En el teléfono no hay nada arriba.** La única navegación es el dock de
+vidrio flotante donde llega el pulgar: seis iconos sin texto y una píldora que
+viaja bajo el activo, como en el resto de la suite.
 6. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail, Instagram y la
    tarjeta `.vcf`. Sin texto de venta.
 
@@ -758,9 +833,17 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
   headless de esta máquina no baja de 500 px de ancho, así que medir «en móvil»
   a 520 escondió durante días que el menú no cabía. Dentro del marco, las media
   queries responden a su ancho.
-- **En pantallas de menos de 400 px el rótulo de la barra se va, el isotipo se
-  queda.** Antes desaparecía la marca entera y el teléfono se quedaba sin firma
-  fija; la flecha sola cabe de sobra.
+- **LA NAVEGACIÓN INFERIOR JAMÁS LLEVA TEXTO.** Regla del Señor Stick para
+  toda la familia, anotada en la bitácora de STICK BUDGETS el 2026-08-24 y en
+  el `STICK_UI_SYSTEM.md`: solo iconos, en cualquier ancho y en cualquier
+  estado, la sección activa incluida. El nombre va en `aria-label` y `title`.
+  Lo que marca la activa es la píldora que viaja, no una etiqueta. Antes de
+  inventar un gesto para el teléfono, mirar si BUDGETS ya lo tiene resuelto:
+  es el referente visual de la suite y el documento sale de ahí, nunca al
+  revés.
+- ~~**En pantallas de menos de 400 px el rótulo de la barra se va, el isotipo
+  se queda.**~~ Superada en la v28: por debajo de 700 px no hay barra arriba
+  de ninguna clase, así que no hay rótulo que esconder.
 - **Manda STICK INDUSTRIES, firma Kevin Gil.** La barra y la entrada llevan
   el logo; el nombre propio vive en la portada, en el pie y en Sobre mí.
   Decidido por Kevin el 2026-09-10, cerrando el pendiente que arrastraba
