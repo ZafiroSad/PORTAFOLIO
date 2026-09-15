@@ -197,17 +197,24 @@ Lo que trae la v18 sobre la v16.4:
 - **Tarjeta de contacto** (`.vcf`) como cuarto acceso de Contacto.
 
 Pendientes:
-1. Verificar en un **teléfono real** (lo automatizado cubre el encuadre, no
-   el tacto ni el rendimiento en gama media)
-0. **Rehacer la sección de apps y los textos** con los prompts del Señor Stick.
-0. **Copias en caché de GitHub.** El historial se purgó el 2026-09-13 (ver
+1. **Correr los dos scripts en el computador de Kevin.** Son los dos cabos
+   que quedaron abiertos y ninguno se puede cerrar desde un contenedor,
+   porque lo que les falta vive en su disco:
+   - `python herramientas/preparar-suite.py` — escribe los tres iconos que
+     faltan (`quantity`, `budgets`, `fit`) desde sus `LOGO.png`.
+   - `node herramientas/preparar-cv.mjs` — reimprime la hoja de vida, que
+     hoy sigue diciendo 4.2 y con el perfil viejo. Hace falta Century Gothic,
+     que solo está ahí. Comprobar que siga cabiendo en una hoja.
+2. Verificar en un **teléfono real** (lo automatizado cubre el encuadre, no
+   el tacto ni el rendimiento en gama media).
+3. **Copias en caché de GitHub.** El historial se purgó el 2026-09-13 (ver
    abajo), pero GitHub sigue sirviendo los commits viejos a quien tenga su
    hash exacto, hasta que su recolector los elimine. Para forzarlo hay que
    pedirlo a GitHub Support citando los hashes, o borrar y recrear el
    repositorio.
-2. La hoja de vida en PDF **sí** lleva el teléfono y el correo en claro, y
+4. La hoja de vida en PDF **sí** lleva el teléfono y el correo en claro, y
    vive en un repositorio público. Es su función —una hoja de vida sin
-   teléfono no sirve—, pero conviene saberlo
+   teléfono no sirve—, pero conviene saberlo.
 
 Lo que más subiría el nivel, y depende de material de Kevin:
 **fotos de obra construida en el mismo encuadre del render.**
@@ -232,6 +239,7 @@ PORTAFOLIO/
 │   ├── logos/                   logos de software y escudos de formación
 │   ├── renders/                 imágenes en 1600 y 2560 px
 │   ├── video/                   6 recorridos, el reel y sus fotogramas de portada
+│   ├── producto/                4 WebP (`pindi-*`) que NO enlaza nadie — ver abiertas
 │   ├── datos/tierra.json        silueta de continentes para el globo (13 KB)
 │   └── paletas.json             color dominante por proyecto
 └── herramientas/
@@ -240,7 +248,8 @@ PORTAFOLIO/
     ├── preparar-og.py           compone las imágenes de compartir 1200x630
     ├── preparar-enlaces.mjs     escribe p/<slug>/ desde el catálogo
     ├── preparar-cv.mjs          imprime la hoja de vida en PDF
-    ├── capturar-suite.mjs       capturas reales de las apps, con puppeteer
+    ├── preparar-suite.py        iconos de las apps desde sus LOGO.png
+    ├── servir.py                servidor local con Range (sin el, ningun video)
     ├── optimizar-imagenes.ps1   extrae y convierte los renders del archivo
     ├── optimizar-videos.ps1     comprime los recorridos
     ├── extraer-paletas.ps1      saca el color dominante de cada portada
@@ -343,13 +352,23 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
 
 ## Decisiones tomadas
 
-- **Las capturas de las apps son REALES, no maquetas.** Las toma
-  `herramientas/capturar-suite.mjs` con puppeteer sobre el Chrome instalado, y
-  se recortan a la zona que cuenta algo. Una maqueta de una app que existe es
-  una mentira pequeña que no hace falta contar.
-- **Solo entran las tres apps de obra.** ATLAS, AROS y QUANTITY. Las otras
-  cuatro de la suite —finanzas, inversiones, entrenamiento— quedan mencionadas
-  en una línea: en un portafolio de ingeniería civil desenfocan.
+- **Las apps se muestran por su ICONO, nunca por una captura.** La v18 ponía
+  pantallazos de 30 KB donde el logo no salía por ningún lado; la v19 los
+  cambió por el icono de cada app, y la v19.3 quitó del todo la idea de
+  enseñar la interfaz. `capturar-suite.mjs` —el script de puppeteer que tomaba
+  esas capturas— ya no existe en el repositorio.
+- **Entran las siete, en dos pesos.** ATLAS, AROS y QUANTITY en tarjeta,
+  porque son las de obra y son las que sostienen el argumento; PROJECTS,
+  ASSETS, BUDGETS y FIT en una tira más tenue debajo. La v19 solo dejaba
+  entrar a las de obra y mencionaba el resto en una línea; el Señor Stick
+  pidió verlas todas, y en dos pesos siguen sin desenfocar un portafolio de
+  ingeniería civil.
+- **Un icono que falta no deja un hueco: deja su inicial.** Los `LOGO.png` de
+  origen viven fuera del repositorio, así que el sitio declara la ruta de los
+  seis aunque el archivo no esté y un `onerror` pone la letra mientras tanto.
+  Cuesta un 404 por icono ausente —hoy tres— y a cambio el día que se corra
+  `preparar-suite.py` aparecen solos sin tocar el `index.html`. Con los tres
+  que sí están, la suite entera pesa **15,8 KB**.
 - **El texto de Sobre mí dice lo que pasa, no lo que suena bien.** La versión
   anterior afirmaba que «los espesores, los apoyos y **la luz** se replantean
   en obra». La luz no se replantea: era una enumeración bonita y falsa. Una
@@ -497,7 +516,11 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
   flotante. Lo único que sobrevivió de todas ellas es el resplandor, que
   sale de `drop-shadow` sobre el PNG y por eso toma la silueta del logo y no
   la de un contenedor.
-- **La escena de Proceso es una SECUENCIA DE FOTOGRAMAS en canvas, no un
+- **La escena de Proceso YA NO ESTÁ EN EL SITIO** — ni ella, ni sus fotogramas
+  en `assets/proceso`, ni `preparar-proceso.ps1`. Las tres notas que siguen se
+  conservan porque la lección vale para cualquier reproducción cuadro a cuadro
+  que se intente después, no porque describan algo que hoy se pueda abrir.
+- **La escena de Proceso era una SECUENCIA DE FOTOGRAMAS en canvas, no un
   `<video>`.** Con vídeo hay que mover `currentTime` en cada cuadro, y un
   salto pedido antes de que resuelva el anterior se descarta: medido en
   Chrome, el vídeo se quedaba clavado con `seeking` en `true` para siempre,
@@ -546,8 +569,16 @@ del reel solo se descargan si alguien pulsa el cartel.
 
 Antes fueron 1,1 MB, y antes de eso 2,26 MB.
 
-Después de `load` llegan los 3,8 MB de la secuencia de Proceso, en segunda
-fila y sin bloquear nada.
+~~Después de `load` llegan los 3,8 MB de la secuencia de Proceso~~ — eso dejó
+de pasar cuando la escena salió del sitio: hoy no se pide ningún fotograma.
+
+**Medido de nuevo el 2026-09-15**, con la suite ya puesta y servido en local:
+**33 peticiones y 2,57 MB** con todo cargado —incluidas las hojas de la
+vitrina, que entran perezosas y no cuentan para «la página lista»—, y de ahí
+la suite entera son **15,8 KB**. Tres de esas peticiones son los 404 de los
+iconos que faltan. **La cifra de arriba, 0,59 MB y 8 peticiones, se midió en
+Chrome real y hasta el evento `load`: no son lo mismo y no se comparan.**
+Queda pendiente repetir aquella medición como se hizo entonces.
 
 Sigue pendiente, si algún día molesta: **una tercera talla de ~800 px para
 las hojas de la vitrina**. Solo existen 1600 y 2560 px, así que cada hoja
@@ -563,6 +594,10 @@ toca la calidad de imagen y eso lo decide Kevin.
    proyectos no están en la carpeta curada. Siguen en disco.
 3. Los nombres de menores que había en los rótulos de LA PUNTA quedaron
    resueltos solos: la ficha ya no rotula las imágenes con nombre propio.
+4. **`assets/producto/pindi-*.webp`**, 4 archivos y 256 KB, no los enlaza
+   nadie: ni el `index.html`, ni un script, ni esta bitácora. Se quedan
+   porque borrar material de Kevin no es una decisión de una sesión de
+   limpieza — pero si no van a volver, sobran.
 
 ## Qué falta aportar para que sea más inmersivo
 
