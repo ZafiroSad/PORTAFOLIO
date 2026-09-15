@@ -8,9 +8,28 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v19.3 — la suite propia vuelve al sitio, en tarjetas y en voz baja.**
+**v19.4 — las dos ramas del 2026-09-14 unidas, iconos completos y CV reimpreso.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v19.4 — 2026-09-14 (cuadre del PC con la sesión remota)
+
+Ese día se trabajó por dos lados sin verse: la sesión remota subió la v19.2
+(textos) y la v19.3 (suite) a la rama `claude/perfil-profesional-arquitectura-00ml0t`,
+y en el PC se hizo en `main` otro commit rotulado también «v19.2»: el sufijo
+`?v=4.1` en las rutas del reel y su póster para saltar la caché del navegador.
+Se fusionó la rama en `main` sin conflictos; **ese arreglo de caché es la
+v19.4** aunque su commit diga v19.2 (el historial publicado no se reescribe).
+
+- **Los tres iconos que faltaban ya están**: `preparar-suite.py` corrido en el
+  PC escribió los seis; los tres recuperados de Drive salieron idénticos byte a
+  byte. Verificado con captura: ATLAS con su «A», AROS y QUANTITY arriba, y la
+  tira de cuatro al 70 %.
+- **Hoja de vida reimpresa con Century Gothic**, con 4.3 y el perfil nuevo. Salía
+  en **dos hojas**: el curso de la UIS a su nombre completo ocupa tres renglones
+  y la columna de Formación creció ~11 mm, lo justo para echar el pie a una
+  segunda hoja. Se bajó el margen entre renglones de 2,4 a 1,8 mm y el del pie
+  de 5 a 3 mm; vuelve a una hoja, comprobado contando páginas del PDF.
 
 ### v19.3 — 2026-09-14
 
@@ -34,7 +53,7 @@ muy sutil, y solo para mostrar que yo he creado esas aplicaciones».
   letra mientras tanto. ATLAS es el único con `null` de verdad: no tiene
   icono dibujado, así que su «A» no es un respaldo sino lo definitivo.
 
-**Faltan tres iconos: `quantity`, `budgets` y `fit`.** Los `LOGO.png` de
+*(Resuelto en la v19.4.)* **Faltaban tres iconos: `quantity`, `budgets` y `fit`.** Los `LOGO.png` de
 origen viven en el computador de Kevin (`01. STICK SUITE`), no en el
 repositorio. Se recuperaron de Drive los de AROS, PROJECTS y ASSETS y se
 procesaron con los mismos parámetros del script; los otros tres no se
@@ -79,7 +98,7 @@ escribió, y el trayecto se corrigió hito por hito.
   especialización es para poder ampliar el cálculo que la aplicación automatiza
   y responder por sus resultados.
 
-**La hoja de vida en PDF hay que reimprimirla en el computador de Kevin**
+*(Resuelto en la v19.4.)* **La hoja de vida en PDF hay que reimprimirla en el computador de Kevin**
 (`node herramientas/preparar-cv.mjs`). Aquí no está instalada Century Gothic,
 que es la tipografía de la marca, así que lo impreso desde este contenedor sale
 con otra letra y con otra paginación —el PDF **sin tocar** también salía a dos
@@ -199,7 +218,7 @@ Lo que trae la v18 sobre la v16.4:
 Pendientes:
 1. Verificar en un **teléfono real** (lo automatizado cubre el encuadre, no
    el tacto ni el rendimiento en gama media)
-0. **Rehacer la sección de apps y los textos** con los prompts del Señor Stick.
+0. ~~Rehacer la sección de apps y los textos~~ — hecho en la v19.2 y la v19.3.
 0. **Copias en caché de GitHub.** El historial se purgó el 2026-09-13 (ver
    abajo), pero GitHub sigue sirviendo los commits viejos a quien tenga su
    hash exacto, hasta que su recolector los elimine. Para forzarlo hay que

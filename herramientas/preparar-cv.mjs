@@ -151,7 +151,10 @@ function hoja(d) {
        border-bottom:.6pt solid var(--linea); }
 
   ul { list-style:none; }
-  li { margin-bottom:2.4mm; break-inside:avoid; }
+  /* 1,8 mm y no 2,4: con el curso de la UIS a su nombre completo (tres
+     renglones) la columna de Formacion crecio ~11 mm y el pie saltaba a
+     una segunda hoja. */
+  li { margin-bottom:1.8mm; break-inside:avoid; }
   .linea { display:flex; align-items:baseline; gap:2.4mm; }
   .titulo { font-weight:700; font-size:9.6pt; }
   .estado { font-family:var(--mono); font-size:6.6pt; letter-spacing:.14em; text-transform:uppercase;
@@ -173,7 +176,7 @@ function hoja(d) {
   .cifra span { font-family:var(--mono); font-size:6.8pt; letter-spacing:.18em;
                 text-transform:uppercase; color:var(--debil); }
 
-  footer { margin-top:5mm; padding-top:4mm; border-top:.6pt solid var(--linea);
+  footer { margin-top:3mm; padding-top:3.4mm; border-top:.6pt solid var(--linea);
            display:flex; justify-content:space-between; align-items:center;
            font-family:var(--mono); font-size:7.2pt; letter-spacing:.16em;
            text-transform:uppercase; color:var(--debil); }
