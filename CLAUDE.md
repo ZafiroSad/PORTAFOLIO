@@ -8,9 +8,37 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v23 — la suite deja de ser una rejilla: un banco y una tira de siete teclas.**
+**v24 — el banco dice lo que cada app resuelve, y el avance se ve venir.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v24 — 2026-09-16
+
+«Ahora sí se ve mejor, ve mejorándolo.» Dos cosas flojas de la v23:
+
+- **El banco era grande y decía poco.** Un nombre y una línea dejaban el panel
+  sostenido por el tamaño y no por el contenido. Ahora cada app lleva sus
+  **partes** en fichas de mono: lo que resuelve HOY, sacado de su propio
+  README y no de su hoja de ruta. De ATLAS entran los módulos operativos y no
+  los siete pendientes; de QUANTITY, los tres capítulos disponibles y no los
+  tres por hacer. Una lista de funciones que no existen es de las cosas que un
+  ingeniero desmonta en dos segundos.
+  **ASSETS y BUDGETS van sin partes a propósito**: sus bitácoras no detallan
+  secciones y aquí no se inventan.
+- **Que se pasara sola sorprendía.** El contenido cambiaba sin aviso y parecía
+  un fallo. Cada tecla lleva ahora un **hilo de avance** que se dibuja durante
+  los 5 s; al parar el reloj, desaparece. Así se lee que va a pasar y se
+  entiende que detenerlo está a un dedo.
+  Detalle que costó: una animación CSS **no se rearranca** porque cambie un
+  atributo del padre — hay que reponer el nodo para que el navegador la tome
+  por nueva.
+- Las teclas en reposo suben de opacidad (.55 → .72): con el hilo marcando la
+  activa, ya no hace falta apagar tanto las demás.
+- El relleno inferior de la tecla va aparte y más holgado: con el relleno
+  parejo, el hilo se montaba sobre el rótulo en pantallas pequeñas.
+
+Medido a 1440, 1024 y 540 px: sin desbordes ni scroll horizontal, siete hilos
+y las fichas de la app abierta.
 
 ### v23 — 2026-09-16
 
