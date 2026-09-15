@@ -8,28 +8,9 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v19.4 — las dos ramas del 2026-09-14 unidas, iconos completos y CV reimpreso.**
+**v20 — LA STICK SUITE, sección propia con las siete apps en tarjeta cuadrada.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
-
-### v19.4 — 2026-09-14 (cuadre del PC con la sesión remota)
-
-Ese día se trabajó por dos lados sin verse: la sesión remota subió la v19.2
-(textos) y la v19.3 (suite) a la rama `claude/perfil-profesional-arquitectura-00ml0t`,
-y en el PC se hizo en `main` otro commit rotulado también «v19.2»: el sufijo
-`?v=4.1` en las rutas del reel y su póster para saltar la caché del navegador.
-Se fusionó la rama en `main` sin conflictos; **ese arreglo de caché es la
-v19.4** aunque su commit diga v19.2 (el historial publicado no se reescribe).
-
-- **Los tres iconos que faltaban ya están**: `preparar-suite.py` corrido en el
-  PC escribió los seis; los tres recuperados de Drive salieron idénticos byte a
-  byte. Verificado con captura: ATLAS con su «A», AROS y QUANTITY arriba, y la
-  tira de cuatro al 70 %.
-- **Hoja de vida reimpresa con Century Gothic**, con 4.3 y el perfil nuevo. Salía
-  en **dos hojas**: el curso de la UIS a su nombre completo ocupa tres renglones
-  y la columna de Formación creció ~11 mm, lo justo para echar el pie a una
-  segunda hoja. Se bajó el margen entre renglones de 2,4 a 1,8 mm y el del pie
-  de 5 a 3 mm; vuelve a una hoja, comprobado contando páginas del PDF.
 
 ### v20 — 2026-09-15
 
@@ -72,6 +53,25 @@ todas iguales pero las 3 principales primero, con un efecto de brillo».
 tarjetas vacías. Pasó tres veces y las tres eran falsa alarma — medidos, los
 `<img>` daban `naturalWidth` 512 y `complete:true`. Para ver la sección de
 verdad hay que incrustar los iconos como `data:` URI en una copia de prueba.
+
+### v19.4 — 2026-09-14 (cuadre del PC con la sesión remota)
+
+Ese día se trabajó por dos lados sin verse: la sesión remota subió la v19.2
+(textos) y la v19.3 (suite) a la rama `claude/perfil-profesional-arquitectura-00ml0t`,
+y en el PC se hizo en `main` otro commit rotulado también «v19.2»: el sufijo
+`?v=4.1` en las rutas del reel y su póster para saltar la caché del navegador.
+Se fusionó la rama en `main` sin conflictos; **ese arreglo de caché es la
+v19.4** aunque su commit diga v19.2 (el historial publicado no se reescribe).
+
+- **Los tres iconos que faltaban ya están**: `preparar-suite.py` corrido en el
+  PC escribió los seis; los tres recuperados de Drive salieron idénticos byte a
+  byte. Verificado con captura: ATLAS con su «A», AROS y QUANTITY arriba, y la
+  tira de cuatro al 70 %.
+- **Hoja de vida reimpresa con Century Gothic**, con 4.3 y el perfil nuevo. Salía
+  en **dos hojas**: el curso de la UIS a su nombre completo ocupa tres renglones
+  y la columna de Formación creció ~11 mm, lo justo para echar el pie a una
+  segunda hoja. Se bajó el margen entre renglones de 2,4 a 1,8 mm y el del pie
+  de 5 a 3 mm; vuelve a una hoja, comprobado contando páginas del PDF.
 
 ### v19.3 — 2026-09-14
 
@@ -625,13 +625,17 @@ Antes fueron 1,1 MB, y antes de eso 2,26 MB.
 ~~Después de `load` llegan los 3,8 MB de la secuencia de Proceso~~ — eso dejó
 de pasar cuando la escena salió del sitio: hoy no se pide ningún fotograma.
 
-**Medido de nuevo el 2026-09-15**, con la suite ya puesta y servido en local:
-**33 peticiones y 2,57 MB** con todo cargado —incluidas las hojas de la
-vitrina, que entran perezosas y no cuentan para «la página lista»—, y de ahí
-la suite entera son **15,8 KB**. Tres de esas peticiones son los 404 de los
-iconos que faltan. **La cifra de arriba, 0,59 MB y 8 peticiones, se midió en
-Chrome real y hasta el evento `load`: no son lo mismo y no se comparan.**
-Queda pendiente repetir aquella medición como se hizo entonces.
+**Medido de nuevo el 2026-09-16**, con la v20 puesta y los seis iconos en su
+sitio, servido en local: **33 peticiones y 2,33 MB** con todo cargado
+—incluidas las hojas de la vitrina, que entran perezosas y no cuentan para
+«la página lista»—, y de ahí la suite entera son **25,8 KB**. **Ninguna
+petición falla**: los tres 404 de los iconos ausentes desaparecieron al
+correr `preparar-suite.py` en la v19.4.
+
+**Esa cifra NO se compara con los 0,59 MB de arriba**, que se midieron en
+Chrome real y hasta el evento `load`. Queda pendiente repetir aquella
+medición como se hizo entonces, que es la que dice lo que cuesta abrir el
+sitio.
 
 Sigue pendiente, si algún día molesta: **una tercera talla de ~800 px para
 las hojas de la vitrina**. Solo existen 1600 y 2560 px, así que cada hoja
