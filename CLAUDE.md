@@ -8,9 +8,85 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v19.1 — sin la sección de apps, el repositorio limpio y el reel a 1440p.**
+**v19.3 — la suite propia vuelve al sitio, en tarjetas y en voz baja.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v19.3 — 2026-09-14
+
+Las apps vuelven, pero no como en la v19. Pedido del Señor Stick: «que sea
+muy sutil, y solo para mostrar que yo he creado esas aplicaciones».
+
+- **Van en Sobre mí, debajo del flujo**, no en sección propia ni en el menú.
+  Sostienen una frase de la biografía —«desarrollo aplicaciones y
+  herramientas propias»— y ese es todo el peso que piden.
+- **Tarjeta = icono, nombre y una línea.** Sin capturas, sin enlaces, sin
+  botón. La v19 ponía fichas con pantallazos de 30 KB y desenfocaba un
+  portafolio de ingeniería civil.
+- **Dos pesos.** ATLAS, AROS y QUANTITY abren en un renglón de tres tarjetas
+  porque son las de obra; PROJECTS, ASSETS, BUDGETS y FIT van debajo en una
+  tira al 70 % de opacidad que se enciende al pasar por encima.
+- **El resplandor es blanco para todas.** Los logos de software de arriba
+  llevan el color de cada marca porque ese color existe. Inventarle uno a
+  cada app propia sería decorar con algo que no es cierto.
+- **Si falta el icono, va la inicial.** Las seis declaran su ruta en
+  `assets/suite/` aunque el archivo no esté, y un `onerror` las deja en su
+  letra mientras tanto. ATLAS es el único con `null` de verdad: no tiene
+  icono dibujado, así que su «A» no es un respaldo sino lo definitivo.
+
+**Faltan tres iconos: `quantity`, `budgets` y `fit`.** Los `LOGO.png` de
+origen viven en el computador de Kevin (`01. STICK SUITE`), no en el
+repositorio. Se recuperaron de Drive los de AROS, PROJECTS y ASSETS y se
+procesaron con los mismos parámetros del script; los otros tres no se
+pudieron traer íntegros desde aquí. **Se arreglan con un comando:**
+
+```powershell
+python herramientas/preparar-suite.py
+```
+
+Escribe los seis en `assets/suite/` y las tarjetas los toman solas — el
+`index.html` ya apunta a esas rutas y no hay que tocar una línea.
+
+### v19.2 — 2026-09-14
+
+Llegó el prompt de los textos que la v19.1 dejó pendientes. Van tal cual los
+escribió, y el trayecto se corrigió hito por hito.
+
+- **La biografía es la suya, palabra por palabra.** Cuatro párrafos que abren
+  con «Diseño para construir, no solo para impresionar». Sale la versión
+  anterior entera, y con ella la frase del noveno semestre y la de las visitas
+  a obra: lo que dice de sí mismo lo dice él.
+- **El promedio sube a 4.3**, en el sitio y en la hoja de vida.
+- **El curso de la UIS lleva el nombre del certificado.** Se leyó el propio
+  diploma (`02. CERTIFICADOS/Kevin_Gil - ASCEIC - Curso_Revit - 2025.pdf`, en
+  su Drive): «Curso de Modelado BIM y Gestión de la Construcción a través de
+  Autodesk REVIT», de la **Asociación Centro de Estudios de Ingeniería Civil
+  UIS**, 50 horas. El nombre del sitio era una paráfrasis.
+- **Dos años corregidos, y el orden con ellos.** El certificado está expedido
+  el 18 de septiembre de **2025**, no 2026; y su propia hoja de vida fecha el
+  congreso XOpen en 2025. Los dos hitos pasan a 2025 y el curso se coloca
+  después del congreso, como en la hoja de vida. La rueda dice que va en orden
+  cronológico: con un 2026 delante de un 2025 dejaba de ser cierto.
+- **Un hito puede no llevar descripción.** «Representante estudiantil» se queda
+  solo con el título, por decisión suya. La rueda y la hoja de vida imprimían
+  `<p>${detalle}</p>` sin mirar: con `detalle:null` habrían escrito la palabra
+  **null** en la página. Las dos plantillas ahora lo comprueban.
+- **XOpen, VISUAL y STICK**, reescritos: el congreso dice que participó en la
+  competencia de puentes y nada más; VISUAL es estudio propio de render y
+  modelado, sin la nota de su cierre; y STICK INDUSTRIES se presenta como la
+  marca personal con la que continúa ese trabajo.
+- **ATLAS entra en el hito de Estructuras por la razón, no de adorno**: la
+  especialización es para poder ampliar el cálculo que la aplicación automatiza
+  y responder por sus resultados.
+
+**La hoja de vida en PDF hay que reimprimirla en el computador de Kevin**
+(`node herramientas/preparar-cv.mjs`). Aquí no está instalada Century Gothic,
+que es la tipografía de la marca, así que lo impreso desde este contenedor sale
+con otra letra y con otra paginación —el PDF **sin tocar** también salía a dos
+hojas—. El `compartir/kevin-gil-cv.pdf` del repositorio sigue siendo el
+anterior: dice 4.2 y lleva el perfil viejo hasta que se vuelva a correr. El
+párrafo de perfil nuevo es 31 caracteres **más corto** que el que sustituye,
+así que la hoja única no debería estar en riesgo, pero conviene mirarlo.
 
 ### Purga del historial — 2026-09-13
 
@@ -152,7 +228,7 @@ PORTAFOLIO/
 ├── compartir/                   tarjeta .vcf, QR, hoja de vida y reel vertical
 ├── assets/
 │   ├── marca/                   logo, isotipo, favicons e imagen de compartir
-│   ├── suite/                   capturas de las apps (las toma capturar-suite.mjs)
+│   ├── suite/                   iconos de las apps (los escribe preparar-suite.py)
 │   ├── logos/                   logos de software y escudos de formación
 │   ├── renders/                 imágenes en 1600 y 2560 px
 │   ├── video/                   6 recorridos, el reel y sus fotogramas de portada
@@ -216,12 +292,13 @@ Todo se recorre desplazando. El menú salta con un desplazamiento animado.
    pulsarlo, el video se abre en una capa **y arranca con sonido**. El
    `<video>` **no existe** hasta ese momento: lo crea el JS y lo destruye al
    cerrar.
-4. **Herramientas** — las tres apps de la suite que resuelven obra: ATLAS,
-   AROS y QUANTITY, con una captura real de cada una.
-5. **Sobre mí** — biografía; el trayecto como **rueda** —el hito del centro
+4. **Sobre mí** — biografía; el trayecto como **rueda** —el hito del centro
    va entero, con luz propia, y los vecinos se reducen según su distancia—;
-   y abajo las herramientas **por etapa**: Modelo, Representación, Apoyo.
-6. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail, Instagram y la
+   las herramientas **por etapa**: Modelo, Representación, Apoyo; y al pie
+   **la suite propia**, tres tarjetas de obra y una tira con las otras
+   cuatro. La sección de Herramientas dejó de existir en la v19.1: las apps
+   viven aquí, en voz baja.
+5. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail, Instagram y la
    tarjeta `.vcf`. Sin texto de venta.
 
 ### Lenguaje visual
