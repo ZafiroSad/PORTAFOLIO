@@ -1955,8 +1955,12 @@ const UTILES = [
    que todavia no existen es la clase de cosa que un ingeniero desmonta en
    dos segundos.
 
-   ASSETS y BUDGETS van sin `partes` a proposito: sus bitacoras no detallan
-   secciones y aqui no se inventan. Cuando Kevin diga las suyas, se añaden.
+   Las de ASSETS y BUDGETS salieron de sus propias bitacoras y no de una
+   suposicion: ASSETS declara sus cuatro pestañas en la estructura de
+   componentes —Resumen, Inversiones, Depositos, Ganancias— y de BUDGETS su
+   bitacora nombra Movimientos, Cuentas, Categorias y Metas. De cada una
+   entran las tres que dicen algo; el resumen o inicio no cuenta, que es el
+   tablero y no una funcion.
 
    `plataforma` es el dato tecnico, y va en mono porque lo dice el STICK UI
    SYSTEM. ATLAS es la unica de escritorio: se instala, no se abre.
@@ -1980,9 +1984,11 @@ const APPS = [
     que:'Contratos y finanzas por proyecto.',
     partes:['Contratos', 'Abonos', 'Colaboradores'] },
   { nombre:'ASSETS',   icono:'assets/suite/assets.webp',    plataforma:'Navegador',
-    que:'Portafolio de inversiones.' },
+    que:'Portafolio de inversiones.',
+    partes:['Inversiones', 'Depósitos', 'Ganancias'] },
   { nombre:'BUDGETS',  icono:'assets/suite/budgets.webp',   plataforma:'Navegador',
-    que:'Finanzas personales.' },
+    que:'Finanzas personales.',
+    partes:['Movimientos', 'Cuentas', 'Metas de ahorro'] },
   { nombre:'FIT',      icono:'assets/suite/fit.webp',       plataforma:'Navegador',
     que:'Entrenamiento de fuerza.',
     partes:['Rutinas', 'Progreso', 'Nutrición'] }

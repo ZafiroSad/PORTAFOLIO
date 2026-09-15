@@ -8,9 +8,28 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v25 — la entrada deja de cortarse, y la suite pasa cada 7 s.**
+**v26 — las siete apps dicen lo que resuelven, y el banco deja de saltar.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v26 — 2026-09-16
+
+- **ASSETS y BUDGETS ya tienen sus partes**, y salieron de sus propias
+  bitácoras, no de una suposición. ASSETS declara sus cuatro pestañas en la
+  estructura de componentes —Resumen, Inversiones, Depósitos, Ganancias— y de
+  BUDGETS su bitácora nombra Movimientos, Cuentas, Categorías y Metas. De cada
+  una entran las tres que dicen algo: el resumen o el inicio no cuentan,
+  porque son el tablero y no una función.
+- **Y con eso se cerró un fallo que aún no se había visto.** Con dos apps sin
+  fichas, el banco **cambiaba de alto cada 7 s en el teléfono** —ahí no tiene
+  `min-height` que lo absorba— y la página daba un salto al pasar de app.
+  Ahora las siete tienen la misma forma de contenido. Medido apagando y
+  encendiendo cada una con esperas reales entre medición y medición: **216 px
+  en escritorio y 299 en móvil, idéntico en las siete**.
+
+  Si algún día una app se queda sin `partes`, el salto vuelve. La salida
+  entonces es ponerle `min-height` al banco en móvil, no quitarle las fichas
+  a las demás.
 
 ### v25 — 2026-09-16
 
