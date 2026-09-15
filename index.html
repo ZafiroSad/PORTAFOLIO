@@ -1443,7 +1443,7 @@ body.bloqueado .masa { animation-play-state:paused; }
 
     <div class="reel-marco asoma">
       <button class="reel-cartel" id="reel-abrir" aria-label="Reproducir el reel — 40 segundos">
-        <img src="assets/video/reel-poster.webp" alt="" loading="lazy" decoding="async">
+        <img src="assets/video/reel-poster.webp?v=4.1" alt="" loading="lazy" decoding="async">
         <span class="reel-velo"></span>
         <span class="reel-boton">
           <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
@@ -2598,6 +2598,9 @@ let reelVideo = null;
 function abrirReel() {
   if (reelVideo) return;
   reelVideo = document.createElement('video');
+  /* CAMBIAR `?v=` CADA VEZ QUE SE REEMPLACE EL REEL: el archivo conserva el
+     nombre, y sin ese sufijo el navegador sigue mostrando la copia vieja que
+     guardo. Tambien en el cartel de la seccion y en el poster. */
   /* Dos calidades del mismo reel. Una pantalla que pinta 1700 px o mas de
      ancho real —un portatil retina, un monitor 1440p o 4K— recibe el de
      2560x1440; un telefono o un portatil normal, el de 1080p, que pesa la
@@ -2605,15 +2608,15 @@ function abrirReel() {
      respetan de forma fiable para video. */
   const pixelesReales = Math.max(screen.width, screen.height) * (devicePixelRatio || 1);
   reelVideo.src = pixelesReales >= 1700 && Math.min(screen.width, screen.height) >= 700
-    ? 'assets/video/reel-1440.mp4'
-    : 'assets/video/reel.mp4';
+    ? 'assets/video/reel-1440.mp4?v=4.1'
+    : 'assets/video/reel.mp4?v=4.1';
   /* Si la de 1440p no llega a cargar, cae a la de 1080p en vez de dejar el
      reproductor en negro. */
   reelVideo.addEventListener('error', function caer() {
     reelVideo.removeEventListener('error', caer);
-    if (!reelVideo.src.endsWith('/reel.mp4')) { reelVideo.src = 'assets/video/reel.mp4'; reelVideo.play().catch(() => {}); }
+    if (!reelVideo.src.includes('/reel.mp4')) { reelVideo.src = 'assets/video/reel.mp4?v=4.1'; reelVideo.play().catch(() => {}); }
   });
-  reelVideo.poster = 'assets/video/reel-poster.webp';
+  reelVideo.poster = 'assets/video/reel-poster.webp?v=4.1';
   reelVideo.controls = true;
   reelVideo.playsInline = true;
   reelCapa.appendChild(reelVideo);
