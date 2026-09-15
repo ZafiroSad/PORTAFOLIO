@@ -733,105 +733,106 @@ body.bloqueado .masa { animation-play-state:paused; }
 @media (max-width:900px){ .flujo { grid-template-columns:1fr; gap:1.8rem } }
 
 /* LA STICK SUITE — seccion propia
-   La v19.3 las puso en voz baja dentro de Sobre mi. El Señor Stick lo vio y
-   pidio lo contrario: seccion con su nombre y las apps con protagonismo. Asi
-   que salen de ahi y vienen aqui, en tarjeta CUADRADA.
+   CONSTRUIDA SOBRE `.vidrio`, NO SOBRE UNA CAJA PROPIA. La primera version
+   se inventó un panel plano —borde de una opacidad y fondo liso— y por eso
+   se leía apagada al lado del resto del sitio: sin el filo especular, sin
+   el desenfoque de detrás y sin el reflejo que sigue al cursor. El sistema
+   ya tenía el componente resuelto en los cuatro accesos de Contacto; esto
+   es el mismo, con el mismo radio de 26 px y la misma altura.
 
-   LAS SIETE MIDEN IGUAL. Antes habia dos pesos —tarjeta contra tira— y eso
-   decia que cuatro de ellas importaban menos. Ahora el orden y el brillo son
-   lo unico que separa a las de obra: se leen primero y se encienden, pero
-   ninguna se encoge. */
-/* A LA IZQUIERDA, como el titular. La primera version centraba la entrada y
-   las tarjetas mientras la cabecera de la seccion seguia alineada a la
-   izquierda —como en todas las demas—, y el bloque quedaba colgando de un
-   titulo que no lo sostenia. */
-.suite-entrada { color:var(--tenue); font-size:.92rem; line-height:1.55; max-width:52ch;
-  margin:0 0 clamp(1.4rem,3vh,2.2rem); }
+   Y OCUPA EL ANCHO ENTERO. Antes eran siete cuadrados de 176 px pegados al
+   margen izquierdo: medio lienzo quedaba vacío y la sección se sentía
+   muerta. Ahora son dos filas a sangre —tres arriba, cuatro abajo— que
+   llenan de borde a borde. Las de obra salen más anchas porque son tres
+   repartiéndose lo mismo que abajo se reparten cuatro; la ALTURA es la
+   misma en las siete, que era lo que había que respetar. */
+.suite-entrada { color:var(--tenue); font-size:.88rem; line-height:1.55; max-width:40ch;
+  margin:0 0 .35rem; }
 
-/* Flex y no rejilla: con cuatro columnas y siete piezas sobraba una celda
-   vacia. Asi las dos filas —tres arriba, cuatro abajo— arrancan las dos del
-   mismo borde izquierdo, el del titular, y no queda hueco. */
-.suite { display:flex; flex-wrap:wrap; justify-content:flex-start;
-  gap:clamp(.65rem,1.5vw,1.05rem); }
-/* El corte obliga a que las de obra se queden solas en su fila. Por debajo
-   de 700 px se apaga: ahi caben dos por fila y forzarlo dejaria una sola
-   colgando. */
-.suite-corte { flex-basis:100%; height:0; margin:0; padding:0; }
-@media (max-width:700px){ .suite-corte { display:none } }
+.suite { display:flex; flex-direction:column; gap:clamp(.7rem,1.4vw,1.05rem); }
+.suite-fila { display:grid; gap:clamp(.7rem,1.4vw,1.05rem);
+  grid-template-columns:repeat(3,minmax(0,1fr)); }
+.suite-fila.resto { grid-template-columns:repeat(4,minmax(0,1fr)); }
 
-.suite-app { position:relative; width:clamp(128px,15.5vw,176px); aspect-ratio:1;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:.55rem; padding:clamp(.7rem,1.6vh,1rem) .7rem; overflow:hidden;
-  border:1px solid rgba(255,255,255,.085); border-radius:18px;
-  background:rgba(255,255,255,.025);
-  opacity:0; transform:translateY(22px) scale(.97);
-  transition:opacity .8s var(--suave), transform .9s var(--salida),
-             background .45s var(--suave), border-color .45s var(--suave); }
-.suite.visible .suite-app { opacity:1; transform:none; }
-.suite.visible .suite-app:nth-child(2) { transition-delay:.07s }
-.suite.visible .suite-app:nth-child(3) { transition-delay:.14s }
-.suite.visible .suite-app:nth-child(5) { transition-delay:.21s }
-.suite.visible .suite-app:nth-child(6) { transition-delay:.27s }
-.suite.visible .suite-app:nth-child(7) { transition-delay:.33s }
-.suite.visible .suite-app:nth-child(8) { transition-delay:.39s }
-.suite-app:hover { background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.17); }
+/* Rectangulares hacia abajo, como los accesos de Contacto: el icono arriba,
+   el nombre y su dato abajo, y aire entre medias. */
+/* CENTRADO, no `space-between`. Los accesos de Contacto solo llevan icono y
+   rotulo, asi que separarlos contra los extremos los equilibra; estas llevan
+   tres lineas de texto y el mismo reparto dejaba un hueco muerto en mitad de
+   la tarjeta. Centrado el bloque entero, la tarjeta se lee llena. */
+.app-tarjeta { position:relative; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:1rem;
+  min-height:clamp(178px,22vh,214px);
+  padding:1.5rem 1.1rem; border-radius:26px; overflow:hidden; text-align:center;
+  opacity:0; transform:translateY(26px);
+  transition:opacity .8s var(--suave), transform .55s var(--salida),
+             border-color .45s var(--suave), box-shadow .5s var(--suave); }
+.suite.visible .app-tarjeta { opacity:1; transform:none; }
+.suite-fila .app-tarjeta:nth-child(2) { transition-delay:.07s }
+.suite-fila .app-tarjeta:nth-child(3) { transition-delay:.14s }
+.suite-fila .app-tarjeta:nth-child(4) { transition-delay:.21s }
+.suite-fila.resto .app-tarjeta { transition-delay:.18s }
+.app-tarjeta:hover { transform:translateY(-6px); border-color:rgba(255,255,255,.28);
+  box-shadow:var(--v-filo), 0 30px 70px -32px rgba(255,255,255,.3),
+             0 20px 50px -30px rgba(0,0,0,.9); }
 
-/* EL BRILLO DE LAS DE OBRA. Tres capas que se suman y ninguna cambia el
-   tamaño: un halo radial por detras del icono, el filo mas claro y un
-   respirar muy lento del resplandor. Se hace con `box-shadow` y un
-   pseudoelemento, no con `filter` sobre la tarjeta, porque el filtro
-   emborronaria tambien el texto. */
-.suite-app.clave { border-color:rgba(255,255,255,.2);
-  background:rgba(255,255,255,.045);
-  box-shadow:0 0 0 1px rgba(255,255,255,.05) inset,
-             0 10px 34px -14px rgba(255,255,255,.34);
+/* EL BRILLO DE LAS DE OBRA. Mismo mecanismo que el `::before` de los accesos
+   de Contacto —un radial por detras— pero encendido de fijo en vez de solo
+   al pasar por encima, y respirando muy despacio. No toca el tamaño: las
+   siete miden igual de alto. */
+.app-tarjeta.clave { border-color:rgba(255,255,255,.2); }
+.app-tarjeta.clave::before { content:''; position:absolute; inset:0; border-radius:inherit;
+  z-index:-1; background:radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,.17), transparent 70%);
   animation:respiraClave 6.5s var(--suave) infinite alternate;
   animation-delay:var(--d,0s); }
-.suite-app.clave::before { content:''; position:absolute; inset:-30% -30% 40% -30%;
-  background:radial-gradient(ellipse at 50% 40%, rgba(255,255,255,.16), transparent 68%);
-  pointer-events:none; }
-@keyframes respiraClave {
-  from { box-shadow:0 0 0 1px rgba(255,255,255,.05) inset,
-                    0 10px 30px -16px rgba(255,255,255,.26) }
-  to   { box-shadow:0 0 0 1px rgba(255,255,255,.08) inset,
-                    0 12px 40px -12px rgba(255,255,255,.46) } }
-.suite-app.clave:hover { border-color:rgba(255,255,255,.3);
-  background:rgba(255,255,255,.075); }
+@keyframes respiraClave { from { opacity:.6 } to { opacity:1 } }
 
-/* La caja del icono mide siempre lo mismo, lleve dibujo o inicial: sin esto
-   las tarjetas no alinean su nombre a la misma altura. */
-.icono-app { position:relative; z-index:1;
-  width:clamp(42px,5vw,58px); height:clamp(42px,5vw,58px);
-  display:grid; place-items:center; flex:none; }
-.icono-app img { width:100%; height:100%; object-fit:contain;
-  filter:drop-shadow(0 0 10px rgba(255,255,255,.2)) drop-shadow(0 0 24px rgba(255,255,255,.08));
-  transition:filter .5s var(--suave), transform .55s var(--resorte); }
-.clave .icono-app img {
-  filter:drop-shadow(0 0 14px rgba(255,255,255,.42)) drop-shadow(0 0 34px rgba(255,255,255,.2)); }
-.suite-app:hover .icono-app img { transform:scale(1.09);
-  filter:drop-shadow(0 0 18px rgba(255,255,255,.5)) drop-shadow(0 0 40px rgba(255,255,255,.24)); }
+/* El icono en su propia pastilla, como el de los accesos: sin ella la
+   silueta flotaba suelta y la tarjeta se leia a medio terminar. */
+.icono-app { width:54px; height:54px; border-radius:18px; display:grid; place-items:center;
+  flex:none; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+  transition:transform .6s var(--resorte), background .45s var(--suave),
+             border-color .45s var(--suave); }
+.clave .icono-app { background:rgba(255,255,255,.11); border-color:rgba(255,255,255,.22); }
+.app-tarjeta:hover .icono-app { transform:translateY(-2px) scale(1.07);
+  background:rgba(255,255,255,.16); border-color:rgba(255,255,255,.34); }
+.icono-app img { width:28px; height:28px; object-fit:contain;
+  filter:drop-shadow(0 0 9px rgba(255,255,255,.28)); }
+.clave .icono-app img { filter:drop-shadow(0 0 13px rgba(255,255,255,.5)); }
 /* Sin icono dibujado, la inicial. Una letra honesta antes que un hueco. */
-.icono-app i { font-family:var(--mono); font-style:normal;
-  font-size:clamp(1.25rem,1.7vw,1.6rem); color:var(--n-200); opacity:.72;
-  letter-spacing:.02em; }
-.clave .icono-app i { opacity:.9; text-shadow:0 0 16px rgba(255,255,255,.3); }
+.icono-app i { font-family:var(--mono); font-style:normal; font-size:1.15rem;
+  color:var(--n-200); opacity:.8; letter-spacing:.02em; }
+.clave .icono-app i { opacity:1; text-shadow:0 0 14px rgba(255,255,255,.35); }
 
-.suite-app b { position:relative; z-index:1;
-  font-family:var(--mono); font-size:.57rem; letter-spacing:.2em; text-transform:uppercase;
-  color:var(--tenue); font-weight:400; }
-.clave b { color:var(--n-200); }
-/* DOS LINEAS DE ALTO AUNQUE SOBRE UNA. La tarjeta centra su contenido, asi
-   que una descripcion de una sola linea —«Finanzas personales.»— subia menos
-   y dejaba su icono y su nombre 7 px por debajo de los vecinos. Reservando
-   el alto de dos lineas, las siete alinean por icono y por rotulo. */
-.suite-app em { position:relative; z-index:1; font-style:normal;
-  font-size:.7rem; line-height:1.35; color:var(--debil); text-align:center;
-  padding:0 .1rem; min-height:2.7em; }
+/* `.app-pie` y no `.pie`: esa clase YA ERA el pie de pagina del sitio, con
+   su `border-top` y su tipografia mono. Reusar el nombre dibujaba una linea
+   dentro de cada tarjeta, pasaba el texto a monoespaciada y estiraba la
+   tarjeta de 232 a 332 px. */
+.app-tarjeta .app-pie { display:flex; flex-direction:column; gap:.4rem; }
+.app-tarjeta .val { display:block; font-size:1rem; font-weight:500; letter-spacing:-.01em;
+  color:var(--tinta); }
+.app-tarjeta .que { display:block; font-size:.74rem; line-height:1.4; color:var(--debil);
+  min-height:2.8em; }
+.app-tarjeta .rot { display:block; font-family:var(--mono); font-size:.55rem;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--debil); }
 
-@media (max-width:700px){
-  .suite-entrada { font-size:.88rem; }
-  .suite { gap:.6rem; }
-  .suite-app { width:clamp(140px,43vw,168px); }
+/* Estrecho, las dos filas se funden en UNA rejilla. Con `3 + 4` repartidos
+   en dos columnas, la primera fila dejaba a QUANTITY sola y con un hueco al
+   lado a mitad de la lista. Con `display:contents` los envoltorios
+   desaparecen y las siete fluyen seguidas: la que sobra queda al final, que
+   es donde no molesta. */
+@media (max-width:900px){
+  .suite { display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:clamp(.6rem,2vw,.9rem); }
+  .suite-fila, .suite-fila.resto { display:contents; }
+}
+@media (max-width:430px){
+  .suite { grid-template-columns:minmax(0,1fr); }
+  .app-tarjeta { min-height:0; flex-direction:row; text-align:left; gap:1rem;
+    padding:1.1rem 1.2rem; align-items:center; justify-content:flex-start; }
+  .app-tarjeta .que { min-height:0; }
+}
 }
 }
 
@@ -1426,7 +1427,8 @@ body.bloqueado .masa { animation-play-state:paused; }
   .titular::after { animation:none; opacity:0 }
   .inicio-aparte, .baja, .mas-filo .marca-mas { opacity:1 }
   .etapa { opacity:1 !important; transform:none !important }
-  .suite-app { opacity:1 !important; transform:none !important; animation:none !important }
+  .app-tarjeta { opacity:1 !important; transform:none !important }
+  .app-tarjeta.clave::before { animation:none !important; opacity:1 !important }
   .mas-filo .raya { transform:none }
   .galeria figure, .hoja, .tira-extra figure { clip-path:none !important; opacity:1 !important; transform:none !important; }
   .ficha-portada-texto h2 span, .ficha .entra { transform:none; opacity:1; filter:none }
@@ -1617,15 +1619,18 @@ body.bloqueado .masa { animation-play-state:paused; }
      un portafolio de ingenieria civil. -->
 <section class="seccion" id="suite">
   <div class="seccion-cuerpo acolchado">
+    <!-- La entrada va DENTRO de la cabecera, a la derecha del titular.
+         `.cabeza` es un flex con `space-between` y `align-items:flex-end`:
+         esta hecha para llevar algo ahi, y Proyectos ya lo hace con su
+         boton. Debajo del titulo dejaba medio lienzo vacio arriba. -->
     <div class="cabeza">
       <div>
         <div class="etiqueta revelar"><span>Software propio</span></div>
         <h2 class="palabras" data-texto="La STICK SUITE."></h2>
       </div>
+      <p class="suite-entrada asoma">Siete aplicaciones escritas para resolver lo que el
+         trabajo pedía y no existía. Las tres primeras resuelven obra.</p>
     </div>
-
-    <p class="suite-entrada asoma">Siete aplicaciones escritas para resolver lo que el trabajo
-       pedía y no existía. Las tres primeras resuelven obra.</p>
 
     <div class="suite" id="suite-rejilla"></div>
   </div>
@@ -1885,39 +1890,32 @@ const UTILES = [
   { nombre:'ChatGPT',     logo:'assets/logos/chatgpt.webp',    color:'116,170,156', etapa:2, negativo:true }
 ];
 
-/* LA SUITE — las aplicaciones propias.
+/* LA STICK SUITE — las aplicaciones propias.
 
-   Esto NO es una vitrina de producto: es la prueba de una frase de la
-   biografia. Por eso cada app trae lo justo —icono, nombre y una linea— y
-   ni una captura, ni un enlace, ni un boton. La version de la v19 ponia
-   fichas grandes con pantallazos y desenfocaba un portafolio de ingenieria
-   civil; aqui pesa lo que debe pesar.
+   `plataforma` es el dato tecnico de cada una, y va en mono porque lo dice
+   el STICK UI SYSTEM. No es relleno: ATLAS es la unica de escritorio, y esa
+   diferencia importa —se instala, no se abre— asi que merece estar escrita.
 
-   Las tres de `obra` abren la fila porque son las que sostienen el
-   argumento. Las otras cuatro van en una tira mas tenue.
-
-   El icono lo escribe `herramientas/preparar-suite.py` desde el LOGO.png
-   de cada app, que vive en el computador de Kevin y no en el repositorio.
-   Por eso las seis declaran su ruta aunque el archivo todavia no este: el
-   `onerror` las deja en la INICIAL mientras falte, y el dia que se corra
-   el script aparecen solas sin tocar una linea de aqui. ATLAS es el unico
-   con `null` de verdad — no tiene icono dibujado, asi que su inicial no es
-   un respaldo sino lo definitivo por ahora. */
+   El icono lo escribe `herramientas/preparar-suite.py` desde el LOGO.png de
+   cada app, que vive en el computador de Kevin y no en el repositorio. Por
+   eso las seis declaran su ruta: si el archivo faltara, el `onerror` las
+   deja en su INICIAL. ATLAS es el unico con `null` de verdad — no tiene
+   icono dibujado, asi que su «A» no es un respaldo sino lo definitivo. */
 const APPS = [
-  { nombre:'ATLAS',    icono:null,
+  { nombre:'ATLAS',    icono:null,                          plataforma:'Escritorio',
     que:'Cálculo estructural según la NSR-10.',       obra:true },
-  { nombre:'AROS',     icono:'assets/suite/aros.webp',
+  { nombre:'AROS',     icono:'assets/suite/aros.webp',      plataforma:'Navegador',
     que:'Residencia y supervisión de obra.',          obra:true },
-  { nombre:'QUANTITY', icono:'assets/suite/quantity.webp',
+  { nombre:'QUANTITY', icono:'assets/suite/quantity.webp',  plataforma:'Navegador',
     que:'Cantidades de obra y despiece de acero.',    obra:true },
 
-  { nombre:'PROJECTS', icono:'assets/suite/projects.webp',
+  { nombre:'PROJECTS', icono:'assets/suite/projects.webp',  plataforma:'Navegador',
     que:'Contratos y finanzas por proyecto.' },
-  { nombre:'ASSETS',   icono:'assets/suite/assets.webp',
+  { nombre:'ASSETS',   icono:'assets/suite/assets.webp',    plataforma:'Navegador',
     que:'Portafolio de inversiones.' },
-  { nombre:'BUDGETS',  icono:'assets/suite/budgets.webp',
+  { nombre:'BUDGETS',  icono:'assets/suite/budgets.webp',   plataforma:'Navegador',
     que:'Finanzas personales.' },
-  { nombre:'FIT',      icono:'assets/suite/fit.webp',
+  { nombre:'FIT',      icono:'assets/suite/fit.webp',       plataforma:'Navegador',
     que:'Entrenamiento de fuerza.' }
 ];
 
@@ -2195,10 +2193,9 @@ document.getElementById('flujo').innerHTML = ETAPAS.map((e, k) => `
    CONTACTO
    ================================================================= */
 /* --- LA STICK SUITE -------------------------------------------- */
-/* La marca de cada app: su icono si `preparar-suite.py` ya lo escribio, y si
-   no, la inicial. El `onerror` cubre el otro caso —el archivo declarado pero
-   ausente—, porque un icono roto en una tarjeta se ve peor que una letra
-   puesta a proposito. */
+/* Cada tarjeta lleva `.vidrio`: es el componente del sistema, el mismo de
+   los accesos de Contacto. Escribirle un panel propio fue el error de la
+   primera version. */
 const marcaApp = (a) => `
   <span class="icono-app">${a.icono
     ? `<img src="${a.icono}" alt="" loading="lazy" decoding="async"
@@ -2206,19 +2203,21 @@ const marcaApp = (a) => `
     : `<i>${a.nombre[0]}</i>`}</span>`;
 
 const tarjetaApp = (a, i) => `
-  <div class="suite-app${a.obra ? ' clave' : ''}" style="--d:${(i * .8).toFixed(1)}s">
+  <div class="app-tarjeta vidrio${a.obra ? ' clave' : ''}" style="--d:${(i * .9).toFixed(1)}s">
     ${marcaApp(a)}
-    <b>${a.nombre}</b>
-    <em>${a.que}</em>
+    <span class="app-pie">
+      <b class="val">${a.nombre}</b>
+      <span class="que">${a.que}</span>
+      <span class="rot">${a.plataforma}</span>
+    </span>
   </div>`;
 
-/* Las de obra van primero y luego el corte, para que se queden solas en su
-   fila. El corte es un elemento de verdad y no un `::after`, porque un
-   pseudoelemento no puede ser hijo flex del contenedor. */
+/* Dos filas de verdad, no una sola con un corte: tres arriba y cuatro abajo,
+   cada una repartiendose el ancho entero. Asi no queda media pagina vacia a
+   la derecha ni una celda suelta al final. */
 document.getElementById('suite-rejilla').innerHTML =
-  APPS.filter(a => a.obra).map(tarjetaApp).join('')
-  + '<span class="suite-corte" aria-hidden="true"></span>'
-  + APPS.filter(a => !a.obra).map(tarjetaApp).join('');
+  `<div class="suite-fila">${APPS.filter(a => a.obra).map(tarjetaApp).join('')}</div>`
+  + `<div class="suite-fila resto">${APPS.filter(a => !a.obra).map(tarjetaApp).join('')}</div>`;
 
 const IG_SVG = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>';
 const WA_SVG = '<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 01-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.2 8.2 0 015.83 2.42 8.18 8.18 0 012.41 5.82c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.43.06-.65.31-.22.25-.85.83-.85 2.03s.87 2.35.99 2.51c.12.17 1.71 2.61 4.15 3.66.58.25 1.03.4 1.39.51.58.19 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29z"/></svg>';

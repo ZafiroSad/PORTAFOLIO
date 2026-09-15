@@ -8,9 +8,53 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v20 — LA STICK SUITE, sección propia con las siete apps en tarjeta cuadrada.**
+**v21 — la suite rehecha sobre `.vidrio`, el componente del sistema.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v21 — 2026-09-16
+
+El Señor Stick vio la v20 publicada: «no me gusta como se ve, se siente vacío
+o muerto ese espacio… las tarjetas tampoco me encantan, trata de ir con el
+STICK UI SYSTEM que se supone que está ese portafolio con ese estilo». Las
+dos cosas eran ciertas y tenían la misma causa.
+
+- **La v20 se inventó un panel en vez de usar `.vidrio`.** Un borde de una
+  opacidad y un fondo liso: sin filo especular, sin el desenfoque de detrás y
+  sin el reflejo que sigue al cursor. El sistema ya tenía el componente
+  resuelto en los cuatro accesos de Contacto. Ahora cada tarjeta lleva
+  `.vidrio`, con el mismo radio de 26 px y la misma altura — y el reflejo y
+  el respaldo de móvil salen gratis, porque el `pointermove` y la regla que
+  apaga el `backdrop-filter` ya apuntaban a `.vidrio`.
+- **El vacío era de anchura, no de contenido.** Siete cuadrados de 176 px
+  pegados al margen izquierdo dejaban medio lienzo muerto. Ahora son dos
+  filas a sangre —tres arriba, cuatro abajo— que llenan de borde a borde. Las
+  de obra salen más anchas porque son tres repartiéndose lo que abajo se
+  reparten cuatro; **la altura es la misma en las siete**, que es lo que
+  había que respetar.
+- **La entrada se mudó DENTRO de la cabecera**, a la derecha del titular.
+  `.cabeza` es un flex con `space-between` y `align-items:flex-end`: está
+  hecha para llevar algo ahí. Debajo del título dejaba vacía la mitad
+  superior de la sección.
+- **`.pie` YA ERA la clase del pie de página.** Reusar el nombre para el
+  bloque de texto de la tarjeta le metía un `border-top` —una línea cruzando
+  cada tarjeta—, le pasaba el texto a monoespaciada y la estiraba de 232 a
+  **332 px**. Se llama `.app-pie`. Comprobado que `.val`, `.que` y `.rot` no
+  chocan con nada.
+- **Centrado en vez de `space-between`.** Los accesos de Contacto solo llevan
+  icono y rótulo, así que separarlos contra los extremos los equilibra; estas
+  llevan tres líneas y el mismo reparto dejaba un hueco muerto en mitad de la
+  tarjeta.
+- **El icono va en su propia pastilla** de 54 px, como el de los accesos.
+  Suelto, la silueta flotaba y la tarjeta se leía a medio terminar.
+- **Cada app trae su plataforma en mono**, que es lo que pide el sistema para
+  el dato técnico. No es relleno: ATLAS es la única de escritorio y esa
+  diferencia importa — se instala, no se abre.
+- **Estrecho, las dos filas se funden en una** con `display:contents`. Con
+  `3 + 4` en dos columnas, QUANTITY quedaba sola y con un hueco al lado a
+  mitad de la lista.
+
+Medido: sin desbordes ni scroll horizontal a 1440, 1024 y 560 px.
 
 ### v20 — 2026-09-15
 
@@ -359,8 +403,9 @@ Todo se recorre desplazando. El menú salta con un desplazamiento animado.
 4. **Sobre mí** — biografía; el trayecto como **rueda** —el hito del centro
    va entero, con luz propia, y los vecinos se reducen según su distancia—;
    y las herramientas **por etapa**: Modelo, Representación, Apoyo.
-5. **La STICK SUITE** — las siete aplicaciones propias en tarjeta cuadrada,
-   todas del mismo tamaño. Las tres de obra van primero y con brillo.
+5. **La STICK SUITE** — las siete aplicaciones propias en tarjetas de
+   vidrio, en dos filas a sangre: tres de obra arriba, con brillo, y las
+   otras cuatro abajo. Misma altura las siete.
 6. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail, Instagram y la
    tarjeta `.vcf`. Sin texto de venta.
 
@@ -421,7 +466,13 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
   cambió por el icono de cada app, y la v19.3 quitó del todo la idea de
   enseñar la interfaz. `capturar-suite.mjs` —el script de puppeteer que tomaba
   esas capturas— ya no existe en el repositorio.
-- **Entran las siete y TODAS MIDEN IGUAL.** Esto ha ido y venido: la v19 solo
+- **LO QUE SE AÑADA VA SOBRE `.vidrio`, no sobre un panel nuevo.** La v20
+  se escribió una caja propia para las tarjetas de la suite y por eso se leía
+  apagada al lado del resto: el sistema no es una paleta de colores, es un
+  componente con filo especular, desenfoque y reflejo al cursor, y está en
+  `.vidrio`. Antes de inventar una superficie, mirar si Contacto o la barra
+  ya la tienen resuelta.
+- **Entran las siete y TODAS MIDEN IGUAL DE ALTO.** Esto ha ido y venido: la v19 solo
   dejaba entrar a las de obra, la v19.3 las puso todas pero en dos pesos, y la
   v20 las iguala. Lo que distingue a ATLAS, AROS y QUANTITY es que van
   **primero y con brillo**, no que sean más grandes — una tarjeta más pequeña
