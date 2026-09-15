@@ -8,9 +8,63 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v26 — las siete apps dicen lo que resuelven, y el banco deja de saltar.**
+**v27 — el menú del teléfono se va abajo, donde llega el pulgar.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v27 — 2026-09-16
+
+«El menú para ir rápido a todo se ve raro» — y era literal. **Medido a 390 px:
+la barra mide 353 y el menú necesita 368 con sus seis entradas**, así que
+CONTACTO se salía por el borde.
+
+**No se había visto porque no se podía ver.** El Chrome headless de esta
+máquina no baja de 500 px de ancho, así que todo lo «móvil» se venía midiendo
+a 520. La salida fue montar la página **dentro de un `<iframe>` de 390 px**:
+ahí dentro las media queries responden al ancho del marco. Desde ahora, lo de
+móvil se comprueba así.
+
+- **El menú se muda abajo.** Apretar la tipografía hasta que quepa no era
+  salida: a .45 rem deja de leerse. Arriba queda solo la marca —la firma y el
+  modo de volver al inicio— y las secciones pasan a una barra de vidrio
+  flotante al alcance del pulgar.
+- **Es el mismo gesto de la barra de escritorio, no un patrón prestado.**
+  Allí una gota de vidrio se desliza bajo el enlace activo; aquí **la gota ES
+  el enlace activo**, que se ensancha y descubre su nombre mientras los demás
+  se quedan en su icono. Un solo idioma en las dos pantallas.
+- **Una sola lista de secciones.** La barra de abajo se escribe desde los
+  enlaces de la de arriba, así que añadir o quitar una sección se hace en un
+  sitio y las dos quedan iguales por construcción.
+- Respeta el hueco de gestos del teléfono con `env(safe-area-inset-bottom)`, y
+  se retira con una capa abierta (`body.bloqueado`), que cubren la ventana
+  entera.
+
+**TRES FALLOS DE ORDEN EN LA MISMA TANDA**, y los tres del mismo tipo: en CSS,
+a igual especificidad decide **quién va después**.
+
+1. La regla que oculta la barra en escritorio se escribió **antes** que la que
+   la dibuja, así que no ganaba: la barra del teléfono salía también en el
+   computador.
+2. El `padding-bottom` que le hace sitio se puso arriba del todo; la regla base
+   de `.seccion-cuerpo` escribe `padding` en abreviado y lo borraba.
+3. Movido detrás de la base, **seguía sin aplicarse**: hay una tercera regla,
+   en el bloque de móvil, que vuelve a fijar ese padding. La holgura tuvo que
+   ir ahí. Medido antes y después: lo último de Proyectos, Reel, Sobre mí y la
+   Suite terminaba a 828 px con la barra en 780 — debajo del vidrio. Ahora
+   cierran en 771, 771, 745 y 744.
+4. Y uno más de lo mismo en la suite: `.banco-fondo.inicial` declara su propio
+   `display:grid` y le ganaba al `display:none` de `.banco-fondo`, así que en
+   el teléfono la letra gigante de ATLAS seguía saliendo encima del texto.
+
+**Verificado a 390, 360 y 320 px**: la barra cabe con cualquier etiqueta
+desplegada —medida una por una—, no hay desbordamiento horizontal, el toque
+salta de verdad (de 2 780 a 5 411 al tocar Contacto) y el corte entre las dos
+barras es limpio en 700/701.
+
+**Ojo con el `scroll` en headless**: no se dispara en un desplazamiento
+programático, así que el resalte de la sección activa sale siempre «ninguno» al
+medirlo aquí. **No es un fallo del sitio** — la v26 ya publicada se comporta
+igual. Para verlo hay que forzar la clase a mano.
 
 ### v26 — 2026-09-16
 
@@ -541,8 +595,11 @@ Todo se recorre desplazando. El menú salta con un desplazamiento animado.
    va entero, con luz propia, y los vecinos se reducen según su distancia—;
    y las herramientas **por etapa**: Modelo, Representación, Apoyo.
 5. **La STICK SUITE** — un banco a lo ancho con una aplicación abierta y una
-   tira de siete teclas que lo cambia. Pasa sola cada 5 s y se para al
+   tira de siete teclas que lo cambia. Pasa sola cada 7 s y se para al
    tocarla. Las tres de obra llevan un punto en su tecla.
+
+**En el teléfono el menú no está arriba: está abajo**, en una barra de vidrio
+flotante donde llega el pulgar. Arriba queda solo la marca.
 6. **Contacto** — cuatro accesos en vidrio: WhatsApp, Gmail, Instagram y la
    tarjeta `.vcf`. Sin texto de venta.
 
@@ -692,6 +749,15 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
 - **El cartel del reel es un `<button>` con una imagen, no un `<video
   poster=…>`.** Un `<video>`, aunque no reproduzca, reserva decodificador y
   negocia el archivo.
+- **EN CSS, A IGUAL ESPECIFICIDAD MANDA EL ORDEN.** Se tropezó cuatro veces en
+  la v27 con el mismo error: una regla escrita antes que la que quiere pisar no
+  hace nada. Antes de dar por hecho que un `display:none` o un `padding` no se
+  aplica, buscar **todas** las reglas de ese selector y mirar cuál va última —
+  en este archivo `.seccion-cuerpo` tiene tres.
+- **Lo de móvil se comprueba dentro de un `<iframe>` de 390 px.** El Chrome
+  headless de esta máquina no baja de 500 px de ancho, así que medir «en móvil»
+  a 520 escondió durante días que el menú no cabía. Dentro del marco, las media
+  queries responden a su ancho.
 - **En pantallas de menos de 400 px el rótulo de la barra se va, el isotipo se
   queda.** Antes desaparecía la marca entera y el teléfono se quedaba sin firma
   fija; la flecha sola cabe de sobra.

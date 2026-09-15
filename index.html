@@ -290,11 +290,74 @@ body.bloqueado .masa { animation-play-state:paused; }
 }
 .menu a:hover { color:var(--tinta); }
 .menu a.activo { color:var(--tinta); }
+/* ============ EN EL TELEFONO, EL MENU SE VA ABAJO ==============
+   MEDIDO A 390 px: la barra mide 353 y el menu necesita 368 con sus seis
+   entradas, asi que CONTACTO se salia por el borde. No se veia antes porque
+   el Chrome headless de la maquina de trabajo no baja de 500 px de ancho;
+   se vio montando la pagina dentro de un iframe de 390, donde las media
+   queries responden al ancho del marco.
+
+   La salida no es apretar la tipografia hasta que quepa —a .45rem ya no se
+   lee— sino mover el menu donde el pulgar llega: una barra flotante abajo.
+   Arriba queda solo la marca, que es la firma y el modo de volver al inicio.
+
+   ES EL MISMO GESTO DE LA BARRA DE ESCRITORIO, no un patron prestado: alli
+   una gota de vidrio se desliza bajo el enlace activo; aqui la gota ES el
+   enlace activo, que se ensancha y descubre su nombre mientras los demas se
+   quedan en su icono. Un solo idioma en las dos pantallas. */
 @media (max-width:700px){
   .barra { padding:0 .4rem 0 .85rem; }
   .marca span.rotulo { font-size:.55rem; letter-spacing:.14em; }
-  .menu a { padding:.5rem .5rem; letter-spacing:.06em; font-size:.55rem; }
+  .menu { display:none; }
+  .barra { justify-content:flex-start; width:auto; left:var(--margen); transform:none; }
+  .barra.compacta { --k:1; opacity:1; transform:none; }
 }
+.fono-nav {
+  position:fixed; z-index:120; left:50%; transform:translateX(-50%);
+  /* El hueco de abajo del telefono —la barra de gestos— se respeta con
+     `env()`. Sin eso, en un iPhone la barra queda debajo del indicador y se
+     toca a medias. */
+  bottom:calc(.7rem + env(safe-area-inset-bottom, 0px));
+  width:min(calc(100% - 1.4rem), 430px);
+  display:flex; align-items:center; justify-content:space-between;
+  gap:.15rem; padding:.34rem; border-radius:999px;
+  transition:transform .45s var(--salida), opacity .35s var(--suave); }
+/* Con una capa abierta —ficha, indice, visor, reel— se retira: esas cubren
+   la ventana entera y la barra quedaria flotando sobre ellas. */
+body.bloqueado .fono-nav { transform:translateX(-50%) translateY(140%); opacity:0; }
+/* Solo en el telefono. VA DESPUES de la regla que la dibuja: las dos tienen
+   la misma especificidad y decide el orden — declarada antes, no ganaba y la
+   barra salia tambien en escritorio. */
+@media (min-width:701px){ .fono-nav { display:none; } }
+
+.fono-nav a {
+  position:relative; flex:none; display:flex; align-items:center; gap:.4rem;
+  height:40px; padding:0 .62rem; border-radius:999px;
+  color:var(--debil); text-decoration:none;
+  transition:color .4s var(--suave), background .45s var(--suave),
+             box-shadow .45s var(--suave), padding .45s var(--salida); }
+.fono-nav svg { width:19px; height:19px; flex:none; display:block; }
+/* El nombre esta SIEMPRE en el DOM y solo se descubre: animar un ancho
+   maximo no obliga a rehacer la maquetacion de toda la barra en cada
+   cuadro, y el lector de pantalla lo lee igual aunque se vea recortado. */
+.fono-nav a b {
+  font-family:var(--mono); font-size:.5rem; letter-spacing:.13em;
+  text-transform:uppercase; font-weight:400; white-space:nowrap;
+  max-width:0; opacity:0; overflow:hidden;
+  transition:max-width .45s var(--salida), opacity .35s var(--suave); }
+.fono-nav a.activo {
+  color:var(--tinta); padding:0 .78rem;
+  background:rgba(255,255,255,.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22); }
+.fono-nav a.activo b { max-width:7rem; opacity:1; }
+.fono-nav a:active { color:var(--tinta); }
+
+@media (max-width:360px){
+  .fono-nav a { padding:0 .5rem; }
+  .fono-nav a.activo { padding:0 .6rem; }
+  .fono-nav a b { font-size:.46rem; letter-spacing:.08em; }
+}
+
 
 .avance { position:fixed; top:0; left:0; right:0; height:1.5px; z-index:121;
   background:linear-gradient(to right, transparent, var(--n-200), var(--tinta));
@@ -872,8 +935,11 @@ body.bloqueado .masa { animation-play-state:paused; }
 
 @media (max-width:760px){
   /* Apilado no hay lado derecho que llenar, y la marca de fondo se cruzaba
-     con el nombre y la descripcion. Fuera. */
-  .banco-fondo { display:none; }
+     con el nombre y la descripcion. Fuera — y con la clase `.inicial` tambien,
+     que declara su propio `display:grid` y le ganaba a un `.banco-fondo` a
+     secas por especificidad: en las apps sin icono dibujado la letra gigante
+     seguia saliendo encima del texto. */
+  .banco-fondo, .banco-fondo.inicial { display:none; }
   .banco { flex-direction:column; text-align:center; gap:1.1rem;
     padding:1.6rem 1.2rem; min-height:0; }
   .banco-texto .d { max-width:none; }
@@ -1377,8 +1443,14 @@ body.bloqueado .masa { animation-play-state:paused; }
   #contacto { min-height:calc(100svh - var(--barra)); }
   /* padding-block, no el abreviado: el abreviado borra el margen
      lateral que pone .acolchado y el texto se pega al borde. */
+  /* El bajo suma el sitio de la barra flotante de secciones. Va en ESTA
+     regla y no en otra mas arriba: es la ultima que toca este padding, y
+     cualquier `padding-bottom` declarado antes lo pisa esta. Medido: sin
+     ello, lo ultimo de Proyectos, del Reel, de Sobre mi y de la Suite
+     terminaba debajo del vidrio. */
   .seccion-cuerpo { justify-content:flex-start;
-    padding-top:clamp(1.6rem,5vh,2.6rem); padding-bottom:clamp(1.6rem,5vh,2.6rem); }
+    padding-top:clamp(1.6rem,5vh,2.6rem);
+    padding-bottom:calc(clamp(1.6rem,5vh,2.6rem) + 3.6rem + env(safe-area-inset-bottom, 0px)); }
   .cabeza { margin-bottom:1.2rem; padding-bottom:.9rem; }
   .cabeza h2 { font-size:clamp(1.65rem,7.6vw,2.3rem); }
   .etiqueta { margin-bottom:.6rem; }
@@ -1517,6 +1589,11 @@ body.bloqueado .masa { animation-play-state:paused; }
     <a href="#contacto">Contacto</a>
   </nav>
 </header>
+
+<!-- La navegacion del telefono. Se escribe desde el JS a partir de los
+     mismos enlaces de la barra de arriba, para que no haya dos listas de
+     secciones que se puedan desincronizar. -->
+<nav class="fono-nav vidrio" id="fono-nav" aria-label="Secciones"></nav>
 
 <div class="mascara-marca">
   <div class="marca-entrada">
@@ -2047,6 +2124,37 @@ document.querySelectorAll('.palabras').forEach(t => {
   t.innerHTML = t.dataset.texto.split(' ').map((p, i) =>
     `<span><i style="transition-delay:${(i * .07).toFixed(3)}s">${p}</i></span>`).join(' ');
 });
+
+/* =================================================================
+   LA BARRA DE ABAJO — solo en el telefono
+
+   No tiene lista propia: la escribe a partir de los enlaces de la barra de
+   arriba, asi que añadir o quitar una seccion se hace en un solo sitio y las
+   dos barras quedan iguales por construccion.
+
+   Los iconos son trazo, del mismo grosor que los del resto del sitio.
+   `Inicio` ya existe como enlace con `data-reiniciar`, y ese atributo se
+   copia para que abajo haga lo mismo que arriba.
+   ================================================================= */
+const DIBUJOS = {
+  '#inicio':    '<path d="M3 10.6 12 3.6l9 7v9.2a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  '#proyectos': '<path d="M3 6.5 12 2l9 4.5-9 4.5z"/><path d="m3 12 9 4.5L21 12"/><path d="m3 17.3 9 4.5 9-4.5"/>',
+  '#reel':      '<circle cx="12" cy="12" r="9"/><path d="M10 8.4 16 12l-6 3.6z"/>',
+  '#sobre':     '<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c0-3.9 3.4-6.3 7.5-6.3s7.5 2.4 7.5 6.3"/>',
+  '#suite':     '<rect x="3.2" y="3.2" width="7.2" height="7.2" rx="2"/><rect x="13.6" y="3.2" width="7.2" height="7.2" rx="2"/><rect x="3.2" y="13.6" width="7.2" height="7.2" rx="2"/><rect x="13.6" y="13.6" width="7.2" height="7.2" rx="2"/>',
+  '#contacto':  '<path d="M20.5 11.6a7.9 7.9 0 0 1-8.5 7.9 9 9 0 0 1-2.6-.4L4.2 20.8l1.5-4.6a7.6 7.6 0 0 1-1.2-4.6A7.9 7.9 0 0 1 12 3.7a7.9 7.9 0 0 1 8.5 7.9z"/>',
+};
+/* Se consulta la barra de arriba directamente y no la constante
+   `enlacesMenu`: esa se declara bastante mas abajo, y usarla aqui la dejaria
+   en su zona muerta — un `ReferenceError` en carga. */
+document.getElementById('fono-nav').innerHTML = [...document.querySelectorAll('.menu a')].map(a => {
+  const href = a.getAttribute('href');
+  return `<a href="${href}"${a.hasAttribute('data-reiniciar') ? ' data-reiniciar' : ''}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${DIBUJOS[href] || ''}</svg>
+    <b>${a.textContent.trim()}</b>
+  </a>`;
+}).join('');
 
 /* =================================================================
    VIDRIO — el reflejo sigue al cursor
@@ -2823,7 +2931,7 @@ document.addEventListener('click', e => {
   const reinicio = e.target.closest('[data-reiniciar]');
   if (reinicio) { e.preventDefault(); volverAlInicio(); return; }
 
-  const enlace = e.target.closest('.menu a');
+  const enlace = e.target.closest('.menu a, .fono-nav a');
   if (enlace) {
     const destino = enlace.getAttribute('href');
     if (destino && destino.startsWith('#')) { e.preventDefault(); saltarA(destino); return; }
@@ -3009,7 +3117,9 @@ const menu      = document.getElementById('menu');
 const gota      = document.getElementById('gota');
 const campo     = document.querySelector('.campo');
 const secciones = [...document.querySelectorAll('#proyectos, #reel, #sobre, #suite, #contacto')];
-const enlacesMenu = [...document.querySelectorAll('.menu a')];
+/* Las dos barras —la de arriba y la del telefono— se resaltan juntas: una
+   sola lista y un solo sitio donde decidir cual esta activa. */
+const enlacesMenu = [...document.querySelectorAll('.menu a, .fono-nav a')];
 const laminaImg = document.getElementById('render-inicio');
 
 /* El indicador liquido se coloca bajo el enlace activo */
