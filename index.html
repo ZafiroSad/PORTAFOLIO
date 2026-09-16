@@ -1730,8 +1730,13 @@ body.bloqueado .fono-nav {
 <!-- ===================== INICIO ===================== -->
 <section class="inicio" id="inicio">
   <div class="lamina">
+    <!-- La portada es la unica imagen con el `srcset` escrito a mano: es la
+         primera que se pide y no puede esperar a que corra el JS. Las tres
+         tallas son las reales, medidas por `preparar-tallas.py`. -->
     <img id="render-inicio" src="assets/renders/cantabria-23-09.webp"
-         srcset="assets/renders/cantabria-23-09.webp 1600w, assets/renders/cantabria-23-09@2x.webp 2560w"
+         srcset="assets/renders/cantabria-23-09@sm.webp 900w,
+                 assets/renders/cantabria-23-09.webp 1600w,
+                 assets/renders/cantabria-23-09@2x.webp 2560w"
          sizes="100vw" alt="Render de patio interior — Lote 23, Villas de Cantabria"
          fetchpriority="high">
   </div>
@@ -2191,9 +2196,30 @@ const ETAPAS = [
 let PALETAS = {};
 fetch('assets/paletas.json').then(r => r.json()).then(p => { PALETAS = p; }).catch(() => {});
 
-const ruta   = (a, i) => `assets/renders/${a}-${String(i).padStart(2,'0')}.webp`;
-const ruta2x = (a, i) => `assets/renders/${a}-${String(i).padStart(2,'0')}@2x.webp`;
-const juego  = (a, i) => `${ruta(a,i)} 1600w, ${ruta2x(a,i)} 2560w`;
+const clave  = (a, i) => `${a}-${String(i).padStart(2,'0')}`;
+const ruta   = (a, i) => `assets/renders/${clave(a,i)}.webp`;
+const ruta2x = (a, i) => `assets/renders/${clave(a,i)}@2x.webp`;
+
+/* ANCHOS REALES DE CADA RENDER, escritos por `preparar-tallas.py`.
+   `[pequena, base, @2x]`, en pixeles; un 0 significa «esa talla no se ofrece».
+
+   Antes esto eran dos numeros fijos —`1600w` y `2560w`— para las 97
+   imagenes, y el navegador elegia con datos falsos: en 13 de ellas el
+   archivo `@2x` mide los MISMOS pixeles que la base y pesa mas, asi que
+   cualquier pantalla densa se llevaba la pesada sin ganar nada. Solo
+   ruitoque-01 —la portada de Punta Ruitoque— eran 424 KB en vez de 347.
+   A mano esto se desincroniza el dia que entre un render; por eso lo
+   escribe el script y no la mano. */
+const TALLAS = {"cantabria-1-01":[900,1600,2560],"cantabria-1-02":[900,1600,2560],"cantabria-1-03":[900,1600,2560],"cantabria-1-04":[900,1600,2560],"cantabria-1-05":[900,1600,2560],"cantabria-1-06":[900,1600,2560],"cantabria-1-07":[900,1600,2560],"cantabria-1-08":[900,1600,2560],"cantabria-1-09":[900,1600,2560],"cantabria-1-10":[900,1600,2560],"cantabria-1-11":[900,1600,2560],"cantabria-1-12":[900,1600,2560],"cantabria-1-13":[900,1600,2560],"cantabria-1-14":[900,1600,2560],"cantabria-1-15":[900,1600,2560],"cantabria-23-01":[900,1600,2560],"cantabria-23-02":[900,1600,2560],"cantabria-23-03":[900,1600,2560],"cantabria-23-04":[900,1600,2560],"cantabria-23-05":[900,1600,2560],"cantabria-23-06":[900,1600,2560],"cantabria-23-07":[900,1280,0],"cantabria-23-08":[900,1376,0],"cantabria-23-09":[900,1600,2560],"cantabria-23-10":[900,1600,2560],"cantabria-23-11":[900,1600,2560],"cantabria-23-12":[900,1600,2560],"cantabria-23-13":[900,1600,2560],"casa-will-01":[900,1600,2560],"casa-will-02":[900,1600,2560],"casa-will-03":[900,1600,2560],"cazadores-01":[900,1600,2560],"cazadores-02":[900,1600,2560],"cazadores-03":[900,1600,2560],"cazadores-04":[900,1600,2560],"cazadores-05":[900,1600,2560],"cazadores-06":[900,1600,2560],"cazadores-07":[900,1600,2560],"cazadores-08":[900,1600,2560],"cazadores-09":[900,1600,2560],"cazadores-10":[900,1600,2253],"cazadores-11":[900,1600,2560],"cazadores-12":[900,1600,2560],"cazadores-13":[900,1600,2560],"cazadores-14":[900,1600,2560],"coincafex-01":[900,1600,1672],"coincafex-02":[900,1600,1677],"coincafex-03":[900,1600,1672],"coincafex-04":[900,1600,1672],"coincafex-05":[900,1600,1672],"coincafex-06":[900,1600,1677],"coincafex-09":[900,1600,1920],"coincafex-10":[900,1600,1677],"lebrija-01":[900,1600,1679],"lebrija-02":[900,1600,2560],"lebrija-03":[900,1392,0],"lebrija-04":[900,1600,2560],"lebrija-05":[900,1152,0],"lebrija-06":[900,1600,2560],"lebrija-07":[900,1600,2560],"lebrija-08":[900,1600,2560],"lebrija-09":[900,1600,2560],"lebrija-10":[900,1600,2560],"lebrija-11":[900,1600,2560],"lebrija-12":[900,1600,2560],"lebrija-13":[900,1266,0],"lebrija-14":[900,1439,0],"lebrija-15":[900,1439,0],"lebrija-16":[900,1510,0],"lebrija-17":[900,1600,2560],"mediterranea-01":[900,1600,1638],"mediterranea-02":[900,1430,0],"mediterranea-03":[900,1386,0],"punta-01":[900,1600,2560],"punta-02":[900,1600,2560],"punta-03":[900,1600,2560],"punta-04":[900,1600,2560],"punta-05":[900,1344,0],"punta-06":[900,1600,2560],"punta-07":[900,1600,2560],"punta-08":[900,1600,2560],"punta-09":[900,1600,2560],"punta-10":[900,1600,2560],"punta-11":[900,1600,2560],"punta-12":[900,1600,2560],"punta-13":[900,1600,2560],"punta-14":[900,1600,2560],"punta-15":[900,1600,2560],"punta-16":[900,1600,2560],"punta-17":[900,1600,2560],"punta-18":[900,1600,2560],"punta-19":[900,1600,2560],"punta-20":[900,1600,2560],"punta-21":[900,1600,2560],"punta-22":[900,1600,2560],"ruitoque-01":[900,1536,0],"ruitoque-02":[900,1536,0]};
+const SUFIJO = ['@sm', '', '@2x'];
+const juego  = (a, i) => {
+  const k = clave(a, i), anchos = TALLAS[k];
+  /* Respaldo por si el mapa no se ha generado: vale lo de siempre. */
+  if (!anchos) return `${ruta(a,i)} 1600w, ${ruta2x(a,i)} 2560w`;
+  return anchos
+    .map((w, j) => w ? `assets/renders/${k}${SUFIJO[j]}.webp ${w}w` : null)
+    .filter(Boolean).join(', ');
+};
 const quieto = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* =================================================================

@@ -8,9 +8,50 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v31 — el visor del teléfono: la imagen y su mando, un solo bloque.**
+**v32 — el sitio abre en 0,86 MB en un teléfono, contra 2,21.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v32 — 2026-09-16
+
+Primera de las mejoras propuestas con libertad creativa. **Lo que costaba abrir
+el sitio en un teléfono estaba mal medido y mal servido.**
+
+La cifra de «0,59 MB hasta que la página está lista» que había aquí es de
+escritorio y de hace seis días. **Medido a 390 px: 2,21 MB con DPR 2 y 2,50 MB
+con DPR 3.** De ahí salieron dos fallos, y el segundo no es una optimización
+sino un dato falso:
+
+1. **Solo existían dos tallas, 1600 y 2560, ninguna por debajo.** Un teléfono
+   de 390 px que necesita 780 se llevaba la de 1600 igual, porque no había
+   otra. Los `sizes` estaban bien puestos —eso se comprobó antes de tocar
+   nada—; lo que faltaba era la talla.
+2. **EL `srcset` MENTÍA.** Declaraba `1600w` y `2560w` para las 97 imágenes
+   sin mirar cuánto miden. Y en **13 de ellas el archivo `@2x` tiene los
+   MISMOS píxeles que la base y pesa más**: `ruitoque-01` —la portada de Punta
+   Ruitoque— son 1536 px en las dos, 347 KB contra 424. Al anunciarla como
+   `2560w`, cualquier pantalla densa se llevaba la pesada **sin ganar un solo
+   píxel**. Entre las trece, 2 MB regalados.
+
+- **Tercera talla de 900 px** para las 97, y **el mapa de anchos reales lo
+  escribe un script** (`preparar-tallas.py`) dentro del `index.html`. A mano se
+  desincroniza el día que entre un render; generado, no puede.
+- **Una talla que no es más ancha que la anterior deja de ofrecerse.** No se
+  borra ningún archivo —eso es decisión de Kevin—, simplemente no se anuncia.
+
+| medido a 390 px | antes | ahora |
+|---|---|---|
+| DPR 2 | 2,21 MB | **0,86 MB** |
+| DPR 3 | 2,50 MB | **2,22 MB** |
+
+El DPR 3 baja menos **y está bien que así sea**: a 390 × 3 pide 1170 px, así
+que sigue eligiendo la de 1600 — lo que se ahorra ahí son las trece `@2x` que
+no aportaban nada. El DPR 2 es el caso de la gama media, y ahí el sitio pesa
+ahora **un 61 % menos**.
+
+Comprobado a 390 px con DPR 2 y 3 y en escritorio a 1440, recorriendo la
+página entera, abriendo un proyecto y el visor: **ninguna petición falla,
+ninguna imagen queda rota** y no hay errores de consola.
 
 ### v31 — 2026-09-16
 
@@ -771,6 +812,7 @@ PORTAFOLIO/
     ├── preparar-enlaces.mjs     escribe p/<slug>/ desde el catálogo
     ├── preparar-cv.mjs          imprime la hoja de vida en PDF
     ├── preparar-suite.py        iconos de las apps desde sus LOGO.png
+    ├── preparar-tallas.py       tercera talla + mapa de anchos reales
     ├── servir.py                servidor local con Range (sin el, ningun video)
     ├── optimizar-imagenes.ps1   extrae y convierte los renders del archivo
     ├── optimizar-videos.ps1     comprime los recorridos
@@ -863,7 +905,12 @@ Tres cosas del sitio no se escriben a mano: se derivan de lo que ya está en
 node herramientas/preparar-enlaces.mjs   # catálogo -> p/<slug>/, og.jpg, sitemap.xml, robots.txt
 node herramientas/preparar-cv.mjs        # trayecto + catálogo -> hoja de vida en PDF
 python herramientas/preparar-og.py       # render + logo -> assets/marca/og.jpg
+python herramientas/preparar-tallas.py   # renders -> talla de 900 px + mapa TALLAS
 ```
+
+**Las tallas** se vuelven a correr cuando entra o sale un render. El script
+mide los anchos de verdad y reescribe el mapa `TALLAS` dentro del `index.html`,
+que es de donde sale cada `srcset` — escrito a mano se desincroniza.
 
 **Las páginas de compartir** existen porque el sitio es un solo `index.html` y
 los proyectos se abren con `#slug`: eso basta para un navegador, pero el
@@ -1152,6 +1199,11 @@ Antes fueron 1,1 MB, y antes de eso 2,26 MB.
 ~~Después de `load` llegan los 3,8 MB de la secuencia de Proceso~~ — eso dejó
 de pasar cuando la escena salió del sitio: hoy no se pide ningún fotograma.
 
+**MEDIDO EN UN TELEFONO, que es lo que faltaba** (v32, 2026-09-16, a 390 px y
+servido en local): **0,86 MB hasta `load` con DPR 2** y 2,22 MB con DPR 3,
+contra 2,21 y 2,50 antes de la tercera talla. Las cifras de abajo son de
+escritorio y no se comparan con estas.
+
 **Medido de nuevo el 2026-09-16**, con la v20 puesta y los seis iconos en su
 sitio, servido en local: **33 peticiones y 2,33 MB** con todo cargado
 —incluidas las hojas de la vitrina, que entran perezosas y no cuentan para
@@ -1164,10 +1216,11 @@ Chrome real y hasta el evento `load`. Queda pendiente repetir aquella
 medición como se hizo entonces, que es la que dice lo que cuesta abrir el
 sitio.
 
-Sigue pendiente, si algún día molesta: **una tercera talla de ~800 px para
-las hojas de la vitrina**. Solo existen 1600 y 2560 px, así que cada hoja
-descarga 1600 aunque en reposo ocupe un cuarto de pantalla. Sin hacer porque
-toca la calidad de imagen y eso lo decide Kevin.
+~~Sigue pendiente una tercera talla de ~800 px para las hojas de la
+vitrina.~~ **Hecha en la v32**, a 900 px y para las 97 imágenes, no solo para
+la vitrina. No tocó la calidad: una pantalla densa sigue recibiendo la de 1600
+o la de 2560: lo único que cambió es que ahora existe una opción para quien no
+puede mostrarlas.
 
 ## Decisiones abiertas
 
