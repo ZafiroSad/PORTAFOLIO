@@ -1406,7 +1406,35 @@ body.bloqueado .fono-nav {
   display:flex; align-items:center; justify-content:center; }
 .visor-capa { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
 .visor-capa img { max-width:100%; max-height:100%; object-fit:contain;
-  border-radius:6px; box-shadow:0 40px 100px -30px rgba(0,0,0,.9); }
+  border-radius:6px; box-shadow:0 40px 100px -30px rgba(0,0,0,.9);
+  /* El zoom lo llevan dos variables que escribe el JS. Va en la imagen y no
+     en la capa porque la capa ya anima su propio `transform` en el cruce
+     entre una foto y la siguiente: serian dos cosas peleando por la misma
+     propiedad. */
+  transform:translate3d(var(--zx,0px), var(--zy,0px), 0) scale(var(--z,1));
+  transition:transform .3s var(--salida); }
+/* Mientras se pellizca no hay transicion: la imagen tiene que ir pegada al
+   dedo, no persiguiendolo. */
+.visor.pellizcando .visor-capa img { transition:none; }
+/* La imagen ampliada se recorta contra la escena en vez de derramarse por
+   encima del mando y del resto de la pagina. SOLO ampliada: sin zoom la
+   imagen nunca se sale —lleva `max-width/height:100%`— y en cambio el cruce
+   entre una foto y la siguiente desliza un 7 %, que con el recorte puesto
+   siempre se veria cortado justo al entrar. */
+.visor.ampliada .visor-escena { overflow:hidden; }
+
+/* AMPLIADA, EL RENDER SE QUEDA CON LA PANTALLA. Es un portafolio de
+   visualizacion: cuando alguien se acerca a mirar el marmol o como cae la
+   luz, lo que sobra es todo lo demas. El mando se aparta y la escena deja de
+   ceñirse a la forma de la imagen para tomar todo el alto. La cruz se queda
+   SIEMPRE: hay que poder salir. */
+.visor.ampliada .visor-hud { opacity:0; pointer-events:none; }
+.visor-hud { transition:opacity .3s var(--suave); }
+.visor.ampliada .visor-capa img { border-radius:0; box-shadow:none; cursor:grab; }
+.visor.ampliada.arrastrando .visor-capa img { cursor:grabbing; }
+/* Sin gestos del navegador dentro de la escena: el pellizco es nuestro, y si
+   no se dice, el navegador amplia la pagina entera. */
+.visor-escena { touch-action:none; }
 .visor-cerrar, .visor-nav { position:absolute; z-index:5; color:var(--tenue);
   width:46px; height:46px; border-radius:50%; display:grid; place-items:center;
   background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09);
@@ -1587,6 +1615,8 @@ body.bloqueado .fono-nav {
      `max-height` la acota por si alguna viene muy vertical. */
   .visor-escena { flex:0 1 auto; height:auto; max-height:100%;
                   aspect-ratio:var(--visor-ar, 3 / 2); }
+  /* Ampliada deja de tomar la forma de la imagen y se lleva todo el alto. */
+  .visor.ampliada .visor-escena { flex:1 1 auto; height:100%; aspect-ratio:auto; }
 
   .visor-cerrar { top:.7rem; right:.7rem; }
 
@@ -3112,6 +3142,10 @@ function mostrar(i, dir = 1) {
   indiceVisor = (i + galeria.length) % galeria.length;
   visorPie.textContent = `${proyectoActual ? proyectoActual.titulo : ''} — ${indiceVisor + 1} / ${galeria.length}`;
 
+  /* Cada imagen empieza sin ampliar: heredar el zoom de la anterior abriria
+     la siguiente ya ampliada y por un sitio que no significa nada en ella. */
+  reponerZoom();
+
   const capa = document.createElement('div');
   capa.className = 'visor-capa';
   capa.innerHTML = `<img src="${galeria[indiceVisor]}" alt="">`;
@@ -3162,6 +3196,7 @@ contenido.addEventListener('click', e => {
   mostrar(Number(pieza.dataset.k));
 });
 function cerrarVisor() {
+  reponerZoom();
   visor.classList.remove('abierto');
   setTimeout(() => { if (!visor.classList.contains('abierto')) { escena.innerHTML = ''; capaViva = null; } }, 500);
 }
@@ -3257,14 +3292,128 @@ document.getElementById('reel-abrir').addEventListener('click', abrirReel);
 document.getElementById('reel-cerrar').addEventListener('click', cerrarReel);
 reelCapa.addEventListener('click', e => { if (e.target === reelCapa) cerrarReel(); });
 
-let tactilX = null;
-visor.addEventListener('touchstart', e => { tactilX = e.changedTouches[0].clientX; }, { passive:true });
+/* =================================================================
+   MIRAR EL RENDER DE CERCA
+
+   Es un portafolio de VISUALIZACION y hasta aqui la imagen se veia a 372 px
+   de ancho en un telefono, sin manera de acercarse. El oficio esta en el
+   detalle —la carpinteria, el marmol, como cae la luz— y no se veia ninguno.
+
+   Pellizcar, doble toque y arrastrar en el telefono; doble clic, rueda y
+   arrastrar en el computador. Al ampliar, el mando se aparta y el render se
+   queda con la pantalla entera.
+   ================================================================= */
+const ZOOM_MAX = 4.5, ZOOM_TOQUE = 2.6;
+let z = 1, zx = 0, zy = 0;
+
+function pintarZoom() {
+  escena.style.setProperty('--z',  z);
+  escena.style.setProperty('--zx', zx + 'px');
+  escena.style.setProperty('--zy', zy + 'px');
+  visor.classList.toggle('ampliada', z > 1.01);
+}
+/* La imagen no se puede arrastrar mas alla de lo que sobresale: con la
+   escala `z`, lo que asoma por cada lado es la mitad del exceso. Sin esto se
+   va de la pantalla y uno se queda mirando un vacio sin saber volver. */
+function acotar() {
+  const im = capaViva && capaViva.querySelector('img');
+  if (!im) { zx = zy = 0; return; }
+  const c = im.getBoundingClientRect();
+  const anchoBase = c.width / z, altoBase = c.height / z;
+  const maxX = Math.max(0, (anchoBase * z - escena.clientWidth)  / 2);
+  const maxY = Math.max(0, (altoBase  * z - escena.clientHeight) / 2);
+  zx = Math.max(-maxX, Math.min(maxX, zx));
+  zy = Math.max(-maxY, Math.min(maxY, zy));
+}
+/* Ampliar HACIA UN PUNTO: lo que hay bajo el dedo se queda bajo el dedo.
+   Con `transform-origin` en el centro, mover de `z` a `z2` desplaza ese punto
+   en proporcion a su distancia al centro; esto lo compensa. */
+function zoomHacia(nuevo, px, py) {
+  nuevo = Math.max(1, Math.min(ZOOM_MAX, nuevo));
+  const c = escena.getBoundingClientRect();
+  const cx = c.left + c.width / 2, cy = c.top + c.height / 2;
+  zx -= (px - cx - zx) * (nuevo / z - 1);
+  zy -= (py - cy - zy) * (nuevo / z - 1);
+  z = nuevo;
+  if (z <= 1.01) { z = 1; zx = zy = 0; }
+  acotar(); pintarZoom();
+}
+function reponerZoom() { z = 1; zx = zy = 0; pintarZoom(); }
+
+/* --- Teléfono: un dedo desliza o recorre, dos pellizcan --- */
+let tactilX = null, tactilY = null, arrastrando = false;
+let pellizco = 0, zAlPellizcar = 1, ultimoToque = 0;
+const separacion = t => Math.hypot(
+  t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+const medio = t => [(t[0].clientX + t[1].clientX) / 2,
+                    (t[0].clientY + t[1].clientY) / 2];
+
+visor.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) {
+    pellizco = separacion(e.touches); zAlPellizcar = z;
+    visor.classList.add('pellizcando');
+    tactilX = null; return;
+  }
+  if (e.touches.length !== 1) return;
+  tactilX = e.touches[0].clientX; tactilY = e.touches[0].clientY;
+  arrastrando = z > 1.01;
+
+  /* Doble toque: amplia donde se toco, o vuelve si ya estaba ampliada. */
+  const ahora = Date.now();
+  if (ahora - ultimoToque < 300 && e.target.closest('.visor-capa')) {
+    if (z > 1.01) reponerZoom();
+    else zoomHacia(ZOOM_TOQUE, tactilX, tactilY);
+    ultimoToque = 0; tactilX = null;
+  } else ultimoToque = ahora;
+}, { passive:true });
+
+visor.addEventListener('touchmove', e => {
+  if (e.touches.length === 2 && pellizco) {
+    const [mx, my] = medio(e.touches);
+    zoomHacia(zAlPellizcar * (separacion(e.touches) / pellizco), mx, my);
+    e.preventDefault(); return;
+  }
+  if (arrastrando && e.touches.length === 1 && tactilX !== null) {
+    zx += e.touches[0].clientX - tactilX;
+    zy += e.touches[0].clientY - tactilY;
+    tactilX = e.touches[0].clientX; tactilY = e.touches[0].clientY;
+    acotar(); pintarZoom(); e.preventDefault();
+  }
+}, { passive:false });
+
 visor.addEventListener('touchend', e => {
-  if (tactilX === null) return;
+  if (e.touches.length < 2) { pellizco = 0; visor.classList.remove('pellizcando'); }
+  if (tactilX === null || arrastrando) { tactilX = null; arrastrando = false; return; }
+  /* El deslizamiento solo cambia de imagen si NO esta ampliada: si lo esta,
+     ese mismo gesto es recorrerla. */
   const salto = e.changedTouches[0].clientX - tactilX;
-  if (Math.abs(salto) > 55) mostrar(indiceVisor + (salto < 0 ? 1 : -1), salto < 0 ? 1 : -1);
+  if (z <= 1.01 && Math.abs(salto) > 55) {
+    mostrar(indiceVisor + (salto < 0 ? 1 : -1), salto < 0 ? 1 : -1);
+  }
   tactilX = null;
 }, { passive:true });
+
+/* --- Computador: doble clic, rueda y arrastrar --- */
+visor.addEventListener('dblclick', e => {
+  if (!e.target.closest('.visor-capa')) return;
+  if (z > 1.01) reponerZoom(); else zoomHacia(ZOOM_TOQUE, e.clientX, e.clientY);
+});
+visor.addEventListener('wheel', e => {
+  if (!e.target.closest('.visor-capa')) return;
+  e.preventDefault();
+  zoomHacia(z * (e.deltaY < 0 ? 1.18 : 1 / 1.18), e.clientX, e.clientY);
+}, { passive:false });
+let raton = null;
+visor.addEventListener('pointerdown', e => {
+  if (e.pointerType !== 'mouse' || z <= 1.01 || !e.target.closest('.visor-capa')) return;
+  raton = [e.clientX, e.clientY]; visor.classList.add('arrastrando');
+});
+addEventListener('pointermove', e => {
+  if (!raton) return;
+  zx += e.clientX - raton[0]; zy += e.clientY - raton[1];
+  raton = [e.clientX, e.clientY]; acotar(); pintarZoom();
+});
+addEventListener('pointerup', () => { raton = null; visor.classList.remove('arrastrando'); });
 
 /* =================================================================
    DESPLAZAMIENTO

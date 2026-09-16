@@ -8,9 +8,54 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v32 — el sitio abre en 0,86 MB en un teléfono, contra 2,21.**
+**v33 — el render se puede mirar de cerca.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v33 — 2026-09-16
+
+Segunda de las mejoras propuestas. **Es un portafolio de VISUALIZACIÓN y hasta
+aquí no había manera de acercarse a una imagen.** En un teléfono el render se
+veía a 372 px de ancho, y ahí no se aprecia nada de lo que sostiene este
+trabajo: la carpintería, el mármol, cómo cae la luz en el interior. Había
+deslizamiento y flechas de teclado —comprobado antes de tocar nada—, pero no
+zoom.
+
+- **Pellizcar, doble toque y arrastrar** en el teléfono; **doble clic, rueda y
+  arrastrar** en el computador. Hasta 4,5 aumentos.
+- **Se amplía HACIA UN PUNTO**: lo que está bajo el dedo se queda bajo el
+  dedo. Con `transform-origin` en el centro, pasar de una escala a otra
+  desplaza cada punto en proporción a su distancia al centro; la fórmula lo
+  compensa. Sin eso uno apunta a una ventana y acaba mirando el cielo.
+- **AMPLIADA, EL RENDER SE QUEDA CON LA PANTALLA.** El mando se aparta y la
+  escena deja de ceñirse a la forma de la imagen para tomar todo el alto:
+  medido, la escena pasa de 209 a 754 px y la imagen de 372 a 968 de ancho. La
+  cruz de cerrar **no se va nunca** — hay que poder salir.
+- **El deslizamiento solo cambia de imagen si NO está ampliada.** Ampliada,
+  ese mismo gesto es recorrer la foto. Sin esa distinción, mirar un detalle a
+  la izquierda te sacaba a la imagen anterior.
+- **El zoom se repone al cambiar de imagen y al cerrar.** Heredarlo abriría la
+  siguiente ya ampliada y por un sitio que en ella no significa nada.
+- **No se puede arrastrar más allá de lo que sobresale.** Sin acotar, la
+  imagen se va de la pantalla y uno se queda mirando un vacío sin saber
+  volver.
+
+Dos detalles que si faltan se notan: el zoom va sobre la **imagen** y no sobre
+la capa, porque la capa ya anima su propio `transform` en el cruce entre una
+foto y la siguiente y serían dos cosas peleando por la misma propiedad; y
+mientras se pellizca **se quita la transición**, o la imagen persigue al dedo
+en vez de ir pegada a él.
+
+**El recorte va SOLO en el estado ampliado.** Puesto siempre, cortaba el cruce
+entre imágenes: la que entra desliza un 7 % y se habría visto cercenada justo
+al aparecer. Sin zoom la imagen nunca se sale —lleva `max-width/height:100%`—,
+así que ahí no hace falta.
+
+Medido a 390 px: doble toque lleva a 2,6 aumentos con el mando en opacidad 0;
+arrastrar mueve 80 px; el pellizco llega al tope de 4,5; el segundo doble
+toque devuelve todo a su sitio; y deslizar sin ampliar sigue pasando de imagen
+(1/13 → 2/13). En escritorio a 1440: doble clic 2,6, rueda 3,07, doble clic
+vuelve a 1. Sin errores de consola.
 
 ### v32 — 2026-09-16
 
@@ -861,6 +906,9 @@ Todo se recorre desplazando. El menú salta con un desplazamiento animado.
    con el mismo desplazamiento animado que el resto del menú.
 2. **Proyectos** — cuatro hojas verticales a sangre, de borde a borde de la
    ventana. Botón *Ver todos los proyectos* → índice con filtros por grupo.
+   El visor **amplía**: pellizco y doble toque en el teléfono, doble clic y
+   rueda en el computador. Al ampliar, el mando se aparta y el render se queda
+   con la pantalla entera.
 3. **El reel** — un cartel a lo ancho con el fotograma más vendedor; al
    pulsarlo, el video se abre en una capa **y arranca con sonido**. El
    `<video>` **no existe** hasta ese momento: lo crea el JS y lo destruye al
