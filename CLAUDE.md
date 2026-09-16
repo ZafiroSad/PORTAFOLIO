@@ -8,9 +8,77 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v29 — el dock deja de ser una ventana.**
+**v30 — el dock, leído de la §8 del sistema y no de una descripción.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v30 — 2026-09-16
+
+«El dock no es como el del UI system, que debe ser como el de BUDGETS o el de
+las demás apps.» Y tenía razón, porque las v28 y v29 se construyeron
+interpretando **la bitácora de BUDGETS**, que describe la regla pero no da las
+medidas. La fuente es otra:
+
+**El sistema son siete archivos.** `STICK UI SYSTEM/STICK_UI_SYSTEM.md` es solo
+el índice; la navegación inferior es la **§8 de `partes/02-shell.md`**, y tiene
+una **§8.4 «Equivalente sin React» escrita justo para apps de un solo HTML como
+esta**, con su CSS y su JS listos para copiar. El CSS canónico de `.glass-dock`
+está en `nucleo/index.css`. Nada de esto se había leído.
+
+**Lo que define la barra NO ES EL COLOR sino una sola PÍLDORA BLANCA que viaja,
+y el icono encima va OSCURO.** Eso es lo que la hace reconocible, y es
+exactamente lo que faltaba: la v28 puso una píldora de vidrio translúcido con
+el icono encendido, que es lo contrario.
+
+Lo que se corrigió, punto por punto contra la tabla de la §8:
+
+| | v28-v29 | §8 |
+|---|---|---|
+| Píldora | vidrio blanco al 12 % | **`var(--tinta)` sólida** |
+| Icono activo | claro sobre vidrio | **`#09090b` sobre la píldora** |
+| Icono inactivo | `--debil` | `#a1a1aa` |
+| Ancho | `min(100% − 1.4rem, 400px)` | **ceñido al contenido, nunca `max-width`** |
+| Icono | 20 px, trazo 1.6 | **16 px, trazo 2.4 fijo en ambos estados** |
+| Botón | `flex:1`, alto 44 | **relleno 10 px, 36 × 36** |
+| Dock | relleno 5,44 px, sin `gap` | **relleno 6, `gap` 2** |
+| `bottom` | 11,2 px | **16 px** |
+| Superficie | `.vidrio` | **`.glass-dock`** |
+| Con capa abierta | se iba un 140 % abajo | **opacidad 0 + 16 px y sin eventos** |
+
+**El ancho ceñido era el fallo grande.** El sistema lo prohíbe expresamente
+—«nunca `w-[92%]` ni `max-w-*`»— porque sin etiquetas el dock **mide lo mismo
+en cualquier pantalla**, y eso es justo lo que lo hace idéntico entre las apps.
+Estirado al ancho de la ventana dejaba de ser el mismo objeto. Medido ahora:
+**240 px a 390, 360, 320 y 700 px**, centrado.
+
+Con seis pestañas aplica la **excepción de la §8.2** y solo esa: relleno
+horizontal del botón a 10 px y aire a 2 px. Lo que no cambia nunca es el alto
+del objetivo táctil —10 + 16 + 10 = 36 dentro de un dock de 48—, que es lo que
+sostiene la regla de accesibilidad.
+
+De la §8.4 se copiaron los **tres detalles que, si faltan, rompen el efecto**:
+recolocar en `resize`, salir sin hacer nada si el dock está oculto
+(`offsetWidth === 0`, o la píldora nace en el borde izquierdo), y colocar la
+primera vez **sin transición**, o vuela desde el borde al cargar.
+
+**Y una cosa que la v29 había acertado sola ya estaba en el sistema.** El
+`index.css` canónico también apaga el `backdrop-filter` por debajo de 900 px
+—por la misma razón medida aquí— y pinta `.glass-dock` a **`rgba(24,26,33,.94)`
+plano**. La v29 había llegado a .96-.97 con un degradado inventado; ahora va el
+valor canónico.
+
+**Dos equivalencias, dichas en voz alta** porque el sistema pide reportar toda
+divergencia en vez de replicarla en silencio: el corte es **700/701 y no `md`
+(768)**, porque es donde en este sitio entra la barra de arriba, que es lo que
+allí hace el Sidebar; y el `z-index` es **120 y no 20**, porque aquí la ficha y
+el índice están en 260 y 210. El gesto es el mismo; solo cambian los números
+contra los que se mide.
+
+Comprobado a 390, 360, 320, 700 y 701 px y en escritorio a 1440 y 1024: dock de
+240 px sin desbordamiento, sin texto, los seis `aria-label` y `title` puestos,
+píldora en saltos regulares de 38 px, activo `#09090b` contra `#a1a1aa`, nada
+bajo el vidrio (las secciones cierran entre 732 y 738 con el dock en 778), con
+capa abierta baja 16 px a opacidad 0 y sin eventos, y sin errores de consola.
 
 ### v29 — 2026-09-16
 
@@ -876,14 +944,23 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
   headless de esta máquina no baja de 500 px de ancho, así que medir «en móvil»
   a 520 escondió durante días que el menú no cabía. Dentro del marco, las media
   queries responden a su ancho.
-- **LA NAVEGACIÓN INFERIOR JAMÁS LLEVA TEXTO.** Regla del Señor Stick para
-  toda la familia, anotada en la bitácora de STICK BUDGETS el 2026-08-24 y en
-  el `STICK_UI_SYSTEM.md`: solo iconos, en cualquier ancho y en cualquier
-  estado, la sección activa incluida. El nombre va en `aria-label` y `title`.
-  Lo que marca la activa es la píldora que viaja, no una etiqueta. Antes de
-  inventar un gesto para el teléfono, mirar si BUDGETS ya lo tiene resuelto:
-  es el referente visual de la suite y el documento sale de ahí, nunca al
-  revés.
+- **EL SISTEMA SON SIETE ARCHIVOS, Y HAY QUE ABRIR EL QUE TOCA.**
+  `STICK_UI_SYSTEM.md` es solo el índice. La navegación inferior es la **§8 de
+  `partes/02-shell.md`**, que trae la tabla de medidas exactas y una **§8.4
+  «Equivalente sin React» escrita para apps de un solo HTML como esta**, con su
+  CSS y su JS listos para copiar; el CSS canónico de `.glass-dock` está en
+  `nucleo/index.css`. Se tardaron tres versiones en el dock por construirlo
+  desde la bitácora de BUDGETS, que enuncia la regla pero no da las medidas.
+  Las dos son de Drive y se leen desde aquí.
+  El sistema dice cómo leerlo: **copiar los bloques tal cual**, y si el código
+  real diverge, **manda el sistema** — se reporta la divergencia, no se replica
+  ni se «mejora» sin preguntar.
+- **LA NAVEGACIÓN INFERIOR JAMÁS LLEVA TEXTO**, y lo que marca la activa es
+  **una píldora blanca sólida con el icono en negativo encima**. Solo iconos,
+  en cualquier ancho y en cualquier estado. El nombre va en `aria-label` y
+  `title`. Y el dock **va ceñido a su contenido**: sin etiquetas mide lo mismo
+  en cualquier pantalla, y eso es lo que lo hace idéntico entre las apps —
+  estirarlo al ancho de la ventana lo convierte en otro objeto.
 - ~~**En pantallas de menos de 400 px el rótulo de la barra se va, el isotipo
   se queda.**~~ Superada en la v28: por debajo de 700 px no hay barra arriba
   de ninguna clase, así que no hay rótulo que esconder.

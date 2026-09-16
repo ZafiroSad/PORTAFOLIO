@@ -308,77 +308,86 @@ body.bloqueado .masa { animation-play-state:paused; }
   .menu  { display:none; }
 }
 
-/* ============ EL DOCK — CALCADO DE STICK BUDGETS ================
-   STICK BUDGETS es la referencia visual de la familia, y su regla sobre
-   esto no admite matices: LA NAVEGACION INFERIOR JAMAS LLEVA TEXTO. Solo
-   iconos, en cualquier ancho y en cualquier estado, la seccion activa
-   incluida. El nombre va en `aria-label` y en `title`: el lector de
-   pantalla lo anuncia igual y el puntero fino muestra el rotulo, asi que
-   no se pierde informacion — solo deja de ocupar sitio. Y un dock de solo
-   iconos MIDE LO MISMO en cualquier pantalla, que es lo que lo hace
-   identico entre las apps.
+/* ============ EL DOCK — §8 DEL STICK UI SYSTEM ==================
+   Leido de la fuente, no de una descripcion: `STICK UI SYSTEM/partes/
+   02-shell.md`, §8 «Navegacion inferior», mas su §8.4, que esta escrita
+   justo para apps de un solo HTML como esta —sin React ni Motion—. Las
+   dos primeras pasadas se hicieron interpretando la bitacora de BUDGETS
+   y divergian en casi todo lo que se ve.
 
-   Esto retira lo que hacia la v27, que era justo lo contrario: la activa
-   se ensanchaba y descubria su nombre. Se veia bien y estaba fuera de la
-   norma.
+   Lo que define la barra NO ES EL COLOR sino UNA SOLA PILDORA BLANCA QUE
+   VIAJA de una pestaña a otra en vez de encenderse y apagarse. Y sobre
+   ella el icono va OSCURO. Eso —blanca con el icono en negativo, no un
+   vidrio claro con el icono encendido— es lo que hace que se reconozca.
 
-   Lo que marca la activa es la PILDORA QUE VIAJA: un solo objeto de
-   vidrio que se desliza de un icono al siguiente. Es el mismo gesto de la
-   gota de la barra de escritorio y el mismo de toda la familia (alli
-   `layoutId` con muelle de .42 s; aqui, sin framework, una transicion de
-   .42 s con `--resorte`, que es el mismo rebote corto).
+   Regla del sistema, sin excepciones y en ningun ancho: LA BARRA JAMAS
+   LLEVA TEXTO. El nombre va en `aria-label` y `title`.
    ================================================================= */
+
+/* Superficie canonica. Va por la clase, nunca a mano: pintarla a mano
+   era lo que delataba a STICK ASSETS como app aparte. */
+.glass-dock {
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  background: rgba(21, 22, 27, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    inset 0  1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.20),
+    0 16px 48px rgba(0, 0, 0, 0.55),
+    0  4px 16px rgba(0, 0, 0, 0.30);
+}
+
 .fono-nav {
   position:fixed; z-index:120; left:50%;
-  /* `translate3d` y no `translateX`: el componente Z, aunque valga 0, manda
-     la barra a su propia capa de composicion de la GPU desde el principio.
-     Sin eso, en Safari de iOS un `position:fixed` con `backdrop-filter` se
-     DESPRENDE durante un scroll rapido y viaja con el contenido hasta que
-     el scroll para. Esta documentado en STICK BUDGETS con captura del
-     Señor Stick, y este dock reune las dos condiciones exactas. */
+  /* `translate3d` con eje Z, y no `translateX`: fuerza al navegador a poner
+     la barra en su propia capa de composicion de la GPU. Sin esto, un
+     `position:fixed` con `backdrop-filter` se DESPRENDE de su sitio durante
+     un scroll rapido en Safari de iOS y viaja con el contenido — bug real,
+     visto en captura. Va en UNA sola declaracion de `transform` (centrado +
+     capa), no en dos reglas peleando por la misma propiedad. */
   transform:translate3d(-50%, 0, 0); will-change:transform;
-  /* El hueco de gestos del telefono se respeta con `env()`. Sin eso, en un
-     iPhone el dock queda debajo del indicador y se toca a medias. */
-  bottom:calc(.7rem + env(safe-area-inset-bottom, 0px));
-  width:min(calc(100% - 1.4rem), 400px);
+  /* `bottom-4` mide desde el borde del viewport; en apps de un solo HTML se
+     suma explicitamente el hueco de gestos. */
+  bottom:calc(16px + env(safe-area-inset-bottom, 0px));
+  /* CEÑIDO AL CONTENIDO. Sin `width` ni `max-width`: el dock mide lo que
+     miden sus botones, y por eso mide LO MISMO en cualquier pantalla. Eso
+     es exactamente lo que lo hace identico entre las apps, y es lo que las
+     dos pasadas anteriores rompieron estirandolo al ancho de la ventana. */
   display:flex; align-items:center;
-  padding:.34rem; border-radius:999px;
-  transition:transform .45s var(--salida), opacity .35s var(--suave); }
-/* Con una capa abierta —ficha, indice, visor, reel— se retira: esas cubren
-   la ventana entera y el dock quedaria flotando sobre ellas. */
-body.bloqueado .fono-nav { transform:translate3d(-50%, 140%, 0); opacity:0; }
-/* Solo en el telefono. VA DESPUES de la regla que lo dibuja: las dos tienen
-   la misma especificidad y decide el orden — declarada antes, no ganaba y
-   el dock salia tambien en escritorio. */
+  gap:2px; padding:6px; border-radius:999px; }
+/* Se abre una capa: se APARTA, no se va de golpe. §8.3. */
+body.bloqueado .fono-nav {
+  opacity:0; transform:translate3d(-50%, 16px, 0); pointer-events:none; }
+/* En escritorio manda la barra de arriba, igual que alli manda el Sidebar.
+   VA DESPUES de la regla que lo dibuja: misma especificidad, decide el orden. */
 @media (min-width:701px){ .fono-nav { display:none; } }
 
-.fono-nav .gota-fono {
-  position:absolute; top:.34rem; bottom:.34rem; left:0; width:0;
-  border-radius:999px;
-  background:rgba(255,255,255,.12);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22);
-  opacity:0; pointer-events:none;
-  transition:transform .42s var(--resorte), width .42s var(--resorte),
-             opacity .35s var(--suave); }
-.fono-nav.viva .gota-fono { opacity:1; }
+/* LA PILDORA. Copiada de §8.4: un elemento propio cuya posicion y ancho
+   escribe el JS en dos variables CSS; el muelle lo pone la transicion. */
+.dock-pildora {
+  position:absolute; top:6px; bottom:6px; left:0; border-radius:999px;
+  background:var(--tinta); pointer-events:none;
+  width:var(--pw,0px); transform:translate3d(var(--px,0px),0,0);
+  transition:transform .45s var(--resorte), width .45s var(--resorte); }
+@media (prefers-reduced-motion:reduce){ .dock-pildora { transition:none; } }
 
-/* `flex:1 1 0` y no un ancho por contenido: con solo iconos, todos miden
-   igual y el dock reparte su ancho en seis partes exactas. Eso es lo que
-   hace que la pildora viaje a saltos regulares y que el area tocable sea
-   la misma en las seis. */
+/* Boton: `px-2.5 py-2.5` (10 px). El relleno horizontal canonico es 16 px,
+   pero §8.2 autoriza bajarlo a 10 con 6 o mas pestañas —aqui son seis—, y
+   con ello el aire entre botones baja de 4 a 2 px. Lo que NO cambia nunca
+   es el alto del objetivo tactil: 10 + 16 + 10 = 36 px dentro de un dock
+   de 48, que es lo que sostiene la regla de accesibilidad. */
 .fono-nav a {
-  position:relative; z-index:1;
-  flex:1 1 0; display:flex; align-items:center; justify-content:center;
-  height:44px; border-radius:999px;
-  color:var(--debil); text-decoration:none;
-  transition:color .35s var(--suave); }
-.fono-nav svg { width:20px; height:20px; display:block; }
-.fono-nav a.activo { color:var(--tinta); }
-.fono-nav a:active { color:var(--tinta); }
-/* Guarda de hover tactil, tambien regla de la familia: en el telefono el
-   navegador dispara un hover falso al tocar y el reflejo de `.vidrio` se
-   queda encendido donde se poso el dedo. */
-@media (hover:none){ .fono-nav.vidrio:hover::after { opacity:0; } }
+  position:relative; z-index:10;
+  display:flex; align-items:center; justify-content:center;
+  padding:10px; border-radius:999px;
+  color:#a1a1aa; text-decoration:none;
+  transition:color 150ms var(--suave); }
+/* Icono de 16 px y trazo 2.4 FIJO EN AMBOS ESTADOS: el contraste lo da el
+   color, no el grosor. */
+.fono-nav svg { width:16px; height:16px; display:block; stroke-width:2.4; }
+/* Activo: tinta OSCURA sobre la pildora blanca. */
+.fono-nav a.activo { color:#09090b; }
 
 
 .avance { position:fixed; top:0; left:0; right:0; height:1.5px; z-index:121;
@@ -1418,10 +1427,15 @@ body.bloqueado .fono-nav { transform:translate3d(-50%, 140%, 0); opacity:0; }
    vidrio pintado: en gama media, cada `backdrop-filter` obliga a
    recomponer lo que hay debajo en cada cuadro del desplazamiento. */
 @media (max-width:900px){
-  .vidrio, .barra, .ficha-barra, .visor-cerrar, .visor-nav, .visor-pie, .tarjeta .sello {
+  .vidrio, .barra, .ficha-barra, .visor-cerrar, .visor-nav, .visor-pie, .tarjeta .sello,
+  .glass-dock {
     backdrop-filter:none !important; -webkit-backdrop-filter:none !important;
   }
   .vidrio { background:linear-gradient(148deg, rgba(38,40,49,.86), rgba(28,30,38,.82) 44%, rgba(34,36,45,.86)); }
+  /* El dock tiene SU propio valor pintado en el sistema —plano, no degradado—
+     y es mas opaco que el vidrio general porque flota sobre contenido vivo.
+     La v29 habia llegado a .96-.97 por medicion propia; el canonico es .94. */
+  .glass-dock { background:rgba(24, 26, 33, 0.94); }
   .barra  { background:rgba(24,26,33,.90); }
   .ficha-barra { background:rgba(20,22,28,.88); }
   .visor-cerrar, .visor-nav, .visor-pie { background:rgba(30,32,40,.9); }
@@ -1582,25 +1596,8 @@ body.bloqueado .fono-nav { transform:translate3d(-50%, 140%, 0); opacity:0; }
      `.inicio-texto` no necesita holgura por lo mismo. */
   .baja { display:none; }
 
-  /* EL DOCK NO PUEDE SER UNA VENTANA. Es la unica superficie del sitio que
-     flota PERMANENTEMENTE sobre contenido vivo: un panel quieto puede
-     permitirse el .82-.86 del vidrio general, este no. MEDIDO: con el
-     vidrio general, el parrafo de Sobre mi se leia entero por detras de los
-     iconos mientras se desplazaba, y sobre un render claro los iconos en
-     `--debil` perdian contraste.
-
-     Y NO se arregla devolviendole el `backdrop-filter`. En movil ese
-     desenfoque esta apagado a proposito —en gama media obliga a recomponer
-     lo de debajo en cada cuadro— y el dock es justo el peor elemento al que
-     devolverselo: esta en pantalla durante TODO el desplazamiento. Lo que
-     sube es la pintura, que no cuesta nada.
-
-     Conserva el filo especular, el borde y el degradado, que es lo que lo
-     hace vidrio; deja de ser transparente, que es lo que lo hacia ilegible. */
-  .fono-nav.vidrio {
-    background:linear-gradient(148deg, rgba(31,33,41,.97),
-                                       rgba(23,25,32,.96) 44%,
-                                       rgba(28,30,38,.97)); }
+  /* El hueco que reserva el dock: `pb-28` del sistema. */
+  .seccion-cuerpo { padding-bottom:calc(7rem + env(safe-area-inset-bottom, 0px)); }
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -1655,7 +1652,7 @@ body.bloqueado .fono-nav { transform:translate3d(-50%, 140%, 0); opacity:0; }
 <!-- La navegacion del telefono. Se escribe desde el JS a partir de los
      mismos enlaces de la barra de arriba, para que no haya dos listas de
      secciones que se puedan desincronizar. -->
-<nav class="fono-nav vidrio" id="fono-nav" aria-label="Secciones"></nav>
+<nav class="fono-nav glass-dock" id="fono-nav" aria-label="Navegación principal"></nav>
 
 <div class="mascara-marca">
   <div class="marca-entrada">
@@ -2215,13 +2212,15 @@ const DIBUJOS = {
    `enlacesMenu`: esa se declara bastante mas abajo, y usarla aqui la dejaria
    en su zona muerta — un `ReferenceError` en carga. */
 document.getElementById('fono-nav').innerHTML =
-  '<span class="gota-fono" id="gota-fono"></span>' +
+  '<span class="dock-pildora" id="dock-pildora"></span>' +
   [...document.querySelectorAll('.menu a')].map(a => {
     const href = a.getAttribute('href');
     const nombre = a.textContent.trim();
+    /* SOLO EL ICONO. El nombre viaja en `aria-label` y `title`: sin ellos,
+       un dock sin texto se queda sin nombre para un lector de pantalla. */
     return `<a href="${href}"${a.hasAttribute('data-reiniciar') ? ' data-reiniciar' : ''}
       aria-label="${nombre}" title="${nombre}">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${DIBUJOS[href] || ''}</svg>
     </a>`;
   }).join('');
@@ -3211,29 +3210,37 @@ function moverGota(a) {
 document.querySelectorAll('.menu a').forEach(a => a.addEventListener('pointerenter', () => moverGota(a)));
 menu.addEventListener('pointerleave', () => moverGota(document.querySelector('.menu a.activo')));
 
-/* La misma idea abajo, con dos diferencias: la pildora del dock NO sigue al
-   puntero —en el telefono no hay puntero que seguir— sino solo a la seccion
-   activa, y se coloca con `translate3d` para que viaje en la capa de la GPU,
-   igual que el dock entero. */
+/* La pildora del dock, copiada de la §8.4 del STICK UI SYSTEM —la que esta
+   escrita para apps sin React—. NO sigue al puntero: en el telefono no hay
+   puntero que seguir, solo sigue a la seccion activa.
+
+   El dock se construye UNA SOLA VEZ. Reescribir su `innerHTML` en cada
+   cambio destruiria la pildora y la haria nacer de nuevo en su sitio, que
+   es justo el efecto que el sistema no quiere. */
 const fonoNav  = document.getElementById('fono-nav');
-const gotaFono = document.getElementById('gota-fono');
-function moverGotaFono() {
-  const a = fonoNav.querySelector('a.activo');
-  /* `offsetWidth` 0 significa que el dock esta oculto (escritorio): no hay
-     nada que medir, y medirlo dejaria la pildora en 0 para cuando se vuelva
-     a ver. */
-  if (!a || !a.offsetWidth) { fonoNav.classList.remove('viva'); return; }
-  gotaFono.style.width = `${a.offsetWidth}px`;
-  gotaFono.style.transform = `translate3d(${a.offsetLeft}px, 0, 0)`;
-  fonoNav.classList.add('viva');
+const pildora  = document.getElementById('dock-pildora');
+function renderDock(inmediato) {
+  const activo = fonoNav.querySelector('a.activo');
+  /* Dock oculto (escritorio): no se puede medir. Midiendo cero, la pildora
+     nace en el borde izquierdo. */
+  if (!activo || activo.offsetWidth === 0) return;
+  /* La primera colocacion va sin transicion, o la pildora vuela desde el
+     borde en cuanto se carga la pagina. */
+  if (inmediato) pildora.style.transition = 'none';
+  pildora.style.setProperty('--px', activo.offsetLeft + 'px');
+  pildora.style.setProperty('--pw', activo.offsetWidth + 'px');
+  if (inmediato) { void pildora.offsetWidth; pildora.style.transition = ''; }
 }
+/* Recolocar al redimensionar: al cruzar los 700 px el dock aparece o
+   desaparece, y al girar el telefono cambia todo de sitio. */
+addEventListener('resize', () => renderDock(true), { passive:true });
 
 /* Un solo sitio decide cual esta activa, y lo usan el scroll y la pasada
    inicial. */
-function resaltar(activa) {
+function resaltar(activa, inmediato) {
   enlacesMenu.forEach(a => a.classList.toggle('activo', a.getAttribute('href') === '#' + activa));
   moverGota(document.querySelector('.menu a.activo'));
-  moverGotaFono();
+  renderDock(inmediato);
 }
 
 function moverParallax(raiz, alto) {
@@ -3289,9 +3296,6 @@ ficha.addEventListener('scroll', () => {
 }, { passive:true });
 addEventListener('resize', () => {
   if (capaIndice.classList.contains('abierta')) ajustarRejilla();
-  /* Al cruzar los 700 px el dock aparece o desaparece, y al girar el
-     telefono cambia su ancho: las dos cosas mueven la pildora de sitio. */
-  moverGotaFono();
 });
 
 /* Una pasada al cargar. Sin ella nada esta activo hasta el primer
@@ -3301,7 +3305,7 @@ addEventListener('resize', () => {
   let activa = '';
   secciones.forEach(s => { if (s.getBoundingClientRect().top <= innerHeight * .4) activa = s.id; });
   seccionActiva = activa;
-  resaltar(activa);
+  resaltar(activa, true);
 })();
 
 /* Van Y VUELVEN. Antes cada bloque se animaba una sola vez y al subir
