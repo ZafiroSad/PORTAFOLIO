@@ -1417,6 +1417,9 @@ body.bloqueado .fono-nav {
 .visor-cerrar { top:1rem; right:1rem; }
 .visor-nav.prev { left:1rem; top:50%; margin-top:-23px; }
 .visor-nav.sig  { right:1rem; top:50%; margin-top:-23px; }
+/* El grupo del mando no existe para la maqueta de escritorio: cada pieza se
+   coloca por su cuenta, como siempre. Solo en el telefono se vuelve una fila. */
+.visor-hud { display:contents; }
 .visor-pie { position:absolute; bottom:1.2rem; left:50%; transform:translateX(-50%); z-index:5;
   font-family:var(--mono); font-size:.58rem; letter-spacing:.18em; color:var(--tenue);
   text-transform:uppercase; padding:.5rem 1.1rem; border-radius:999px;
@@ -1557,12 +1560,55 @@ body.bloqueado .fono-nav {
   .tarjeta-pie h4 { font-size:.92rem; }
 
   /* --- Visor: los mandos donde llega el pulgar --- */
-  .visor { padding:.6rem; }
-  .visor-nav { bottom:1.2rem; top:auto; margin-top:0; width:52px; height:52px; }
-  .visor-nav.prev { left:calc(50% - 92px); }
-  .visor-nav.sig  { right:calc(50% - 92px); }
-  .visor-pie { bottom:5.4rem; font-size:.53rem; }
+  /* ===== EL VISOR EN EL TELEFONO =====
+     EL HUD SE VA DE ENCIMA DE LA IMAGEN. Las flechas se quedaban a media
+     altura, tapando el render, y el rotulo caia suelto mas abajo partido en
+     dos lineas: tres piezas repartidas por la pantalla en vez de un mando.
+
+     Y no era un fallo de orden sino DE ESPECIFICIDAD, que es el otro modo de
+     perder: `.visor-nav.prev` lleva DOS clases y le ganaba al `top:auto` de
+     `.visor-nav`, que lleva una — por mucho que fuera despues. Se corrige
+     donde se declara el sitio, con las dos clases puestas.
+
+     Ahora las tres piezas van en UNA SOLA FILA abajo —flecha · rotulo ·
+     flecha— y la imagen se queda con todo lo de arriba. */
+
+  /* LA IMAGEN Y SU MANDO SON UN SOLO BLOQUE, centrado. Antes eran tres
+     piezas sueltas repartidas por la pantalla: la imagen a media altura, el
+     rotulo partido en dos lineas mas abajo y las flechas ENCIMA del render.
+     Con el mando pegado a la imagen no queda un campo de negro en medio y se
+     lee como una pieza. */
+  .visor { flex-direction:column; justify-content:center; gap:.85rem;
+           padding:.55rem .55rem calc(1rem + env(safe-area-inset-bottom, 0px)); }
+
+  /* La escena toma la FORMA de la imagen —el JS le pasa su proporcion— en vez
+     de ocupar todo el alto. Es lo que deja el mando pegado debajo sin tener
+     que medir pixeles: si la imagen es apaisada, la escena es baja.
+     `max-height` la acota por si alguna viene muy vertical. */
+  .visor-escena { flex:0 1 auto; height:auto; max-height:100%;
+                  aspect-ratio:var(--visor-ar, 3 / 2); }
+
   .visor-cerrar { top:.7rem; right:.7rem; }
+
+  /* El mando, en fila. Las piezas dejan de estar posicionadas: aqui las
+     coloca el flex.
+     OJO, ESTO NO ES UN FALLO DE ORDEN SINO DE ESPECIFICIDAD: `.visor-nav.prev`
+     lleva DOS clases, asi que hay que apagarlo con dos clases tambien. Con
+     `.visor-nav` a secas no se apagaba —por mucho que fuera despues— y las
+     flechas se quedaban clavadas a media altura sobre la imagen. */
+  .visor-hud { display:flex; align-items:center; justify-content:center;
+               gap:.6rem; flex:none; width:100%; }
+  .visor-nav { position:static; width:52px; height:52px; flex:none; }
+  /* Las CUATRO propiedades que pone la regla de escritorio hay que apagarlas
+     con dos clases, `margin-top` incluido. Apagar solo `top` no bastaba: el
+     `margin-top:-23px` seguia ganando y subia cada flecha 23 px — justo
+     encima de la imagen, que es lo que se estaba arreglando. Medido: el
+     mando salia de 31 px de alto con botones de 52 dentro. */
+  .visor-nav.prev, .visor-nav.sig {
+    position:static; top:auto; left:auto; right:auto; margin-top:0; }
+  .visor-pie { position:static; transform:none; min-width:0;
+               font-size:.5rem; letter-spacing:.1em; padding:.5rem .8rem;
+               white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 }
 
 /* Con la barra de arriba retirada, las secciones RECUPERAN ese alto. Iba
@@ -1894,10 +1940,16 @@ body.bloqueado .fono-nav {
 
 <div class="visor" id="visor" role="dialog" aria-modal="true" aria-label="Imagen ampliada">
   <button class="visor-cerrar" id="visor-cerrar" aria-label="Cerrar">&times;</button>
-  <button class="visor-nav prev" id="visor-prev" aria-label="Anterior">&#8249;</button>
   <div class="visor-escena" id="visor-escena"></div>
-  <button class="visor-nav sig" id="visor-sig" aria-label="Siguiente">&#8250;</button>
-  <div class="visor-pie mono" id="visor-pie"></div>
+  <!-- Las tres piezas del mando van juntas. En escritorio el grupo es
+       `display:contents`, asi que no existe para la maqueta y cada una se
+       coloca donde siempre; en el telefono se vuelve una fila debajo de la
+       imagen. -->
+  <div class="visor-hud">
+    <button class="visor-nav prev" id="visor-prev" aria-label="Anterior">&#8249;</button>
+    <div class="visor-pie mono" id="visor-pie"></div>
+    <button class="visor-nav sig" id="visor-sig" aria-label="Siguiente">&#8250;</button>
+  </div>
 </div>
 
 <div class="reel-capa" id="reel-capa" role="dialog" aria-modal="true" aria-label="Reel">
@@ -3038,6 +3090,17 @@ function mostrar(i, dir = 1) {
   capa.className = 'visor-capa';
   capa.innerHTML = `<img src="${galeria[indiceVisor]}" alt="">`;
   escena.appendChild(capa);
+
+  /* La escena toma la forma de la imagen, y con ella el mando se queda
+     pegado debajo. Se pone en cuanto se conocen las medidas reales —puede
+     que ya este en cache, y entonces `decode` resuelve al instante. */
+  const lamina = capa.querySelector('img');
+  const darForma = () => {
+    if (lamina.naturalWidth && lamina.naturalHeight) {
+      escena.style.setProperty('--visor-ar', `${lamina.naturalWidth} / ${lamina.naturalHeight}`);
+    }
+  };
+  if (lamina.complete) darForma(); else lamina.addEventListener('load', darForma, { once:true });
 
   const parado = quieto();
   const saliente = capaViva;

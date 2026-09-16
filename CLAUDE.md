@@ -8,9 +8,56 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v30 — el dock, leído de la §8 del sistema y no de una descripción.**
+**v31 — el visor del teléfono: la imagen y su mando, un solo bloque.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v31 — 2026-09-16
+
+«Arregla cómo se ven las imágenes desde celular, que el HUD no interrumpa la
+vista y que se vea organizado.» Con captura suya del visor abierto, y las dos
+cosas eran ciertas.
+
+**Las flechas estaban ENCIMA del render, a media altura.** Existía desde hacía
+versiones una regla de móvil que las bajaba (`.visor-nav { bottom:1.2rem;
+top:auto }`) y **no hacía nada**: `.visor-nav.prev` lleva **dos** clases y le
+gana a `.visor-nav`, que lleva una. **No es el fallo de orden de la v27: es el
+otro, el de especificidad**, y por eso no se arregla moviendo la regla de
+sitio — hay que apagarla con dos clases.
+
+Y me pasó **dos veces en la misma tanda**: corregido `top` con dos clases,
+dejé `margin-top:0` con una, y el `margin-top:-23px` de escritorio siguió
+subiendo cada flecha 23 px, otra vez sobre la imagen. Se vio midiendo: el
+mando salía de **31 px de alto con botones de 52 dentro**, que es imposible si
+todo está en su sitio. La lección práctica: cuando una regla de escritorio
+usa dos clases, hay que apagar **todas** sus propiedades con dos clases.
+
+**Y el conjunto estaba desarmado.** Tres piezas repartidas: la imagen a media
+altura, las flechas encima de ella y el rótulo suelto mucho más abajo, partido
+en dos líneas. Medido: entre el borde de abajo de la imagen y el rótulo había
+**286 px de negro**.
+
+- **Las tres piezas del mando se agrupan en un `.visor-hud`.** En escritorio
+  ese grupo es `display:contents`, así que no existe para la maqueta y cada
+  pieza se coloca donde siempre; en el teléfono se convierte en **una fila
+  debajo de la imagen**: flecha · rótulo · flecha.
+- **La escena toma la FORMA de la imagen.** El JS le pasa su proporción real
+  (`--visor-ar`, de `naturalWidth/naturalHeight`) y la escena deja de ocupar
+  todo el alto. Así el mando queda pegado debajo sin tener que medir píxeles
+  ni saber nada de la imagen desde el CSS, y con una imagen vertical la escena
+  crece sola. El bloque —imagen y mando— se centra entero.
+- El rótulo va en una línea con recorte, y centrado en la misma banda que las
+  flechas.
+
+Medido a 390, 360 y 320 px: sin solape entre imagen y mando —imagen 281-490,
+mando 504-556 a 390—, el mando mide 52 px con las tres piezas alineadas, y el
+bloque queda centrado. En escritorio —1440, 1024 y 761— **nada cambia**: el
+grupo sigue en `display:contents`, las flechas siguen absolutas al 50 % del
+alto y el rótulo abajo. Sin errores de consola.
+
+**Sobre «lo veo igual» del dock:** el despliegue de la v30 terminó a las
+14:00:11 UTC, las 9:00 en Colombia, y la captura está sellada a las 9:00. Lo
+que se vio era la v29.
 
 ### v30 — 2026-09-16
 
@@ -935,6 +982,12 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
 - **El cartel del reel es un `<button>` con una imagen, no un `<video
   poster=…>`.** Un `<video>`, aunque no reproduzca, reserva decodificador y
   negocia el archivo.
+- **Y ANTES QUE EL ORDEN, MANDA LA ESPECIFICIDAD.** Es el otro modo de perder,
+  y pasó dos veces en la v31 con el visor: `.visor-nav.prev` lleva dos clases,
+  así que un `.visor-nav { top:auto; margin-top:0 }` de una sola clase no lo
+  apaga **por mucho que vaya después**. Cuando la regla que se quiere pisar
+  usa dos clases, hay que apagar **todas** sus propiedades con dos clases —
+  apagar solo una deja la otra puesta y el fallo se ve a medias.
 - **EN CSS, A IGUAL ESPECIFICIDAD MANDA EL ORDEN.** Se tropezó cuatro veces en
   la v27 con el mismo error: una regla escrita antes que la que quiere pisar no
   hace nada. Antes de dar por hecho que un `display:none` o un `padding` no se
