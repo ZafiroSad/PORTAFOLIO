@@ -8,9 +8,75 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v33 — el render se puede mirar de cerca.**
+**v34 — modo claro, que era la regla 4 del sistema y llevaba años sin cumplirse.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v34 — 2026-09-16
+
+Pedido suyo al elegir las mejoras. Y no es un capricho: **la regla 4 de las
+reglas de lectura del STICK UI SYSTEM dice «modo claro obligatorio en todas
+las apps de la familia»**, y el portafolio llevaba divergiendo ahí desde
+siempre.
+
+**NO ES UNA INVERSIÓN.** Un portafolio de visualización tiene una regla propia
+que manda sobre el tema —*el render es lo más brillante de la pantalla y todo
+lo demás solo lo enmarca*—, así que se aclara el armazón y **se quedan oscuros
+en los dos temas** los tres sitios donde el fondo está al servicio de una
+imagen y no de la interfaz: **el visor** (mirar una foto de cerca quiere fondo
+neutro y oscuro; es lo que hacen Lightroom y Fotos, y no por gusto), **la capa
+del reel** y **los velos de las hojas**, que no son interfaz sino un degradado
+encima de una fotografía para que el título se lea.
+
+**Primero hubo que hacer sitio.** Había **133 colores escritos a mano** fuera
+de las fichas. Se añadieron cinco tokens para los patrones que se repetían
+—`--relleno`, `--relleno-alto`, `--filo-alto`, `--halo`, `--brillo-marca`— y
+con eso el tema sale de un solo sitio en vez de regla por regla.
+
+**Cinco cosas que solo aparecieron mirando, no razonando:**
+
+1. **El vidrio del teléfono no cambiaba.** Por debajo de 900 px hay un bloque
+   que pinta `.vidrio` **a mano** —para ahorrarse el `backdrop-filter`, decisión
+   ya tomada— y por eso no pasa por los tokens: las tarjetas de Contacto, el
+   banco de la suite y el dock se quedaban gris oscuro sobre una página clara.
+   Ese bloque necesita su gemelo en claro.
+2. **LOS ICONOS DE LA SUITE SON SILUETAS BLANCAS** —`preparar-suite.py` las
+   escribe así— y sobre fondo claro **desaparecen**. Se invierten, y con ellos
+   su resplandor. Es el caso simétrico de los logos negros de software
+   (Twinmotion, ChatGPT), que se invertían para el fondo oscuro y en claro hay
+   que **dejar de** invertir.
+3. **El velo de la portada iba siempre hacia la sombra**, así que en claro
+   dejaba el titular oscuro sobre un render oscuro. Ahora vela **hacia el
+   tema**: oscurece en oscuro, aclara en claro. Y su último 1 % ya usaba
+   `--base`, así que el borde de abajo cambiaba de tema y el resto no.
+4. **La píldora del dock.** El sistema **espeja la rampa entera** en claro
+   —`--color-white` pasa a ser oscuro—, así que allí la píldora es oscura con
+   el icono blanco. Aquí eso se consigue con `--contratinta` y
+   `--dock-apagado`; con los valores fijos anteriores el icono activo quedaba
+   negro sobre píldora negra.
+5. **El disco del tema se pegaba al borde izquierdo.** `right:var(--margen)`
+   no bastaba porque el bloque de 760 px devuelve `width:calc(100% - 1.4rem)`
+   **después**, y la barra volvía a ocupar el ancho entero. Medido: acababa a
+   334 px del borde derecho de una pantalla de 390. **El fallo de orden, otra
+   vez.**
+
+**Dónde vive el conmutador.** En escritorio, al final de la barra: es el único
+control que no lleva a ninguna parte. En el teléfono **la barra se queda
+reducida a ese disco** —no cabe en el dock, que es solo navegación y ya son
+seis secciones—, que es el patrón de la §6 del sistema para cuando no hay
+header donde vivir. La clase la pone un script **en el `head`**, antes del
+primer pintado: decidido al final, la página se vería oscura y se aclararía de
+golpe. Recuerda la elección y, si nunca se eligió, hace caso al sistema.
+
+**Un peaje que conviene saber:** en claro el velo de la portada lava bastante
+el render de abajo, que es donde cae el titular. Es el precio de que un texto
+oscuro se lea sobre una fotografía; si molesta, la salida es un titular blanco
+con velo oscuro también en claro, y decirlo.
+
+Comprobado en los dos temas, a 390 px con DPR 2 y en escritorio a 1440,
+recorriendo la página entera, abriendo un proyecto, el visor y el zoom:
+**ninguna petición falla, ninguna imagen queda rota, sin desbordamiento
+horizontal y sin errores de consola.**
 
 ### v33 — 2026-09-16
 
@@ -973,6 +1039,19 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
 
 ## Decisiones tomadas
 
+- **EL TEMA SE DECIDE ANTES DEL PRIMER PINTADO**, en un script del `head`, y
+  no con el resto del JS: al final del archivo la página se vería oscura y se
+  aclararía de golpe. Y **el modo claro no es una inversión**: el visor, la
+  capa del reel y los velos de las hojas se quedan oscuros en los dos temas,
+  porque ahí el fondo está al servicio de una fotografía y no de la interfaz.
+  Lo que decide no es el tema sino la regla de la casa: el render es lo más
+  brillante de la pantalla.
+- **OJO CON LAS DOS COSAS QUE NO PASAN POR LOS TOKENS.** El bloque de
+  `@media (max-width:900px)` pinta el vidrio **a mano** para ahorrarse el
+  `backdrop-filter`, así que necesita su gemelo en claro o el teléfono se
+  queda en oscuro a medias. Y los **iconos de la suite son siluetas blancas**:
+  sobre fondo claro desaparecen y hay que invertirlos — igual que los logos
+  negros de software hay que **dejar** de invertirlos.
 - **SE PUBLICA EN `main` CADA VEZ, sin esperar revisión.** Decidido por el
   Señor Stick el 2026-09-16: «siempre que hagas algo quiero que publiques para
   checar». Hasta entonces el trabajo se dejaba en la rama

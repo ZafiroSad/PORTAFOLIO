@@ -108,22 +108,46 @@
   --linea:        rgba(255,255,255,.10);
   --linea-fuerte: rgba(255,255,255,.26);
 
+  /* Los tres rellenos que se repetian escritos a mano por todo el archivo:
+     el de una superficie en reposo, el de la misma al señalarla, y el filo
+     claro de arriba. Tenerlos aqui es lo que permite que exista el modo
+     claro sin ir regla por regla. */
+  --relleno:      var(--relleno);
+  --relleno-alto: var(--relleno-alto);
+  --filo-alto:    var(--filo-alto);
+  --sombra-honda: rgba(0,0,0,.55);
+  /* Resplandores: en claro no pueden ser blancos o no existen. */
+  --halo:         rgba(255,255,255,.25);
+  --brillo-marca: rgba(255,255,255,.45);
+  --barrido:      rgba(255,255,255,.9);
+  /* El sistema espeja la rampa entera en claro: alli `--color-white` pasa a
+     ser oscuro, asi que la pildora del dock queda oscura con el icono
+     blanco. Aqui se consigue con estos dos. */
+  --contratinta:  #09090b;
+  --dock-apagado: #a1a1aa;
+  --velo-portada: linear-gradient(to top, var(--base) 1%, rgba(11,12,16,.74) 30%,
+                  rgba(11,12,16,.16) 62%, rgba(11,12,16,.48) 100%);
+
   /* --- Vidrio liquido --- */
   --v-fondo: linear-gradient(148deg,
               rgba(255,255,255,.085) 0%,
               rgba(255,255,255,.028) 44%,
-              rgba(255,255,255,.055) 100%);
+              var(--relleno) 100%);
   --v-borde: rgba(255,255,255,.11);
   --v-blur:  blur(16px) saturate(175%);   /* 26px se veia igual y costaba el doble */
-  --v-filo:  inset 0 1px 0 rgba(255,255,255,.18),
-             inset 0 -1px 0 rgba(255,255,255,.045),
-             inset 1px 0 0 rgba(255,255,255,.05),
-             inset -1px 0 0 rgba(255,255,255,.05);
+  --v-filo:  inset 0 1px 0 var(--filo-alto),
+             inset 0 -1px 0 var(--relleno),
+             inset 1px 0 0 var(--relleno),
+             inset -1px 0 0 var(--relleno);
   --v-sombra: 0 22px 60px -26px rgba(0,0,0,.85);
 
   /* Tinte del proyecto abierto: el color dominante de su render
      empuja el campo del fondo, muy por debajo del umbral de lectura */
   --th:210; --ts:16%;
+
+  --campo-luz: rgba(196,204,220,.07);
+  --campo-pie: #101116;
+  --masa-op: .55;
 
   --margen: clamp(1.25rem, 4vw, 4.5rem);
   --barra: 60px;
@@ -137,6 +161,94 @@
   --mono: ui-monospace, "Cascadia Code", "Fira Code", "JetBrains Mono",
           Consolas, monospace;
 }
+
+/* =================================================================
+   MODO CLARO
+
+   Regla 4 del STICK UI SYSTEM: «Modo claro obligatorio en todas las apps de
+   la familia». El portafolio llevaba divergiendo ahi desde siempre.
+
+   NO ES UNA INVERSION. Un portafolio de visualizacion tiene una regla propia
+   que manda sobre el tema: EL RENDER ES LO MAS BRILLANTE DE LA PANTALLA y
+   todo lo demas solo lo enmarca. Por eso aqui se aclara el armazon —campo,
+   vidrio, texto, lineas, tarjetas— y se quedan OSCUROS en los dos temas tres
+   sitios donde el fondo esta al servicio de una imagen y no de la interfaz:
+
+     · el visor, porque mirar una foto de cerca quiere fondo neutro y oscuro
+       —es lo que hacen Lightroom y Fotos, y no por gusto: un marco claro le
+       roba contraste al render;
+     · la capa del reel, por lo mismo;
+     · los velos de las hojas de la vitrina, que no son interfaz sino un
+       degradado ENCIMA de una fotografia para que el titulo se lea.
+
+   Todo lo demas sale de los tokens, que es justo para lo que estan.
+   ================================================================= */
+:root.claro {
+  --base:   #eef0f4;
+  --base-2: #fafbfd;
+  --tinta:  #15161b;
+  --n-200:  #2b2d35;
+  --tenue:  #5a5e6a;
+  --debil:  #8b8f99;
+
+  --linea:        rgba(21,22,27,.12);
+  --linea-fuerte: rgba(21,22,27,.32);
+
+  --relleno:      rgba(21,22,27,.045);
+  --relleno-alto: rgba(21,22,27,.10);
+  /* El filo de arriba sigue siendo BLANCO, no oscuro: es un reflejo de luz,
+     y la luz no cambia de color porque el fondo sea claro. */
+  --filo-alto:    rgba(255,255,255,.95);
+  --sombra-honda: rgba(21,22,27,.18);
+
+  --v-fondo: linear-gradient(148deg,
+              rgba(255,255,255,.80) 0%,
+              rgba(255,255,255,.62) 44%,
+              rgba(255,255,255,.74) 100%);
+  --v-borde: rgba(21,22,27,.10);
+  --v-filo:  inset 0 1px 0 rgba(255,255,255,.95),
+             inset 0 -1px 0 rgba(21,22,27,.05),
+             inset 1px 0 0 rgba(255,255,255,.6),
+             inset -1px 0 0 rgba(255,255,255,.6);
+  --v-sombra: 0 22px 60px -30px rgba(21,22,27,.28);
+
+  --campo-luz: rgba(255,255,255,.75);
+  --campo-pie: #e4e7ee;
+  /* Las masas de luz, mas tenues: sobre claro, al 55 % se leen como manchas. */
+  --masa-op: .30;
+  --ts: 10%;
+  --halo:         rgba(21,22,27,.14);
+  --brillo-marca: rgba(21,22,27,.35);
+  --barrido:      rgba(21,22,27,.75);
+  --contratinta:  #ffffff;
+  --dock-apagado: #4b505d;
+  --velo-portada: linear-gradient(to top, var(--base) 2%, rgba(238,240,244,.86) 30%,
+                  rgba(238,240,244,.14) 62%, rgba(238,240,244,.52) 100%);
+}
+/* El grano es ruido blanco: sobre fondo claro se ve sucio. */
+:root.claro .grano { opacity:.02; }
+/* Los logos negros (Twinmotion, ChatGPT) se invierten para que se lean sobre
+   el fondo oscuro. Sobre fondo claro esa inversion los vuelve blancos e
+   invisibles: aqui se deshace y vuelven a su color, que es el correcto. */
+:root.claro .util.negativo img,
+:root.claro .util.negativo:hover img { filter:none; }
+/* Las miniaturas del archivo se oscurecian para que el texto blanco encima
+   se leyera. En claro ese texto sigue siendo blanco sobre la foto —es un
+   velo sobre imagen, no interfaz—, asi que solo se suaviza el apagado. */
+:root.claro .tarjeta-marco img { filter:brightness(.92) saturate(.95); }
+
+/* LOS ICONOS DE LA SUITE SON SILUETAS BLANCAS —`preparar-suite.py` las
+   escribe asi, blanco sobre transparente— y sobre fondo claro desaparecen.
+   Se invierten, y con ellos su resplandor, que tambien era blanco. Es el
+   mismo caso que los logos negros de software, al reves. */
+:root.claro .tecla .ic img,
+:root.claro .tecla[aria-selected="true"] .ic img,
+:root.claro .banco-marca img,
+/* `.banco-fondo` ES la imagen, no un contenedor, y lleva su propio desenfoque
+   que hay que conservar al invertirla. */
+:root.claro .banco-fondo { filter:invert(1) blur(.3px); }
+:root.claro .tecla[aria-selected="true"] .ic img { filter:invert(1) drop-shadow(0 0 10px rgba(21,22,27,.35)); }
+:root.claro .banco-marca img { filter:invert(1) drop-shadow(0 0 22px rgba(21,22,27,.18)); }
 
 * { margin:0; padding:0; box-sizing:border-box; }
 /* `manipulation` retira el zoom por doble toque —el que se dispara sin
@@ -175,13 +287,13 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 .campo { position:fixed; inset:-420px 0; z-index:0; pointer-events:none; overflow:hidden;
   will-change:transform;
   background:
-    radial-gradient(130% 85% at 50% -12%, rgba(196,204,220,.07), transparent 62%),
-    linear-gradient(180deg, var(--base-2) 0%, var(--base) 48%, #101116 100%); }
+    radial-gradient(130% 85% at 50% -12%, var(--campo-luz), transparent 62%),
+    linear-gradient(180deg, var(--base-2) 0%, var(--base) 48%, var(--campo-pie) 100%); }
 
 /* SOLO se anima translate. Animar `scale` obliga a rasterizar de nuevo
    el desenfoque en cada cuadro — es lo que hundia los fotogramas por
    segundo; moviendo la capa ya rasterizada el coste es casi cero. */
-.masa { position:absolute; border-radius:50%; filter:blur(72px); opacity:.55;
+.masa { position:absolute; border-radius:50%; filter:blur(72px); opacity:var(--masa-op);
   will-change:transform; contain:strict; }
 .m1 { width:66vmax; height:66vmax; left:-20vmax; top:-16vmax;
       background:radial-gradient(circle, hsl(214 22% 62% / .30), transparent 68%);
@@ -234,7 +346,7 @@ body.bloqueado .masa { animation-play-state:paused; }
 .vidrio::after {
   content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
   background:radial-gradient(220px circle at var(--mx,50%) var(--my,0%),
-             rgba(255,255,255,.16), transparent 62%);
+             var(--filo-alto), transparent 62%);
   opacity:0; transition:opacity .55s var(--suave); z-index:-1;
 }
 .vidrio:hover::after { opacity:1; }
@@ -271,13 +383,13 @@ body.bloqueado .masa { animation-play-state:paused; }
 .marca:hover .iso { transform:translateX(2px); }
 @keyframes latirIso {
   0%,100% { filter:drop-shadow(0 0 0 rgba(255,255,255,0)) }
-  50%     { filter:drop-shadow(0 0 6px rgba(255,255,255,.45)) } }
+  50%     { filter:drop-shadow(0 0 6px var(--brillo-marca)) } }
 
 /* El indicador liquido se desliza bajo el enlace activo en vez de que
    cada enlace pinte su propia caja: es un solo objeto que viaja. */
 .menu { position:relative; display:flex; gap:.1rem; padding:.25rem; border-radius:999px; }
 .menu .gota { position:absolute; top:.25rem; bottom:.25rem; left:0; width:0; border-radius:999px;
-  background:rgba(255,255,255,.12); box-shadow:inset 0 1px 0 rgba(255,255,255,.22);
+  background:var(--relleno-alto); box-shadow:inset 0 1px 0 var(--filo-alto);
   transition:transform .55s var(--salida), width .55s var(--salida), opacity .4s;
   opacity:0; pointer-events:none; }
 .menu.viva .gota { opacity:1; }
@@ -290,6 +402,19 @@ body.bloqueado .masa { animation-play-state:paused; }
 }
 .menu a:hover { color:var(--tinta); }
 .menu a.activo { color:var(--tinta); }
+/* El conmutador de tema. Es el unico control de la barra que no lleva a
+   ninguna parte, asi que va al final, separado del menu por su propio aire. */
+.tema {
+  flex:none; width:34px; height:34px; margin-left:.35rem; border-radius:50%;
+  display:grid; place-items:center; color:var(--tenue);
+  background:var(--relleno); border:1px solid var(--linea);
+  box-shadow:inset 0 1px 0 var(--filo-alto);
+  transition:color .3s var(--suave), background .3s var(--suave),
+             transform .5s var(--resorte); }
+.tema svg { width:15px; height:15px; display:block; }
+@media (hover:hover){ .tema:hover { color:var(--tinta); background:var(--relleno-alto); transform:rotate(-18deg); } }
+.tema:active { transform:scale(.94); }
+
 /* ============ EN EL TELEFONO NO HAY BARRA ARRIBA ================
    MEDIDO A 390 px: la barra de arriba mide 353 y el menu necesita 368 con
    sus seis entradas, asi que CONTACTO se salia por el borde. No se vio
@@ -304,8 +429,14 @@ body.bloqueado .masa { animation-play-state:paused; }
    pie y Sobre mi.
    ================================================================= */
 @media (max-width:700px){
-  .barra { display:none; }
-  .menu  { display:none; }
+  /* La barra no desaparece del todo: se queda reducida al conmutador de
+     tema, que tiene que poder alcanzarse desde cualquier pantalla y no cabe
+     en el dock —ahi solo va navegacion, y son seis secciones ya—. Es el mismo
+     patron que la §6 del sistema usa cuando no hay header donde vivir: un
+     disco flotante y nada mas.
+     Se apaga TODO lo que la hacia una barra —el vidrio, el filo, la sombra,
+     el reflejo— o seria una barra de un solo boton. */
+  .barra .marca, .menu { display:none; }
 }
 
 /* ============ EL DOCK — §8 DEL STICK UI SYSTEM ==================
@@ -336,6 +467,15 @@ body.bloqueado .masa { animation-play-state:paused; }
     inset 0 -1px 0 rgba(0, 0, 0, 0.20),
     0 16px 48px rgba(0, 0, 0, 0.55),
     0  4px 16px rgba(0, 0, 0, 0.30);
+}
+/* Valores canonicos del modo claro, copiados de `nucleo/index.css`. */
+:root.claro .glass-dock {
+  background: rgba(255, 255, 255, 0.80);
+  border-color: rgba(21, 22, 27, 0.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 16px 40px rgba(21, 22, 27, 0.14),
+    0  4px 14px rgba(21, 22, 27, 0.08);
 }
 
 .fono-nav {
@@ -381,13 +521,13 @@ body.bloqueado .fono-nav {
   position:relative; z-index:10;
   display:flex; align-items:center; justify-content:center;
   padding:10px; border-radius:999px;
-  color:#a1a1aa; text-decoration:none;
+  color:var(--dock-apagado); text-decoration:none;
   transition:color 150ms var(--suave); }
 /* Icono de 16 px y trazo 2.4 FIJO EN AMBOS ESTADOS: el contraste lo da el
    color, no el grosor. */
 .fono-nav svg { width:16px; height:16px; display:block; stroke-width:2.4; }
 /* Activo: tinta OSCURA sobre la pildora blanca. */
-.fono-nav a.activo { color:#09090b; }
+.fono-nav a.activo { color:var(--contratinta); }
 
 
 .avance { position:fixed; top:0; left:0; right:0; height:1.5px; z-index:121;
@@ -487,7 +627,7 @@ body.bloqueado .fono-nav {
 .titular { position:relative; }
 .titular::after {
   content:attr(data-texto); position:absolute; inset:0; pointer-events:none;
-  background:linear-gradient(100deg, transparent 40%, rgba(255,255,255,.9) 50%, transparent 60%);
+  background:linear-gradient(100deg, transparent 40%, var(--barrido) 50%, transparent 60%);
   background-size:300% 100%; background-position:130% 0;
   -webkit-background-clip:text; background-clip:text; color:transparent;
   animation:barrerLuz 2.4s var(--suave) 4.3s;
@@ -570,9 +710,13 @@ body.bloqueado .fono-nav {
 @keyframes asentar { to { transform:scale(1.06); opacity:1 } }
 /* Degradado que apaga la parte baja para que el texto se lea sin
    recuadros, y funde el render con el campo por el borde inferior */
-.lamina::after { content:''; position:absolute; inset:0;
-  background:linear-gradient(to top, var(--base) 1%, rgba(11,12,16,.74) 30%,
-             rgba(11,12,16,.16) 62%, rgba(11,12,16,.48) 100%); }
+/* EL VELO DE LA PORTADA VA HACIA EL TEMA, no siempre hacia la sombra. En
+   oscuro oscurece la foto para que el titular blanco se lea; en claro la
+   aclara, porque ahi el titular es oscuro. Velar siempre hacia la sombra
+   dejaba, en claro, letra oscura sobre un render oscuro — y encima el ultimo
+   1 % se aclaraba igual (usa `--base`), asi que el borde de abajo cambiaba de
+   tema y el resto no. */
+.lamina::after { content:''; position:absolute; inset:0; background:var(--velo-portada); }
 
 .inicio-texto { position:relative; z-index:2;
   display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:clamp(1.5rem,4vw,4rem);
@@ -790,7 +934,7 @@ body.bloqueado .fono-nav {
 .btn-todos:active { transform:translateY(-1px) scale(.985); }
 .btn-todos .cuenta { font-family:var(--mono); font-size:.62rem; letter-spacing:.16em; color:var(--debil); }
 .btn-todos .disco { width:30px; height:30px; border-radius:50%; display:grid; place-items:center;
-  background:rgba(255,255,255,.1); box-shadow:inset 0 1px 0 rgba(255,255,255,.24);
+  background:var(--linea); box-shadow:inset 0 1px 0 var(--filo-alto);
   transition:background .4s, transform .6s var(--salida); }
 .btn-todos:hover .disco { background:var(--tinta); transform:rotate(45deg); }
 .btn-todos .disco svg { transition:stroke .4s; }
@@ -901,7 +1045,7 @@ body.bloqueado .fono-nav {
 .partes span { font-family:var(--mono); font-size:.55rem; letter-spacing:.13em;
   text-transform:uppercase; color:var(--tenue);
   padding:.42rem .68rem; border-radius:999px;
-  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); }
+  background:var(--relleno); border:1px solid var(--linea); }
 /* Al cambiar de app el contenido entra, no aparece de golpe. */
 .banco-marca, .banco-texto { animation:entraBanco .55s var(--salida) both; }
 @keyframes entraBanco { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:none } }
@@ -928,8 +1072,8 @@ body.bloqueado .fono-nav {
 .tecla:hover .ic img, .tecla:focus-visible .ic img { opacity:.85; }
 .tecla:hover .ic i, .tecla:focus-visible .ic i { opacity:.8; }
 .tecla:hover b, .tecla:focus-visible b { color:var(--tenue); }
-.tecla[aria-selected="true"] { background:rgba(255,255,255,.055);
-  border-color:rgba(255,255,255,.14); }
+.tecla[aria-selected="true"] { background:var(--relleno);
+  border-color:var(--linea); }
 .tecla[aria-selected="true"] .ic img { opacity:1;
   filter:drop-shadow(0 0 13px rgba(255,255,255,.5)); }
 .tecla[aria-selected="true"] .ic i { opacity:1; }
@@ -1053,7 +1197,7 @@ body.bloqueado .fono-nav {
 .hito h4 { font-size:1rem; font-weight:500; margin:.15rem 0 .2rem; letter-spacing:-.01em; line-height:1.25; }
 .hito p { font-size:.81rem; line-height:1.5; color:var(--tenue); margin:0; max-width:44ch; }
 .hito .marca-estado { font-family:var(--mono); font-size:.52rem; letter-spacing:.16em; text-transform:uppercase;
-  color:var(--n-200); background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.08);
+  color:var(--n-200); background:var(--linea); border:1px solid var(--linea);
   border-radius:999px; padding:.2rem .55rem; margin-left:.6rem;
   vertical-align:middle; white-space:nowrap; }
 /* El hito del centro no solo es el mas grande: es el que tiene luz.
@@ -1065,7 +1209,7 @@ body.bloqueado .fono-nav {
 .hito.foco .escudo img { filter:drop-shadow(0 4px 16px rgba(0,0,0,.7)) brightness(1.1); }
 .hito.foco .escudo { color:var(--tenue); }
 .hito.foco .anio { color:var(--tenue); }
-.hito.foco h4 { text-shadow:0 0 26px rgba(255,255,255,.25); }
+.hito.foco h4 { text-shadow:0 0 26px var(--halo); }
 
 /* ============ CONTACTO ======================================== */
 /* Toda la seccion se centra, cabecera incluida: el titulo alineado a
@@ -1103,7 +1247,7 @@ body.bloqueado .fono-nav {
 .enlace .icono { width:52px; height:52px; border-radius:17px; display:grid; place-items:center;
   color:rgb(var(--c));
   background:rgba(var(--c),.13); border:1px solid rgba(var(--c),.22);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+  box-shadow:inset 0 1px 0 var(--filo-alto);
   transition:transform .6s var(--resorte), background .45s, color .45s, border-color .45s; }
 .enlace:hover .icono { transform:translateY(-2px) scale(1.08);
   background:rgb(var(--c)); border-color:rgb(var(--c)); color:#0d0e12; }
@@ -1131,7 +1275,7 @@ body.bloqueado .fono-nav {
   background:
     radial-gradient(120% 68% at 12% 0%,   hsl(214 22% 62% / .16), transparent 64%),
     radial-gradient(110% 62% at 88% 100%, hsl(32 30% 64% / .12),  transparent 64%),
-    linear-gradient(180deg, var(--base-2) 0%, var(--base) 52%, #101116 100%);
+    linear-gradient(180deg, var(--base-2) 0%, var(--base) 52%, var(--campo-pie) 100%);
   overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain;
   opacity:0; visibility:hidden;
   transition:opacity .5s var(--suave), visibility .5s, background .9s var(--suave); }
@@ -1177,9 +1321,9 @@ body.bloqueado .fono-nav {
 #ficha-compartir #ficha-compartir-texto { white-space:nowrap; }
 .ficha-cerrar { display:flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.58rem;
   letter-spacing:.2em; text-transform:uppercase; color:var(--tenue); padding:.5rem .95rem;
-  border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+  border-radius:999px; background:var(--relleno); border:1px solid var(--linea);
   transition:color .3s var(--suave), background .3s var(--suave), border-color .3s; }
-.ficha-cerrar:hover { color:var(--tinta); background:rgba(255,255,255,.13); border-color:var(--linea-fuerte); }
+.ficha-cerrar:hover { color:var(--tinta); background:var(--relleno-alto); border-color:var(--linea-fuerte); }
 .ficha-cerrar .aspa { position:relative; width:10px; height:10px; }
 .ficha-cerrar .aspa::before, .ficha-cerrar .aspa::after { content:''; position:absolute; top:50%; left:0;
   width:100%; height:1px; background:currentColor; }
@@ -1216,7 +1360,7 @@ body.bloqueado .fono-nav {
 .pin { position:relative; flex:none; width:11px; height:11px; border-radius:50%;
   background:var(--tinta); box-shadow:0 0 14px rgba(255,255,255,.55); }
 .pin::after { content:''; position:absolute; inset:0; border-radius:50%;
-  border:1px solid rgba(255,255,255,.5); animation:latidoPin 2.6s var(--suave) infinite; }
+  border:1px solid var(--linea-fuerte); animation:latidoPin 2.6s var(--suave) infinite; }
 @keyframes latidoPin {
   0%   { transform:scale(1);   opacity:.65 }
   70%  { transform:scale(3.4); opacity:0 }
@@ -1237,7 +1381,7 @@ body.bloqueado .fono-nav {
 .conteo .aro { position:relative; width:60px; height:60px; flex:none; }
 .conteo .aro svg { width:100%; height:100%; transform:rotate(-90deg); }
 .conteo .aro circle { fill:none; stroke-width:1.5; }
-.conteo .aro .pista { stroke:rgba(255,255,255,.1); }
+.conteo .aro .pista { stroke:var(--linea); }
 .conteo .aro .arco  { stroke:var(--tinta); stroke-linecap:round;
   transition:stroke-dashoffset .35s var(--suave); }
 .conteo .cifra { position:absolute; inset:0; display:grid; place-items:center;
@@ -1258,7 +1402,7 @@ body.bloqueado .fono-nav {
   padding:0 clamp(.5rem,1vw,.9rem); }
 .galeria .fila { display:flex; gap:clamp(.5rem,1vw,.9rem); }
 .galeria figure { position:relative; overflow:hidden; cursor:pointer; flex:1 1 0; min-width:0;
-  border-radius:4px; background:rgba(255,255,255,.03);
+  border-radius:4px; background:var(--relleno);
   clip-path:inset(12% 0 12% 0); opacity:0;
   transition:clip-path 1.15s var(--salida), opacity .8s var(--suave); }
 .galeria .fila.doble figure { height:clamp(260px,42vh,520px); }
@@ -1344,7 +1488,7 @@ body.bloqueado .fono-nav {
   background:
     radial-gradient(120% 62% at 18% 0%,   hsl(214 22% 62% / .16), transparent 64%),
     radial-gradient(110% 58% at 86% 100%, hsl(32 30% 64% / .12),  transparent 64%),
-    linear-gradient(180deg, var(--base-2) 0%, var(--base) 52%, #101116 100%);
+    linear-gradient(180deg, var(--base-2) 0%, var(--base) 52%, var(--campo-pie) 100%);
   overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain;
   opacity:0; visibility:hidden; transition:opacity .45s var(--suave), visibility .45s; }
 .indice-capa { transform:translateY(1.8%) scale(.988);
@@ -1357,9 +1501,9 @@ body.bloqueado .fono-nav {
   padding:calc(52px + clamp(1.4rem,4vh,2.4rem)) var(--margen) 1.2rem; }
 .filtro { font-family:var(--mono); font-size:.58rem; letter-spacing:.16em; text-transform:uppercase;
   color:var(--debil); padding:.55rem 1.05rem; border-radius:999px;
-  background:rgba(255,255,255,.04); border:1px solid var(--linea);
+  background:var(--relleno); border:1px solid var(--linea);
   transition:color .3s var(--suave), border-color .3s var(--suave), background .3s var(--suave); }
-.filtro:hover { color:var(--tenue); border-color:var(--linea-fuerte); background:rgba(255,255,255,.08); }
+.filtro:hover { color:var(--tenue); border-color:var(--linea-fuerte); background:var(--linea); }
 .filtro.activo { color:var(--base); background:var(--tinta); border-color:var(--tinta); }
 .filtro .n { opacity:.5; margin-left:.45rem; }
 
@@ -1373,8 +1517,8 @@ body.bloqueado .fono-nav {
 .tarjeta.oculta { display:none; }
 
 .tarjeta-marco { position:relative; aspect-ratio:16/10; overflow:hidden; border-radius:16px;
-  background:rgba(255,255,255,.03); border:1px solid var(--linea);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.1); }
+  background:var(--relleno); border:1px solid var(--linea);
+  box-shadow:inset 0 1px 0 var(--linea); }
 .tarjeta-marco img { width:100%; height:106%; object-fit:cover;
   transition:transform 1.2s var(--salida), filter .6s var(--suave); filter:brightness(.76) saturate(.88); }
 .tarjeta:hover .tarjeta-marco img { transform:scale(1.05); filter:brightness(1) saturate(1); }
@@ -1472,6 +1616,19 @@ body.bloqueado .fono-nav {
   .visor-cerrar, .visor-nav, .visor-pie { background:rgba(30,32,40,.9); }
   .tarjeta .sello { background:rgba(16,17,22,.88); }
   .masa { filter:blur(56px); }
+
+  /* EL MISMO RESPALDO, EN CLARO. Sin esto el modo claro se rompe justo en el
+     telefono: estas reglas pintan el vidrio A MANO —para ahorrarse el
+     `backdrop-filter`— y por eso no pasan por los tokens, asi que las
+     tarjetas de Contacto, el banco de la suite y el dock se quedaban grises
+     oscuros sobre una pagina clara.
+     El visor y el sello NO estan aqui a proposito: el visor se queda oscuro
+     en los dos temas, y el sello va encima de una fotografia. */
+  :root.claro .vidrio {
+    background:linear-gradient(148deg, rgba(255,255,255,.93), rgba(255,255,255,.86) 44%, rgba(255,255,255,.91)); }
+  :root.claro .barra       { background:rgba(255,255,255,.92); }
+  :root.claro .ficha-barra { background:rgba(250,251,253,.92); }
+  :root.claro .glass-dock  { background:rgba(255,255,255,.96); }
 }
 
 /* =================================================================
@@ -1672,6 +1829,29 @@ body.bloqueado .fono-nav {
      `.inicio-texto` no necesita holgura por lo mismo. */
   .baja { display:none; }
 
+  /* LA BARRA SE QUEDA REDUCIDA AL CONMUTADOR DE TEMA. Tiene que poder
+     alcanzarse desde cualquier pantalla y no cabe en el dock —ahi solo va
+     navegacion, y son seis secciones—. Es el patron de la §6 del sistema
+     para cuando no hay header donde vivir: un disco flotante y nada mas.
+     Se apaga todo lo que la hacia una barra o seria una barra de un boton.
+
+     VA AQUI, DESPUES DEL BLOQUE DE 760 px, y no con las demas reglas del
+     telefono: alli el `width:calc(100% - 1.4rem)` del bloque de 760 le ganaba
+     por orden y la barra seguia ocupando el ancho entero, con lo que el disco
+     se pegaba al borde IZQUIERDO. Medido: acababa a 334 px del borde derecho
+     de una pantalla de 390. */
+  .barra {
+    width:auto; height:auto; padding:0; left:auto; transform:none;
+    top:calc(.75rem + env(safe-area-inset-top, 0px));
+    right:var(--margen);
+    background:none; border:none; box-shadow:none;
+    backdrop-filter:none; -webkit-backdrop-filter:none; }
+  .barra::after { display:none; }
+  .barra.compacta { opacity:1; transform:none; }
+  .tema { margin-left:0; width:38px; height:38px;
+          background:var(--v-fondo); border:1px solid var(--v-borde);
+          box-shadow:var(--v-filo), 0 8px 24px -12px var(--sombra-honda); }
+
   /* El hueco que reserva el dock: `pb-28` del sistema. */
   .seccion-cuerpo { padding-bottom:calc(7rem + env(safe-area-inset-bottom, 0px)); }
 }
@@ -1696,6 +1876,20 @@ body.bloqueado .fono-nav {
   .hito { transform:none !important; opacity:1 !important; }
 }
 </style>
+<script>
+/* Va aqui, en el `head`, y no con el resto del JS: decidir el tema despues
+   del primer pintado significa ver la pagina en oscuro y que se aclare de
+   golpe. Lee lo que se eligio la ultima vez y, si nunca se eligio, lo que
+   pida el sistema. */
+(function () {
+  try {
+    var g = localStorage.getItem('stick-tema');
+    var claro = g ? g === 'claro'
+                  : matchMedia('(prefers-color-scheme: light)').matches;
+    if (claro) document.documentElement.classList.add('claro');
+  } catch (e) { /* sin almacenamiento: se queda en oscuro, que es el de casa */ }
+})();
+</script>
 </head>
 <body>
 
@@ -1723,6 +1917,9 @@ body.bloqueado .fono-nav {
     <a href="#suite">Suite</a>
     <a href="#contacto">Contacto</a>
   </nav>
+  <!-- El unico control que no es navegacion. En el telefono la barra se
+       queda reducida a este disco. -->
+  <button class="tema" id="tema" type="button"></button>
 </header>
 
 <!-- La navegacion del telefono. Se escribe desde el JS a partir de los
@@ -2332,6 +2529,42 @@ document.getElementById('fono-nav').innerHTML =
            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${DIBUJOS[href] || ''}</svg>
     </a>`;
   }).join('');
+
+/* =================================================================
+   EL TEMA
+
+   Regla 4 del STICK UI SYSTEM: modo claro obligatorio en la familia. La
+   clase la pone un script del `head` antes del primer pintado; aqui solo
+   vive el boton que la cambia y lo que hay que recordar.
+   ================================================================= */
+const btnTema = document.getElementById('tema');
+const SOL  = '<circle cx="12" cy="12" r="4.1"/><path d="M12 2.7v2.1M12 19.2v2.1M4.6 4.6l1.5 1.5'
+           + 'M17.9 17.9l1.5 1.5M2.7 12h2.1M19.2 12h2.1M4.6 19.4l1.5-1.5M17.9 6.1l1.5-1.5"/>';
+const LUNA = '<path d="M20.4 13.5A8 8 0 0 1 10.5 3.6 8.2 8.2 0 1 0 20.4 13.5z"/>';
+
+function pintarTema() {
+  const claro = document.documentElement.classList.contains('claro');
+  /* El icono dice A DONDE LLEVA, no donde se esta: en oscuro se ofrece el
+     sol. Al reves, la mitad de la gente lo lee como un indicador y no como
+     un boton. */
+  btnTema.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"
+      aria-hidden="true">${claro ? LUNA : SOL}</svg>`;
+  const rotulo = claro ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro';
+  btnTema.setAttribute('aria-label', rotulo);
+  btnTema.title = rotulo;
+  /* La barra del sistema del telefono va a juego, o queda un borde negro
+     sobre una pagina clara. */
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', claro ? '#eef0f4' : '#15161b');
+}
+btnTema.addEventListener('click', () => {
+  document.documentElement.classList.toggle('claro');
+  try { localStorage.setItem('stick-tema',
+        document.documentElement.classList.contains('claro') ? 'claro' : 'oscuro'); } catch (e) {}
+  pintarTema();
+});
+pintarTema();
 
 /* =================================================================
    VIDRIO — el reflejo sigue al cursor
