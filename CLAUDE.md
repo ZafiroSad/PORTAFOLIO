@@ -8,9 +8,52 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v28 — en el teléfono no hay barra arriba, y el dock es el de la familia.**
+**v29 — el dock deja de ser una ventana.**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v29 — 2026-09-16
+
+«Sigue.» Se recorrió el teléfono pantalla por pantalla —ocho capturas a 390 px,
+la página entera— en vez de mirar solo el dock, y salió un fallo que la v28 no
+podía ver midiendo holguras.
+
+**EL PÁRRAFO DE SOBRE MÍ SE LEÍA A TRAVÉS DEL DOCK.** La v28 comprobó que nada
+quedara debajo del vidrio **al final de cada sección**, y eso era cierto. Lo
+que no cubre esa medición es el desplazamiento: mientras se lee, TODO el
+contenido pasa por debajo. Y el dock es transparente.
+
+La causa, medida y no supuesta: `.vidrio` va a **.82-.86 de opacidad** y en
+móvil el `backdrop-filter` **está apagado a propósito** —decisión ya tomada:
+en gama media obliga a recomponer lo de debajo en cada cuadro—. Sin
+desenfoque, ese 14-18 % restante deja pasar texto claro sobre fondo oscuro
+perfectamente legible. Sobre un render claro pasaba lo simétrico: los iconos
+en `--debil` perdían contraste.
+
+**El dock es la única superficie del sitio que flota PERMANENTEMENTE sobre
+contenido vivo.** Un panel quieto puede permitirse ser una ventana; este no.
+Sube a .96-.97 de pintura y conserva el filo especular, el borde y el
+degradado, que es lo que lo hace vidrio.
+
+**No se arregla devolviéndole el `backdrop-filter`**, que era la tentación: es
+justo el peor elemento al que devolvérselo, porque está en pantalla durante
+todo el desplazamiento. Subir la pintura no cuesta nada.
+
+Medido con el píxel, en las franjas del dock donde no hay icono, contra un
+fondo vacío como suelo:
+
+| sobre el párrafo de Sobre mí | media | sangrado |
+|---|---|---|
+| antes | 37,41 | **+6,66** |
+| ahora | 31,09 | **+0,34** |
+
+Y las tres situaciones —fondo vacío, texto y render claro— dan ahora el mismo
+número (30,8 / 31,1 / 30,9): el dock se lee igual tenga lo que tenga detrás,
+que es lo que se buscaba.
+
+Comprobado sin regresión a 390, 360, 320, 700 y 701 px y en escritorio a 1440
+y 1024: sin desbordamiento, sin errores de consola y todo lo de la v28 en su
+sitio.
 
 ### v28 — 2026-09-16
 

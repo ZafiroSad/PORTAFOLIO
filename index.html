@@ -1581,6 +1581,26 @@ body.bloqueado .fono-nav { transform:translate3d(-50%, 140%, 0); opacity:0; }
      Gil — Bucaramanga» SI se queda: acaba en 760 y libra el dock por 16 px.
      `.inicio-texto` no necesita holgura por lo mismo. */
   .baja { display:none; }
+
+  /* EL DOCK NO PUEDE SER UNA VENTANA. Es la unica superficie del sitio que
+     flota PERMANENTEMENTE sobre contenido vivo: un panel quieto puede
+     permitirse el .82-.86 del vidrio general, este no. MEDIDO: con el
+     vidrio general, el parrafo de Sobre mi se leia entero por detras de los
+     iconos mientras se desplazaba, y sobre un render claro los iconos en
+     `--debil` perdian contraste.
+
+     Y NO se arregla devolviendole el `backdrop-filter`. En movil ese
+     desenfoque esta apagado a proposito —en gama media obliga a recomponer
+     lo de debajo en cada cuadro— y el dock es justo el peor elemento al que
+     devolverselo: esta en pantalla durante TODO el desplazamiento. Lo que
+     sube es la pintura, que no cuesta nada.
+
+     Conserva el filo especular, el borde y el degradado, que es lo que lo
+     hace vidrio; deja de ser transparente, que es lo que lo hacia ilegible. */
+  .fono-nav.vidrio {
+    background:linear-gradient(148deg, rgba(31,33,41,.97),
+                                       rgba(23,25,32,.96) 44%,
+                                       rgba(28,30,38,.97)); }
 }
 
 @media (prefers-reduced-motion:reduce){
