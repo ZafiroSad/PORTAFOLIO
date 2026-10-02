@@ -547,7 +547,7 @@ body.bloqueado .fono-nav {
 .mascara-marca {
   position:fixed; inset:0; z-index:400;
   display:flex; align-items:center; justify-content:center;
-  background:var(--base);
+  background:transparent;
   /* ARRANCA CUANDO EL BRILLO YA ACABO, no encima. Antes salia a los 2,75 s
      con el barrido especular todavia a mitad de camino —termina a los 3,05—
      asi que la marca se iba antes de terminar su propio gesto y la entrada
@@ -653,7 +653,7 @@ html.puerta { overflow:hidden; }
   background:linear-gradient(100deg, transparent 40%, var(--barrido) 50%, transparent 60%);
   background-size:300% 100%; background-position:130% 0;
   -webkit-background-clip:text; background-clip:text; color:transparent;
-  animation:barrerLuz 2.4s var(--suave) 3.6s;
+  animation:barrerLuz 2.4s var(--suave) 3.0s;
 }
 @keyframes barrerLuz { from { background-position:130% 0 } to { background-position:-70% 0 } }
 .regla-marca {
@@ -670,10 +670,22 @@ html.puerta { overflow:hidden; }
    durante la entrada, y sobre el render de la portada, fundido con
    `screen` (en claro, `multiply`) para que SOLO sume luz o sombra y el
    render siga siendo lo mas brillante de la pantalla. */
-.seda { position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none; }
-.mascara-marca .seda { opacity:0; animation:entrarSeda 2.6s var(--suave) .15s forwards; }
-@keyframes entrarSeda { to { opacity:.62 } }
-@keyframes aparecerSeda { to { opacity:.72 } }
+/* La estela es el fondo de TODA la pagina: un lienzo fijo detras del contenido,
+   que sustituye a las masas de color. Su vena luminosa pasa por detras del
+   titulo de la seccion que se esta leyendo (assets/seda.js + el script al final). */
+.seda-fondo { position:fixed; inset:0; width:100%; height:100%; display:block; z-index:0; pointer-events:none; }
+.masa { display:none; }
+/* LA PUERTA: mientras espera, solo se ve el logo sobre la estela */
+html.puerta .lienzo, html.puerta .barra, html.puerta .fono-nav, html.puerta .avance { opacity:0; pointer-events:none; }
+html.abierto .lienzo { animation:aparecerPagina 1.5s var(--suave) .15s backwards; }
+html.abierto .barra, html.abierto .fono-nav, html.abierto .avance { animation:aparecerPagina 1.2s var(--suave) .9s backwards; }
+@keyframes aparecerPagina { from { opacity:0 } }
+/* El boton de la puerta: fondo blanco, letra negra */
+.entrar { background:#fff; color:#0b0b0d; border:0; -webkit-backdrop-filter:none; backdrop-filter:none;
+  box-shadow:0 14px 50px rgba(0,0,0,.5); }
+.entrar .disco { background:#0b0b0d; color:#fff; }
+:root.claro .entrar { background:#0b0b0d; color:#fff; box-shadow:0 14px 40px rgba(21,22,27,.28); }
+:root.claro .entrar .disco { background:#fff; color:#0b0b0d; }
 
 /* ECO TIPOGRAFICO. Al asentarse, cada letra arrastra copias suyas hacia
    arriba que se pliegan sobre ella. Una propiedad registrada (`--eco`) se
@@ -750,90 +762,63 @@ html.puerta { overflow:hidden; }
   transition:opacity .85s var(--suave) var(--r,0s), transform .95s var(--salida) var(--r,0s); }
 
 
-/* ============ INICIO — la pantalla ============================
-   Recreada desde el reel de inicio: fondo negro, un panel con perspectiva
-   que se enciende (un bloque con el isotipo crece, destella en gris y deja
-   ver el render), halo gris detras, seda de luz encima y letras con eco. */
-.inicio { position:relative; min-height:100svh; display:flex; flex-direction:column; align-items:center;
-  justify-content:center; gap:clamp(1.1rem,3.4vh,2.4rem); padding:calc(var(--barra) + 1.2rem) 0 3rem; overflow:hidden; }
+/* ============ INICIO ========================================== */
+.inicio { position:relative; min-height:100svh; display:flex; flex-direction:column; justify-content:flex-end;
+  padding:var(--barra) 0 0; overflow:hidden; }
+.lamina { position:absolute; inset:0; overflow:hidden; }
+.lamina img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  transform:scale(1.3); opacity:0;
+  animation:asentar 2.4s var(--salida) .25s forwards; will-change:transform; }
+@keyframes asentar { to { transform:scale(1.06); opacity:1 } }
+/* Degradado que apaga la parte baja para que el texto se lea sin
+   recuadros, y funde el render con el campo por el borde inferior */
+/* EL VELO DE LA PORTADA VA HACIA EL TEMA, no siempre hacia la sombra. En
+   oscuro oscurece la foto para que el titular blanco se lea; en claro la
+   aclara, porque ahi el titular es oscuro. Velar siempre hacia la sombra
+   dejaba, en claro, letra oscura sobre un render oscuro — y encima el ultimo
+   1 % se aclaraba igual (usa `--base`), asi que el borde de abajo cambiaba de
+   tema y el resto no. */
+.lamina::after { content:''; position:absolute; inset:0; background:var(--velo-portada); }
 
-.halo-inicio { position:absolute; left:50%; top:58%; width:min(150vw,1700px); height:min(92vh,920px);
-  translate:-50% -50%; pointer-events:none; opacity:0;
-  background:radial-gradient(closest-side, rgba(176,180,192,.30), rgba(120,124,134,.09) 62%, transparent);
-  animation:halo 4.4s var(--suave) .2s forwards; }
-@keyframes halo { 0% { opacity:0 } 38% { opacity:.75 } 56% { opacity:1 } 100% { opacity:.5 } }
-:root.claro .halo-inicio { display:none; }
+.inicio-texto { position:relative; z-index:2;
+  display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:clamp(1.5rem,4vw,4rem);
+  align-items:end; padding:0 var(--margen) clamp(3rem,9vh,6rem); }
+@media (max-width:900px){ .inicio-texto { grid-template-columns:1fr; gap:1.4rem } }
 
-.cap-inicio { position:relative; z-index:2; margin:0; text-align:center; font-weight:400; color:var(--tinta);
-  font-size:clamp(1.15rem,2.5vw,2.1rem); line-height:1.2; letter-spacing:-.01em; }
-.cap-inicio .l { display:block; white-space:nowrap; }
-
-.escena-inicio { position:relative; z-index:2; width:min(88vw,1180px);
-  height:min(60svh, calc(min(88vw,1180px) * .56)); perspective:2400px; container-type:inline-size; }
-.pantalla { position:absolute; inset:0; border-radius:clamp(18px,2.4vw,34px); overflow:hidden; background:#08080a;
-  box-shadow:0 0 0 1.5px rgba(255,255,255,.2), 0 70px 160px rgba(0,0,0,.85), 0 0 120px rgba(190,194,206,.14);
-  transform:rotateX(var(--rx,6deg)) rotateY(var(--ry,-9deg)); transform-origin:50% 60%; will-change:transform;
-  opacity:0; animation:encender .8s var(--suave) .1s forwards; }
-@keyframes encender { to { opacity:1 } }
-.pantalla #render-inicio { position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-  transform:scale(1.18); opacity:0; animation:asentar 3.2s var(--salida) 1.8s forwards; will-change:transform; }
-@keyframes asentar { to { transform:scale(1.05); opacity:1 } }
-.velo-pantalla { position:absolute; inset:0;
-  background:linear-gradient(to top, rgba(5,5,6,.86) 0%, rgba(5,5,6,.38) 34%, rgba(5,5,6,0) 62%); }
-.pantalla .seda { position:absolute; inset:0; z-index:1; mix-blend-mode:screen; opacity:0;
-  animation:aparecerSeda 3.4s var(--suave) 2.3s forwards; }
-
-/* Todo lo de la portada espera: sus animaciones arrancan al abrir la puerta,
-   asi los retardos de abajo se cuentan desde el toque, no desde la carga. */
-.inicio *, .inicio *::before, .inicio *::after { animation-play-state:paused; }
-html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::after { animation-play-state:running; }
-.pantalla { color:#f7f8fa; }
-.pantalla .titular .letra, .pantalla .subtitular span, .pantalla .inicio-aparte .dato { color:#f7f8fa; }
-
-/* El bloque que crece desde el isotipo y llena el panel */
-.bloque { position:absolute; left:50%; top:50%; translate:-50% -50%; z-index:4; opacity:0;
-  width:clamp(84px,11cqw,150px); height:clamp(84px,11cqw,150px); border-radius:clamp(22px,3.4cqw,40px);
-  background:radial-gradient(120% 120% at 30% 20%, #f1f2f5, #dcdee3 55%, #b9bcc4);
-  box-shadow:0 0 90px rgba(210,214,224,.55), inset 0 0 40px rgba(255,255,255,.55);
-  display:grid; place-items:center; overflow:hidden; pointer-events:none;
-  animation:brotarBloque .8s var(--salida) .2s forwards,
-            crecerBloque 1.05s cubic-bezier(.87,0,.13,1) 1.0s forwards,
-            apagarBloque 1s var(--suave) 2.05s forwards; }
-.bloque img { width:46%; height:auto; display:block; animation:apagarIso .45s var(--suave) 1.45s forwards; }
-@keyframes brotarBloque { from { opacity:0; scale:.6 } to { opacity:1; scale:1 } }
-@keyframes crecerBloque { to { width:100%; height:100%; border-radius:0 } }
-@keyframes apagarBloque { to { opacity:0 } }
-@keyframes apagarIso { to { opacity:0; scale:.8 } }
-
-.inicio-texto { position:absolute; left:0; right:0; bottom:0; z-index:3;
-  padding:0 clamp(1.1rem,4.4cqw,3.4rem) clamp(1.1rem,4.6cqw,3.2rem); }
-.titular { font-size:clamp(2rem,10.4cqw,8.2rem); font-weight:800; letter-spacing:-.055em;
-  line-height:.9; text-transform:uppercase; margin-bottom:.7rem; white-space:nowrap; }
+/* El titulo recorta el mismo render que tiene detras: no es una capa
+   sobre la imagen, es la imagen leida a traves de las letras. */
+.titular { font-size:clamp(2.6rem,7.2vw,8.4rem); font-weight:800; letter-spacing:-.055em;
+  line-height:.88; text-transform:uppercase; margin-bottom:.7rem; white-space:nowrap; }
 .titular .letra { animation-duration:1.3s, 1.9s; }
+@media (max-width:900px){ .titular { font-size:clamp(2.6rem,12.4vw,5.4rem); } }
 .subtitular { overflow:hidden; padding-bottom:.14em; margin-bottom:-.14em; }
 .subtitular span { display:block; transform:translateY(115%);
-  animation:emerger 1.15s var(--salida) 2.7s forwards;
-  font-family:var(--mono); font-size:clamp(.54rem,1.5cqw,.78rem); letter-spacing:.24em;
+  animation:emerger 1.15s var(--salida) 1.9s forwards;
+  font-family:var(--mono); font-size:clamp(.6rem,1.35vw,.78rem); letter-spacing:.24em;
   text-transform:uppercase; color:var(--n-200); }
 @keyframes emerger { to { transform:translateY(0) } }
 
-.inicio-aparte { position:absolute; z-index:3; top:clamp(.9rem,3cqw,2rem); right:clamp(1.1rem,4.4cqw,3.4rem);
-  opacity:0; animation:aparecer 1.2s ease 3s forwards; }
-.inicio-aparte .dato { font-family:var(--mono); font-size:clamp(.5rem,1.3cqw,.62rem); letter-spacing:.2em;
-  text-transform:uppercase; color:var(--n-200);
-  display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; justify-content:flex-end; }
+.inicio-aparte { opacity:0; animation:aparecer 1.2s ease 2.2s forwards; padding-bottom:.5rem; }
+.inicio-aparte p { color:var(--tenue); font-size:clamp(.9rem,1.1vw,1rem); max-width:40ch; }
+.inicio-aparte .dato { font-family:var(--mono); font-size:.6rem; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--debil); margin-top:1rem;
+  display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; }
 .inicio-aparte .dato .sep { width:16px; height:1px; background:var(--linea-fuerte); }
 @keyframes aparecer { to { opacity:1 } }
 
-.baja { position:absolute; left:50%; bottom:1rem; z-index:3; transform:translateX(-50%);
+.baja { position:absolute; left:50%; bottom:1.4rem; z-index:3; transform:translateX(-50%);
   display:flex; flex-direction:column; align-items:center; gap:.5rem;
   font-family:var(--mono); font-size:.53rem; letter-spacing:.22em; text-transform:uppercase; color:var(--debil);
-  opacity:0; animation:aparecer 1s ease 3.4s forwards; }
-.baja .hilo { width:1px; height:30px; background:linear-gradient(to bottom, var(--linea-fuerte), transparent); }
+  opacity:0; animation:aparecer 1s ease 2.6s forwards; }
+.baja .hilo { width:1px; height:34px; background:linear-gradient(to bottom, var(--linea-fuerte), transparent); }
 .baja .hilo::after { content:''; display:block; width:1px; height:12px; background:var(--tinta);
   animation:gotear 2.2s var(--suave) infinite; }
-@keyframes gotear { 0% { transform:translateY(-12px); opacity:0 } 40% { opacity:1 } 100% { transform:translateY(30px); opacity:0 } }
-@media (max-height:640px) { .baja { display:none; } }
+@keyframes gotear { 0% { transform:translateY(-12px); opacity:0 } 40% { opacity:1 } 100% { transform:translateY(34px); opacity:0 } }
+
+/* Todo lo de la portada espera a que se abra la puerta: sus animaciones
+   estaban en pausa, asi los retardos cuentan desde el toque. */
+.inicio *, .inicio *::before, .inicio *::after { animation-play-state:paused; }
+html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::after { animation-play-state:running; }
 
 /* ============ PROYECTOS — vitrina a sangre ==================== */
 .vitrina { display:flex; width:100%; flex:1; min-height:clamp(420px,56vh,760px); overflow:hidden;
@@ -907,61 +892,6 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
   font-family:var(--mono); font-size:.6rem; letter-spacing:.2em; text-transform:uppercase;
   border:1px solid rgba(255,255,255,.42); border-radius:999px; padding:.55rem 1.1rem;
   background:rgba(255,255,255,.09); backdrop-filter:blur(12px); }
-
-/* ============ Reel ============================================
-   El reel nuevo es vertical (9:16) y silencioso: vive en un panel con la
-   misma perspectiva que la portada, se reproduce solo, mudo y en bucle
-   mientras esta a la vista, y se pausa al salir. El <video> no tiene `src`
-   hasta que la seccion se acerca: ni se pide ni se decodifica antes. Un
-   toque lo amplia en la capa del reproductor. */
-.reel-escena { position:relative; display:flex; justify-content:center; align-items:center;
-  padding:clamp(1rem,3vh,2rem) 0; perspective:2400px; }
-.reel-halo { position:absolute; left:50%; top:50%; width:min(120vw,1100px); height:min(110%,900px); translate:-50% -50%;
-  pointer-events:none; background:radial-gradient(closest-side, rgba(176,180,192,.26), rgba(120,124,134,.07) 62%, transparent); }
-:root.claro .reel-halo { display:none; }
-.reel-panel { position:relative; height:min(62svh,760px); aspect-ratio:9/16; max-width:88vw; padding:0; cursor:pointer;
-  border:0; border-radius:clamp(20px,3vw,34px); overflow:hidden; background:#08080a;
-  box-shadow:0 0 0 1.5px rgba(255,255,255,.2), 0 70px 150px rgba(0,0,0,.85), 0 0 110px rgba(190,194,206,.12);
-  transform:rotateX(var(--rx,3deg)) rotateY(var(--ry,-10deg)); will-change:transform; }
-.reel-panel video, .reel-panel img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
-.reel-ampliar { position:absolute; right:1rem; bottom:1rem; z-index:2; display:inline-flex; align-items:center; gap:.5rem;
-  font-size:.56rem; letter-spacing:.22em; text-transform:uppercase; color:#f7f8fa;
-  background:rgba(5,5,6,.5); border:1px solid rgba(255,255,255,.22); padding:.48rem .85rem; border-radius:999px;
-  backdrop-filter:blur(8px); opacity:.0; transform:translateY(6px); transition:opacity .5s var(--suave), transform .6s var(--salida); }
-.reel-panel:hover .reel-ampliar, .reel-panel:focus-visible .reel-ampliar { opacity:1; transform:none; }
-@media (hover:none) { .reel-ampliar { opacity:.9; transform:none; } }
-
-/* La capa del reproductor, hermana del lienzo como las demas modales. */
-.reel-capa {
-  position:fixed; inset:0; z-index:310; display:none;
-  place-items:center; background:rgba(8,9,12,.94);
-  backdrop-filter:blur(10px);
-  opacity:0; transition:opacity .5s var(--suave);
-}
-.reel-capa.abierta { display:grid; }
-.reel-capa.visible { opacity:1; }
-.reel-capa video {
-  height:min(90svh, 1100px); width:auto; max-width:94vw; aspect-ratio:9/16; border-radius:18px;
-  background:#000; box-shadow:0 40px 120px -40px rgba(0,0,0,1);
-}
-.reel-mudo {
-  position:absolute; left:50%; bottom:1.6rem; transform:translateX(-50%);
-  display:none; font-size:.58rem; letter-spacing:.16em; text-transform:uppercase;
-  color:var(--tenue); background:rgba(255,255,255,.07); border:1px solid var(--v-borde);
-  padding:.5rem 1rem; border-radius:999px; text-align:center; max-width:calc(100% - 2rem);
-}
-.reel-capa.sin-sonido .reel-mudo { display:block; }
-
-.reel-cerrar {
-  position:absolute; top:1.2rem; right:1.4rem; z-index:2;
-  width:44px; height:44px; border-radius:50%;
-  display:grid; place-items:center; cursor:pointer;
-  color:var(--tinta); font-size:1.5rem; line-height:1;
-  background:rgba(255,255,255,.08); border:1px solid var(--v-borde);
-  transition:background .35s, transform .45s var(--salida);
-}
-.reel-cerrar:hover { background:rgba(255,255,255,.16); transform:rotate(90deg); }
-
 
 .hoja-vida { display:flex; justify-content:center; padding:clamp(1.6rem,4vh,2.6rem) 0 0; }
 .hoja-vida .disco svg { transition:stroke .4s; }
@@ -1870,8 +1800,7 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
 @media (max-width:700px){
   .seccion { padding-top:1.1rem; }
   /* La portada se lleva la pantalla entera: ya no hay barra que esquivar. */
-  .inicio  { padding-top:4.2rem; }
-  .escena-inicio { width:88vw; height:min(62svh, 118vw); }
+  .inicio  { padding-top:0; }
   /* Sin barra que descontar. La holgura del dock la pone el
      `padding-bottom` de `.seccion-cuerpo`, no este alto. */
   #contacto { min-height:100svh; }
@@ -1914,8 +1843,7 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
 @media (prefers-reduced-motion:reduce){
   *, *::before, *::after { animation:none !important; transition:none !important; }
   .mascara-marca { display:none }
-  .pantalla, .pantalla #render-inicio { opacity:1; transform:none }
-  .bloque { display:none }
+  .lamina img { opacity:1; transform:none }
   /* Las letras arrancan con blur(16px): sin animacion que lo retire,
      el titular se quedaba borroso. No basta con devolver la opacidad. */
   .titular .letra, .letra { opacity:1 !important; filter:none !important; }
@@ -1958,6 +1886,7 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
   <div class="masa m4"></div>
   <div class="grano"></div>
 </div>
+<canvas class="seda-fondo" id="seda-fondo" aria-hidden="true"></canvas>
 
 <div class="avance" id="avance"></div>
 
@@ -1969,7 +1898,6 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
   <nav class="menu" id="menu">
     <span class="gota" id="gota"></span>
     <a href="#inicio" data-reiniciar>Inicio</a>
-    <a href="#reel">Reel</a>
     <a href="#proyectos">Proyectos</a>
     <a href="#sobre">Sobre mí</a>
     <a href="#suite">Suite</a>
@@ -1986,7 +1914,6 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
 <nav class="fono-nav glass-dock" id="fono-nav" aria-label="Navegación principal"></nav>
 
 <div class="mascara-marca">
-  <canvas class="seda" id="seda-entrada" aria-hidden="true"></canvas>
   <button class="entrar" id="entrar" type="button" aria-label="Entrar al portafolio">
     <span>Entrar</span>
     <span class="disco"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -2020,60 +1947,30 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
 
 <!-- ===================== INICIO ===================== -->
 <section class="inicio" id="inicio">
-  <div class="halo-inicio"></div>
-  <h2 class="cap-inicio" aria-label="Ingeniero civil y visualizador">
-    <span class="l" data-texto="Ingeniero civil" aria-hidden="true"></span>
-    <span class="l" data-texto="y visualizador" aria-hidden="true"></span>
-  </h2>
-  <div class="escena-inicio">
-    <div class="pantalla">
-      <!-- La portada es la unica imagen con el `srcset` escrito a mano: es la
-           primera que se pide y no puede esperar a que corra el JS. Las tres
-           tallas son las reales, medidas por `preparar-tallas.py`. -->
-      <img id="render-inicio" src="assets/renders/cantabria-23-09.webp"
-           srcset="assets/renders/cantabria-23-09@sm.webp 900w,
-                   assets/renders/cantabria-23-09.webp 1600w,
-                   assets/renders/cantabria-23-09@2x.webp 2560w"
-           sizes="min(88vw,1180px)" alt="Render de patio interior — Lote 23, Villas de Cantabria"
-           fetchpriority="high">
-      <div class="velo-pantalla"></div>
-      <canvas class="seda" id="seda-portada" aria-hidden="true"></canvas>
-      <div class="inicio-aparte">
-        <div class="dato mono">
-          <span>Kevin Gil</span><span class="sep"></span>
-          <span>Bucaramanga, Colombia</span>
-        </div>
+  <div class="lamina">
+    <!-- La portada es la unica imagen con el `srcset` escrito a mano: es la
+         primera que se pide y no puede esperar a que corra el JS. Las tres
+         tallas son las reales, medidas por `preparar-tallas.py`. -->
+    <img id="render-inicio" src="assets/renders/cantabria-23-09.webp"
+         srcset="assets/renders/cantabria-23-09@sm.webp 900w,
+                 assets/renders/cantabria-23-09.webp 1600w,
+                 assets/renders/cantabria-23-09@2x.webp 2560w"
+         sizes="100vw" alt="Render de patio interior — Lote 23, Villas de Cantabria"
+         fetchpriority="high">
+  </div>
+  <div class="inicio-texto">
+    <div>
+      <h1 class="titular" id="titular" data-texto="PORTAFOLIO"></h1>
+      <div class="subtitular"><span>Ingeniero civil · Visualización arquitectónica</span></div>
+    </div>
+    <div class="inicio-aparte">
+      <div class="dato mono">
+        <span>Kevin Gil</span><span class="sep"></span>
+        <span>Bucaramanga, Colombia</span>
       </div>
-      <div class="inicio-texto">
-        <h1 class="titular" id="titular" data-texto="PORTAFOLIO"></h1>
-        <div class="subtitular"><span>Ingeniero civil · Visualización arquitectónica</span></div>
-      </div>
-      <div class="bloque" aria-hidden="true"><img src="assets/marca/isotipo.svg" alt=""></div>
     </div>
   </div>
   <div class="baja"><span>Desplace</span><span class="hilo"></span></div>
-</section>
-
-<!-- ===================== REEL =====================
-     Vertical y sin sonido: el <video> no tiene `src` hasta que la seccion se
-     acerca, y se pausa al salir de pantalla. -->
-<section class="seccion seccion-reel" id="reel">
-  <div class="seccion-cuerpo acolchado">
-    <div class="cabeza">
-      <div>
-        <div class="etiqueta revelar"><span>En movimiento</span></div>
-        <h2 class="palabras" data-texto="El reel."></h2>
-      </div>
-    </div>
-    <div class="reel-escena asoma">
-      <div class="reel-halo"></div>
-      <button class="reel-panel" id="reel-abrir" type="button" aria-label="Ampliar el reel">
-        <img src="assets/video/reel-inicio-poster.webp?v=5" alt="" loading="lazy" decoding="async">
-        <video id="reel-inline" muted loop playsinline preload="none" tabindex="-1"></video>
-        <span class="reel-ampliar mono">Ampliar</span>
-      </button>
-    </div>
-  </div>
 </section>
 
 <!-- ===================== PROYECTOS ===================== -->
@@ -2248,10 +2145,6 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
   </div>
 </div>
 
-<div class="reel-capa" id="reel-capa" role="dialog" aria-modal="true" aria-label="Reel">
-  <button class="reel-cerrar" id="reel-cerrar" aria-label="Cerrar">&times;</button>
-  <p class="reel-mudo mono">El navegador bloqueó el sonido · actívelo en el control de volumen</p>
-</div>
 
 <script src="assets/seda.js"></script>
 <script>
@@ -2527,8 +2420,7 @@ function repartir(el, texto, retraso, paso = .045) {
 /* Arranca CON la capa todavia puesta, no despues: las letras suben
    mientras la marca se disuelve, y por ese solape no hay un instante en que
    la pantalla este vacia esperando. */
-repartir(document.getElementById('titular'), 'PORTAFOLIO', 2.0, .06);
-document.querySelectorAll('.cap-inicio .l').forEach((l, i) => repartir(l, l.dataset.texto, .5 + i * .3, .04));
+repartir(document.getElementById('titular'), 'PORTAFOLIO', 1.2, .06);
 
 /* LA PUERTA DE ENTRADA
 
@@ -2567,95 +2459,71 @@ document.querySelectorAll('.cap-inicio .l').forEach((l, i) => repartir(l, l.data
 
 
 /* =================================================================
-   SEDA — la entrada y la portada
+   LA ESTELA — fondo de toda la pagina, con sentido
 
-   El mismo shader dos veces: detras de la marca mientras se dibuja, y sobre
-   el render cuando aparece. Cada instancia corre solo mientras se ve: la de
-   la entrada muere con la capa, la de la portada se detiene al salir de
-   pantalla y con la pestaña en segundo plano. Con `prefers-reduced-motion`
-   pinta UN fotograma y no anima.
+   Un lienzo fijo detras del contenido (el mismo shader de assets/seda.js).
+   Tres reglas hacen que no sea adorno:
+     1. GUIA: la vena luminosa se desliza hasta quedar detras del titulo de la
+        seccion que se esta leyendo (el `.cabeza` mas cercano al centro), con
+        suavizado. Al volver arriba, descansa en el centro, detras del logo.
+     2. RESPONDE: el desplazamiento mueve su corriente y, segun la velocidad,
+        la enciende un poco; al parar, se aquieta.
+     3. SE CALLA: mas tenue en claro y bajo cualquier capa abierta, y se pausa
+        con la pestaña en segundo plano. Con movimiento reducido pinta un
+        fotograma y no anima.
    ================================================================= */
 (() => {
-  if (typeof crearSeda !== 'function') return;
+  const c = document.getElementById('seda-fondo');
+  if (!c || typeof crearSeda !== 'function') return;
   const html = document.documentElement;
   const esClaro = () => html.classList.contains('claro');
-  const montar = (id, fase, escala, siempreOscura) => {
-    const c = document.getElementById(id);
-    if (!c) return null;
-    try { const s = crearSeda(c, { claro: !siempreOscura && esClaro(), fase, escala }); return s && { c, s }; }
-    catch (e) { c.remove(); return null; }
-  };
-  const bucle = (inst, intensidad, activo) => {
-    const t0 = performance.now();
-    let id = 0, vivo = true;
-    const paso = () => {
-      id = 0;
-      if (!vivo || !activo()) return;
-      inst.s.tam();
-      inst.s.pintar((performance.now() - t0) / 1000, intensidad());
-      id = requestAnimationFrame(paso);
-    };
-    const arrancar = () => { if (!id && vivo) id = requestAnimationFrame(paso); };
-    return { arrancar, parar() { vivo = false; cancelAnimationFrame(id); } };
-  };
-  const reactivar = [];
-  new MutationObserver(() => {
-    if (entrada) entrada.s.claro = esClaro();
-    reactivar.forEach(f => f());
-  }).observe(html, { attributes:true, attributeFilter:['class'] });
+  let s = null;
+  try { s = crearSeda(c, { claro: esClaro(), escala: .6 }); } catch (e) { s = null; }
+  if (!s) { c.remove(); return; }
+  new MutationObserver(() => { s.claro = esClaro(); if (quieto()) pintarFijo(); })
+    .observe(html, { attributes:true, attributeFilter:['class'] });
 
-  // --- La entrada: detras de la marca, hasta que la capa se retira ---
-  const capa = document.querySelector('.mascara-marca');
-  const entrada = montar('seda-entrada', 0, .7);
-  if (entrada && capa) {
-    if (quieto()) { entrada.s.tam(); entrada.s.pintar(2.5, 1); }
-    else {
-      const b = bucle(entrada, () => 1, () => !capa.classList.contains('fuera') && !document.hidden);
-      b.arrancar();
-      document.addEventListener('visibilitychange', b.arrancar);
-      new MutationObserver(() => {
-        if (capa.classList.contains('fuera')) { b.parar(); entrada.s.borrar(); entrada.c.remove(); }
-      }).observe(capa, { attributes:true, attributeFilter:['class'] });
-    }
-  } else if (entrada) entrada.c.remove();
+  const cabezas = [...document.querySelectorAll('.cabeza')];
+  const t0 = performance.now();
+  let desp = 0, vel = 0, yAntes = scrollY, tAntes = t0, id = 0;
 
-  // --- La portada: sobre el render, solo mientras se ve ---
-  const portada = montar('seda-portada', 3.7, .7, true);
-  if (portada) {
-    if (quieto()) { portada.s.tam(); portada.s.pintar(5, 1); portada.c.style.animation = 'none'; portada.c.style.opacity = '.4'; }
-    else {
-      let visible = true;
-      const b = bucle(portada, () => 1, () => visible && !document.hidden);
-      new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible) b.arrancar(); },
-        { threshold:0 }).observe(portada.c.parentElement);
-      document.addEventListener('visibilitychange', b.arrancar);
-      reactivar.push(b.arrancar);
-      b.arrancar();
+  const objetivo = () => {
+    const H = innerHeight, m = Math.min(innerWidth, H);
+    if (html.classList.contains('puerta') || scrollY < H * .55) return 0;
+    let mejor = null, dmin = 1e9;
+    for (const el of cabezas) {
+      const r = el.getBoundingClientRect();
+      if (r.bottom < -H * .2 || r.top > H * 1.2) continue;
+      const cy = r.top + r.height * .5, d = Math.abs(cy - H * .42);
+      if (d < dmin) { dmin = d; mejor = cy; }
     }
+    return mejor == null ? 0 : (H / 2 - mejor) / m;
+  };
+
+  const pintarFijo = () => { s.tam(); s.pintar(3.2, esClaro() ? .42 : .5, objetivo()); };
+
+  const cuadro = (ahora) => {
+    id = 0;
+    if (document.hidden) return;
+    if (!document.body.classList.contains('bloqueado')) {
+      const dt = Math.max(1, ahora - tAntes), dy = scrollY - yAntes;
+      vel += ((Math.abs(dy) / dt) - vel) * .12;           // px/ms suavizado
+      yAntes = scrollY; tAntes = ahora;
+      desp += (objetivo() - desp) * .05;
+      const base = html.classList.contains('puerta') ? 1.05 : (esClaro() ? .42 : .5);
+      const intensidad = base + Math.min(.3, vel * .45);
+      s.tam();
+      s.pintar((ahora - t0) / 1000 + scrollY * .0007, intensidad, desp);
+    }
+    id = requestAnimationFrame(cuadro);
+  };
+  const arrancar = () => { if (!id) id = requestAnimationFrame(cuadro); };
+
+  if (quieto()) { pintarFijo(); addEventListener('resize', pintarFijo); }
+  else {
+    arrancar();
+    document.addEventListener('visibilitychange', arrancar);
   }
-})();
-
-/* La pantalla de la portada respira: se endereza al bajar y sigue el puntero
-   un poco. Un bucle corto que se detiene al alcanzar el destino. */
-(() => {
-  const p = document.querySelector('.pantalla');
-  if (!p || quieto()) return;
-  let rx = 6, ry = -9, tx = 6, ty = -9, mx = .5, my = .5, raf = 0;
-  const alvo = () => {
-    const s = Math.min(1, scrollY / (innerHeight * .8));
-    tx = (6 + (my - .5) * -4) * (1 - s);
-    ty = (-9 + (mx - .5) * 7) * (1 - s);
-    if (!raf) raf = requestAnimationFrame(paso);
-  };
-  const paso = () => {
-    raf = 0;
-    rx += (tx - rx) * .075; ry += (ty - ry) * .075;
-    p.style.setProperty('--rx', rx.toFixed(3) + 'deg');
-    p.style.setProperty('--ry', ry.toFixed(3) + 'deg');
-    if (Math.abs(tx - rx) + Math.abs(ty - ry) > .01) raf = requestAnimationFrame(paso);
-  };
-  addEventListener('scroll', alvo, { passive:true });
-  addEventListener('pointermove', e => { mx = e.clientX / innerWidth; my = e.clientY / innerHeight; alvo(); }, { passive:true });
 })();
 
 document.querySelectorAll('.palabras').forEach(t => {
@@ -2682,7 +2550,6 @@ document.querySelectorAll('.palabras').forEach(t => {
 const DIBUJOS = {
   '#inicio':    '<path d="M3 10.6 12 3.6l9 7v9.2a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   '#proyectos': '<path d="M3 6.5 12 2l9 4.5-9 4.5z"/><path d="m3 12 9 4.5L21 12"/><path d="m3 17.3 9 4.5 9-4.5"/>',
-  '#reel':      '<circle cx="12" cy="12" r="9"/><path d="M10 8.4 16 12l-6 3.6z"/>',
   '#sobre':     '<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c0-3.9 3.4-6.3 7.5-6.3s7.5 2.4 7.5 6.3"/>',
   '#suite':     '<rect x="3.2" y="3.2" width="7.2" height="7.2" rx="2"/><rect x="13.6" y="3.2" width="7.2" height="7.2" rx="2"/><rect x="3.2" y="13.6" width="7.2" height="7.2" rx="2"/><rect x="13.6" y="13.6" width="7.2" height="7.2" rx="2"/>',
   '#contacto':  '<path d="M20.5 11.6a7.9 7.9 0 0 1-8.5 7.9 9 9 0 0 1-2.6-.4L4.2 20.8l1.5-4.6a7.6 7.6 0 0 1-1.2-4.6A7.9 7.9 0 0 1 12 3.7a7.9 7.9 0 0 1 8.5 7.9z"/>',
@@ -3620,94 +3487,11 @@ document.addEventListener('keydown', e => {
     return;
   }
   if (e.key === 'Escape') {
-    if (reelVideo) { cerrarReel(); return; }
     if (ficha.classList.contains('abierta')) { cerrarFicha(); return; }
     if (capaIndice.classList.contains('abierta')) cerrarIndice();
   }
 });
 
-/* =================================================================
-   REEL
-   El <video> se CREA al abrir y se DESTRUYE al cerrar. Dejarlo en el
-   HTML —aunque sea con preload="none"— basta para que algunos
-   navegadores pidan los primeros bytes del archivo al montar la
-   pagina, y son 15 MB que nadie ha pedido todavia.
-   ================================================================= */
-const reelCapa = document.getElementById('reel-capa');
-let reelVideo = null;
-
-function abrirReel() {
-  if (reelVideo) return;
-  reelVideo = document.createElement('video');
-  /* CAMBIAR `?v=` CADA VEZ QUE SE REEMPLACE EL REEL: el archivo conserva el
-     nombre y, sin ese sufijo, el navegador sigue mostrando la copia vieja. */
-  reelVideo.src = 'assets/video/reel-inicio.mp4?v=5';
-  reelVideo.poster = 'assets/video/reel-inicio-poster.webp?v=5';
-  reelVideo.controls = true;
-  reelVideo.loop = true;
-  reelVideo.playsInline = true;
-  reelCapa.appendChild(reelVideo);
-
-  reelCapa.classList.add('abierta');
-  document.body.style.overflow = 'hidden';
-  requestAnimationFrame(() => reelCapa.classList.add('visible'));
-
-  reelVideo.play().catch(() => {});
-}
-
-function cerrarReel() {
-  if (!reelVideo) return;
-  reelCapa.classList.remove('visible', 'sin-sonido');
-  const v = reelVideo;
-  reelVideo = null;
-  v.pause();
-  setTimeout(() => {
-    v.remove();
-    reelCapa.classList.remove('abierta');
-    document.body.style.overflow = '';
-  }, 480);
-}
-
-
-/* El reel en linea: sin `src` hasta que la seccion se acerca; reproduce mudo y
-   en bucle mientras se ve, y se pausa al salir. Con movimiento reducido solo
-   muestra el cartel. El panel gira hacia el puntero y con el desplazamiento,
-   como la pantalla de la portada. */
-(() => {
-  const v = document.getElementById('reel-inline');
-  const panel = document.getElementById('reel-abrir');
-  if (!v || !panel) return;
-  if (!quieto()) {
-    const io = new IntersectionObserver(es => {
-      const dentro = es[0].isIntersecting;
-      if (dentro && !v.src) { v.src = 'assets/video/reel-inicio.mp4?v=5'; }
-      if (dentro) v.play().catch(() => {}); else v.pause();
-    }, { rootMargin:'200px 0px', threshold:.15 });
-    io.observe(panel);
-    document.addEventListener('visibilitychange', () => { if (document.hidden) v.pause(); });
-
-    let rx = 3, ry = -10, tx = 3, ty = -10, mx = .5, raf = 0;
-    const alvo = () => {
-      const r = panel.getBoundingClientRect();
-      const p = Math.max(-1, Math.min(1, (r.top + r.height / 2 - innerHeight / 2) / innerHeight));
-      tx = 3 + p * 7; ty = -10 + (mx - .5) * 10 + p * 4;
-      if (!raf) raf = requestAnimationFrame(paso);
-    };
-    const paso = () => {
-      raf = 0;
-      rx += (tx - rx) * .08; ry += (ty - ry) * .08;
-      panel.style.setProperty('--rx', rx.toFixed(3) + 'deg');
-      panel.style.setProperty('--ry', ry.toFixed(3) + 'deg');
-      if (Math.abs(tx - rx) + Math.abs(ty - ry) > .01) raf = requestAnimationFrame(paso);
-    };
-    addEventListener('scroll', alvo, { passive:true });
-    addEventListener('pointermove', e => { mx = e.clientX / innerWidth; alvo(); }, { passive:true });
-  }
-})();
-
-document.getElementById('reel-abrir').addEventListener('click', abrirReel);
-document.getElementById('reel-cerrar').addEventListener('click', cerrarReel);
-reelCapa.addEventListener('click', e => { if (e.target === reelCapa) cerrarReel(); });
 
 /* =================================================================
    MIRAR EL RENDER DE CERCA
@@ -3843,7 +3627,7 @@ const campo     = document.querySelector('.campo');
 /* `#inicio` entra en la lista: sin el, arriba del todo NINGUNA seccion
    estaba activa y el dock del telefono —que ahora es la unica navegacion
    que hay ahi— se quedaba sin pildora justo en lo primero que se ve. */
-const secciones = [...document.querySelectorAll('#inicio, #proyectos, #reel, #sobre, #suite, #contacto')];
+const secciones = [...document.querySelectorAll('#inicio, #proyectos, #sobre, #suite, #contacto')];
 /* Las dos barras —la de arriba y la del telefono— se resaltan juntas: una
    sola lista y un solo sitio donde decidir cual esta activa. */
 const enlacesMenu = [...document.querySelectorAll('.menu a, .fono-nav a')];
