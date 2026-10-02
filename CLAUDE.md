@@ -12,7 +12,7 @@ CV interactiva y portafolio de visualización arquitectónica.
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
 
-### v35 (RAMA `seda`, sin publicar) — 2026-10-01
+### v35 — 2026-10-01 (PUBLICADO en GitHub Pages, commit dc865c5)
 
 Pedido: efectos tomados de un reel de referencia (@textura.eu), **en grises**,
 lo mas fieles y suaves posible; fondo **negro**; portada recreada como el reel;
@@ -36,14 +36,14 @@ entrada que **espera** hasta que se toque.
 - **Corregido un fallo previo**: `animationend` subia desde los hijos y retiraba
   la capa a ~1,4 s (el logo se quedaba en «STIC»).
 - **Reel 9:16 de 19 s** (HyperFrames, fuera del repo, en
-  `Downloads\seda-portafolioeel`).
+  `Downloads\seda-portafolio
+eel`).
 - **Herramientas de verificacion** (en `Downloads\seda-portafolio\herramientas`,
   no estan en el repo): capturas con el tiempo de las animaciones congelado.
   Congelar con `getAnimations()` y fijar `currentTime` es lo unico fiable: el
   reloj real del navegador no deja capturar la entrada.
-- **Pendiente**: reel nuevo reemplaza o convive con el actual; version 16:9;
-  destello entre secciones al hacer scroll; revisar las fichas de proyecto y el
-  visor sobre el negro nuevo.
+- **Pendiente**: version 16:9 del reel; destello entre secciones al hacer scroll;
+  revisar las fichas de proyecto y el visor sobre el negro nuevo; musica del reel.
 
 ### v34 — 2026-09-16
 
