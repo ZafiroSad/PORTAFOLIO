@@ -28,6 +28,8 @@ blanco con letra negra, y la estela detras de todo con sentido.
   puerta. Mientras espera, `html.puerta` oculta el sitio y bloquea el scroll;
   al abrir, `html.abierto` echa a andar la portada (sus animaciones estaban en
   pausa: los retardos cuentan desde el toque) y la pagina aparece con fundido.
+- **Boton de la puerta**: solo texto («Entrar»), pastilla blanca con letra negra, sin flecha. Clase `.btn-puerta` —NO `.entrar`, que ya es el boton «Ver proyecto» de las fichas y se pisaban—.
+- **Movil**: la vitrina de proyectos deja el margen de la pagina a cada lado (`width:calc(100% - 2*var(--margen))`).
 - **PORTADA**: la de la v34, imagen completa a sangre, titular con eco. Sin
   tarjeta, sin panel con perspectiva.
 - **LA ESTELA, FONDO DE TODA LA PAGINA**: un lienzo fijo (`#seda-fondo`) detras
