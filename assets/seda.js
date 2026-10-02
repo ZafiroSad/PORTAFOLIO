@@ -18,22 +18,39 @@ float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
  return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
 float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<4;i++){s+=a*n(p);p=p*2.03+vec2(7.1,3.3);a*=.5;}return s;}
+// Una estela: curva que respira, hilos paralelos y una vena luminosa en el centro.
+//   off   : posicion vertical de la vena     slope : inclinacion
+//   ph    : fase propia                       k     : hacia que lado se abre el abanico (+1 / -1)
+float estela(vec2 uv,float t,float off,float slope,float ph,float k){
+ float w=fbm(uv*.9+vec2(t+ph,-t*.5));
+ float c=.30*sin(uv.x*1.5+t*2.+ph+w*.9)+slope*uv.x+.05*sin(uv.x*3.2-t*3.+ph);
+ float d=uv.y-c-off;
+ float fan=.55+1.25*smoothstep(-1.,1.,uv.x*k);
+ float u=d/fan;
+ float p=u*46.+w*2.2+t*2.;
+ float hil=pow(.5+.5*sin(p),26.);
+ float fino=pow(.5+.5*sin(p*2.3+1.7),40.)*.6;
+ float env=exp(-pow(u/.24,2.));
+ float nucleo=exp(-pow(u/.05,2.))*.45;
+ float vel=exp(-pow(u/.9,2.))*.26*(.6+fbm(uv*2.2+t));
+ return (hil*.75+fino)*env+nucleo*env+vel;
+}
+vec2 rot(vec2 p,float a){float c=cos(a),s=sin(a);return vec2(c*p.x-s*p.y,s*p.x+c*p.y);}
 void main(){
  vec2 uv=(gl_FragCoord.xy-.5*uR)/min(uR.x,uR.y);
  float t=uT*.12+uF;
- float w=fbm(uv*.9+vec2(t,-t*.5));
- float c=.30*sin(uv.x*1.5+t*2.+w*.9)-.10*uv.x+.05*sin(uv.x*3.2-t*3.);
- float d=uv.y-c-uP;
- float fan=.55+1.25*smoothstep(-1.,1.,uv.x);
- float u=d/fan;
- float ph=u*46.+w*2.2+t*2.;
- float hil=pow(.5+.5*sin(ph),26.);
- float fino=pow(.5+.5*sin(ph*2.3+1.7),40.)*.6;
- float env=exp(-pow(u/.24,2.));
- float nucleo=exp(-pow(u/.05,2.))*.45;
- float vel=exp(-pow(u/.9,2.))*.16*(.6+fbm(uv*2.2+t));
- float L=(hil*.75+fino)*env+nucleo*env+vel;
- L*=smoothstep(-1.5,-.1,uv.x)*(1.-smoothstep(.9,1.7,uv.x)*.7);
+ float E=.5*uR.y/min(uR.x,uR.y);          // mitad del alto visible
+ float X=.5*uR.x/min(uR.x,uR.y);          // mitad del ancho visible
+ // Dos estelas que BARREN TODA LA PANTALLA, como en la referencia: un manojo
+ // grueso de hilos con resplandor que cruza de lado a lado.
+ //  A: casi vertical; su recorrido es el ANCHO (entra por un borde y sale por el otro).
+ //  B: mas horizontal; su recorrido es el ALTO, y uP la empuja para acompanar al titulo.
+ float thA=1.2+.4*sin(uT*.11+uF);
+ float offA=1.05*max(X,E)*sin(uT*.21+uF);
+ float thB=.15-.45*sin(uT*.09+1.+uF);
+ float offB=uP+.95*E*sin(uT*.16+2.5+uF);
+ float L=estela(rot(uv,thA),t,offA,.18*sin(uT*.13),0.,1.)+.85*estela(rot(uv,thB),t*.9,offB,-.2*sin(uT*.1),2.7,-1.);
+ L=min(L,1.7);
  float v=1.-dot(uv*.55,uv*.55);
  L=L*uI*v;
  vec3 luz=vec3(.80,.82,.86);

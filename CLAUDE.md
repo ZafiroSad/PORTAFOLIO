@@ -30,6 +30,8 @@ blanco con letra negra, y la estela detras de todo con sentido.
   pausa: los retardos cuentan desde el toque) y la pagina aparece con fundido.
 - **Boton de la puerta**: solo texto («Entrar»), pastilla blanca con letra negra, sin flecha. Clase `.btn-puerta` —NO `.entrar`, que ya es el boton «Ver proyecto» de las fichas y se pisaban—.
 - **Movil**: la vitrina de proyectos deja el margen de la pagina a cada lado (`width:calc(100% - 2*var(--margen))`).
+- **Estela v2 (dos estelas que barren toda la pantalla)**: tras ver de cerca el reel de referencia, el shader pasa a dos estelas: A casi vertical que recorre el ANCHO, B mas horizontal que recorre el ALTO (y `desp` la empuja hacia el titulo de la seccion). Giran y cruzan con el tiempo (y con el scroll, `scrollY*.0016`). Intensidad base .34 oscuro / .3 claro para no tapar el texto. Ojo: `estela_global`/`seda_dos` son scripts de usar y tirar; el shader final esta en `assets/seda.js`.
+- **Boton de la puerta**: aparece a los .6 s (antes a los 3,1 s: «se demora en salir»).
 - **PORTADA**: la de la v34, imagen completa a sangre, titular con eco. Sin
   tarjeta, sin panel con perspectiva.
 - **LA ESTELA, FONDO DE TODA LA PAGINA**: un lienzo fijo (`#seda-fondo`) detras

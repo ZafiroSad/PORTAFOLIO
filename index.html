@@ -584,7 +584,7 @@ html.puerta { overflow:hidden; }
   color:var(--tinta); cursor:pointer; border:1px solid var(--v-borde); border-radius:999px;
   background:var(--v-fondo); -webkit-backdrop-filter:var(--v-blur); backdrop-filter:var(--v-blur);
   box-shadow:var(--v-filo), var(--v-sombra); opacity:0; transform:translateY(14px);
-  animation:aparecerEntrar 1.4s var(--salida) 3.1s forwards;
+  animation:aparecerEntrar .9s var(--salida) .6s forwards;
   transition:background .5s var(--suave), scale .6s var(--salida); }
 .btn-puerta .disco { display:grid; place-items:center; width:34px; height:34px; border-radius:50%;
   background:var(--tinta); color:var(--contratinta); transition:transform .6s var(--salida); }
@@ -2494,7 +2494,7 @@ repartir(document.getElementById('titular'), 'PORTAFOLIO', 1.2, .06);
     return mejor == null ? 0 : (H / 2 - mejor) / m;
   };
 
-  const pintarFijo = () => { s.tam(); s.pintar(3.2, esClaro() ? .42 : .5, objetivo()); };
+  const pintarFijo = () => { s.tam(); s.pintar(3.2, esClaro() ? .3 : .34, objetivo()); };
 
   const cuadro = (ahora) => {
     id = 0;
@@ -2504,10 +2504,10 @@ repartir(document.getElementById('titular'), 'PORTAFOLIO', 1.2, .06);
       vel += ((Math.abs(dy) / dt) - vel) * .12;           // px/ms suavizado
       yAntes = scrollY; tAntes = ahora;
       desp += (objetivo() - desp) * .05;
-      const base = html.classList.contains('puerta') ? 1.05 : (esClaro() ? .42 : .5);
-      const intensidad = base + Math.min(.3, vel * .45);
+      const base = html.classList.contains('puerta') ? 1.05 : (esClaro() ? .3 : .34);
+      const intensidad = base + Math.min(.22, vel * .4);
       s.tam();
-      s.pintar((ahora - t0) / 1000 + scrollY * .0007, intensidad, desp);
+      s.pintar((ahora - t0) / 1000 + scrollY * .0016, intensidad, desp);
     }
     id = requestAnimationFrame(cuadro);
   };
