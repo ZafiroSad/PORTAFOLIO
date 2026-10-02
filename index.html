@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>STICK INDUSTRIES · Kevin Gil</title>
 <meta name="description" content="STICK INDUSTRIES — Kevin Gil. Ingeniero civil y visualizador arquitectónico. Modelo, imagen y recorrido de proyectos construibles. Bucaramanga, Colombia.">
-<meta name="theme-color" content="#15161b">
+<meta name="theme-color" content="#050506">
 <!-- El SVG manda donde se puede; el PNG queda de respaldo para pestanas
      viejas, y el de 180 px es el que toma iOS al anclar en la pantalla. -->
 <link rel="icon" href="assets/marca/favicon.svg" type="image/svg+xml">
@@ -98,8 +98,8 @@
      saturados de la version anterior daban el aire de portada de IA;
      aqui el campo se mueve en tonos de piedra, hormigon y luz de
      tarde, que es de donde viene el material del oficio. --- */
-  --base:   #15161b;
-  --base-2: #1d1f26;
+  --base:   #050506;
+  --base-2: #09090b;
   --tinta:  #f7f8fa;
   --n-200:  #dfe1e8;
   --tenue:  #adb0bb;
@@ -125,8 +125,8 @@
      blanco. Aqui se consigue con estos dos. */
   --contratinta:  #09090b;
   --dock-apagado: #a1a1aa;
-  --velo-portada: linear-gradient(to top, var(--base) 1%, rgba(11,12,16,.74) 30%,
-                  rgba(11,12,16,.16) 62%, rgba(11,12,16,.48) 100%);
+  --velo-portada: linear-gradient(to top, var(--base) 1%, rgba(5,5,6,.74) 30%,
+                  rgba(5,5,6,.16) 62%, rgba(5,5,6,.48) 100%);
 
   /* --- Vidrio liquido --- */
   --v-fondo: linear-gradient(148deg,
@@ -145,9 +145,9 @@
      empuja el campo del fondo, muy por debajo del umbral de lectura */
   --th:210; --ts:16%;
 
-  --campo-luz: rgba(196,204,220,.07);
-  --campo-pie: #101116;
-  --masa-op: .55;
+  --campo-luz: rgba(190,196,210,.045);
+  --campo-pie: #050506;
+  --masa-op: .32;
 
   --margen: clamp(1.25rem, 4vw, 4.5rem);
   --barra: 60px;
@@ -296,16 +296,16 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 .masa { position:absolute; border-radius:50%; filter:blur(72px); opacity:var(--masa-op);
   will-change:transform; contain:strict; }
 .m1 { width:66vmax; height:66vmax; left:-20vmax; top:-16vmax;
-      background:radial-gradient(circle, hsl(214 22% 62% / .30), transparent 68%);
+      background:radial-gradient(circle, hsl(220 5% 62% / .26), transparent 68%);
       animation:derivaA 52s var(--suave) infinite; }
 .m2 { width:56vmax; height:56vmax; right:-18vmax; top:6vmax;
-      background:radial-gradient(circle, hsl(32 30% 64% / .22), transparent 66%);
+      background:radial-gradient(circle, hsl(0 0% 60% / .16), transparent 66%);
       animation:derivaB 64s var(--suave) infinite; }
 .m3 { width:74vmax; height:74vmax; left:10vmax; bottom:-32vmax;
-      background:radial-gradient(circle, hsl(28 16% 58% / .20), transparent 68%);
+      background:radial-gradient(circle, hsl(0 0% 56% / .16), transparent 68%);
       animation:derivaC 70s var(--suave) infinite; }
 .m4 { width:46vmax; height:46vmax; right:4vmax; bottom:-10vmax;
-      background:radial-gradient(circle, hsl(196 18% 60% / .18), transparent 66%);
+      background:radial-gradient(circle, hsl(220 4% 58% / .14), transparent 66%);
       animation:derivaB 58s var(--suave) infinite reverse; }
 @keyframes derivaA {
   0%,100% { transform:translate3d(0,0,0) }
@@ -553,23 +553,46 @@ body.bloqueado .fono-nav {
      asi que la marca se iba antes de terminar su propio gesto y la entrada
      se sentia cortada. Ahora: el logo se completa, respira un cuarto de
      segundo, y recien entonces se disuelve, mas despacio que antes. */
-  animation:disolverMarca 1.55s var(--suave) 3.3s forwards;
+  /* LA PUERTA. Ya no se disuelve sola: se queda en STICK INDUSTRIES con la
+     seda detras hasta que alguien toca la pantalla o el boton. Entonces
+     `.abierta` la disuelve despacio mientras la portada se enciende. */
+  cursor:pointer;
   /* NUNCA recibe el puntero. Es una capa de bienvenida que cubre la ventana
      entera con z-index 400: si su animacion no llega a correr —y no corre
      mientras la pestana esta en segundo plano, porque el navegador congela
      las animaciones ahi— se quedaria tragandose todos los clics del sitio.
      Medido: 78 s despues de cargar seguia opaca e interceptando el puntero. */
-  pointer-events:none;
+  pointer-events:auto;
 }
+.mascara-marca.abierta { pointer-events:none; cursor:default;
+  animation:disolverMarca 1.7s cubic-bezier(.4,0,.2,1) .15s forwards; }
 @keyframes disolverMarca { to { opacity:0; visibility:hidden; } }
+html.puerta { overflow:hidden; }
 /* El JS la retira del todo cuando acaba, o pasado un plazo si no acaba. */
 .mascara-marca.fuera { display:none; }
 
 .marca-entrada { width:min(66vw, 640px); position:relative; color:var(--tinta);
   /* Se aleja mientras se disuelve. Apagarse a secas se lee como que algo
      se apago; alejarse se lee como que la pagina viene hacia delante. */
-  animation:alejarMarca 1.55s var(--salida) 3.3s forwards; }
-@keyframes alejarMarca { to { transform:scale(1.045); filter:blur(2px) } }
+  }
+.mascara-marca.abierta .marca-entrada { animation:alejarMarca 1.9s var(--salida) .1s forwards; }
+@keyframes alejarMarca { to { transform:scale(1.09); filter:blur(7px) } }
+/* El boton de la puerta */
+.entrar { position:absolute; left:50%; bottom:max(9vh,3rem); translate:-50% 0; z-index:2;
+  display:inline-flex; align-items:center; gap:.9rem; padding:.62rem .62rem .62rem 1.5rem;
+  font:inherit; font-family:var(--mono); font-size:.66rem; letter-spacing:.26em; text-transform:uppercase;
+  color:var(--tinta); cursor:pointer; border:1px solid var(--v-borde); border-radius:999px;
+  background:var(--v-fondo); -webkit-backdrop-filter:var(--v-blur); backdrop-filter:var(--v-blur);
+  box-shadow:var(--v-filo), var(--v-sombra); opacity:0; transform:translateY(14px);
+  animation:aparecerEntrar 1.4s var(--salida) 3.1s forwards;
+  transition:background .5s var(--suave), scale .6s var(--salida); }
+.entrar .disco { display:grid; place-items:center; width:34px; height:34px; border-radius:50%;
+  background:var(--tinta); color:var(--contratinta); transition:transform .6s var(--salida); }
+.entrar:hover { scale:1.04; } .entrar:hover .disco { transform:translateX(3px); }
+.entrar:focus-visible { outline:2px solid var(--tinta); outline-offset:4px; }
+@keyframes aparecerEntrar { to { opacity:1; transform:none } }
+.mascara-marca.abierta .entrar { animation:none; opacity:0; transform:translateY(8px);
+  transition:opacity .5s var(--suave), transform .6s var(--salida); }
 .marca-entrada svg { display:block; width:100%; height:auto; overflow:visible; }
 
 /* La flecha llega desde la izquierda. Recorrido corto y deceleracion
@@ -630,7 +653,7 @@ body.bloqueado .fono-nav {
   background:linear-gradient(100deg, transparent 40%, var(--barrido) 50%, transparent 60%);
   background-size:300% 100%; background-position:130% 0;
   -webkit-background-clip:text; background-clip:text; color:transparent;
-  animation:barrerLuz 2.4s var(--suave) 4.3s;
+  animation:barrerLuz 2.4s var(--suave) 3.6s;
 }
 @keyframes barrerLuz { from { background-position:130% 0 } to { background-position:-70% 0 } }
 .regla-marca {
@@ -650,13 +673,7 @@ body.bloqueado .fono-nav {
 .seda { position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none; }
 .mascara-marca .seda { opacity:0; animation:entrarSeda 2.6s var(--suave) .15s forwards; }
 @keyframes entrarSeda { to { opacity:.62 } }
-.lamina .seda { z-index:1; mix-blend-mode:screen; opacity:0;
-  animation:aparecerSeda 3.2s var(--suave) 3.6s forwards;
-  -webkit-mask-image:linear-gradient(to bottom, #000 0%, #000 55%, transparent 96%);
-          mask-image:linear-gradient(to bottom, #000 0%, #000 55%, transparent 96%); }
-:root.claro .lamina .seda { mix-blend-mode:multiply; }
-@keyframes aparecerSeda { to { opacity:.4 } }
-.lamina::after { z-index:2; }
+@keyframes aparecerSeda { to { opacity:.72 } }
 
 /* ECO TIPOGRAFICO. Al asentarse, cada letra arrastra copias suyas hacia
    arriba que se pliegan sobre ella. Una propiedad registrada (`--eco`) se
@@ -733,58 +750,90 @@ body.bloqueado .fono-nav {
   transition:opacity .85s var(--suave) var(--r,0s), transform .95s var(--salida) var(--r,0s); }
 
 
-/* ============ INICIO ========================================== */
-.inicio { position:relative; min-height:100svh; display:flex; flex-direction:column; justify-content:flex-end;
-  padding:var(--barra) 0 0; overflow:hidden; }
-.lamina { position:absolute; inset:0; overflow:hidden; }
-.lamina img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-  transform:scale(1.3); opacity:0;
-  animation:asentar 2.4s var(--salida) 2.1s forwards; will-change:transform; }
-@keyframes asentar { to { transform:scale(1.06); opacity:1 } }
-/* Degradado que apaga la parte baja para que el texto se lea sin
-   recuadros, y funde el render con el campo por el borde inferior */
-/* EL VELO DE LA PORTADA VA HACIA EL TEMA, no siempre hacia la sombra. En
-   oscuro oscurece la foto para que el titular blanco se lea; en claro la
-   aclara, porque ahi el titular es oscuro. Velar siempre hacia la sombra
-   dejaba, en claro, letra oscura sobre un render oscuro — y encima el ultimo
-   1 % se aclaraba igual (usa `--base`), asi que el borde de abajo cambiaba de
-   tema y el resto no. */
-.lamina::after { content:''; position:absolute; inset:0; background:var(--velo-portada); }
+/* ============ INICIO — la pantalla ============================
+   Recreada desde el reel de inicio: fondo negro, un panel con perspectiva
+   que se enciende (un bloque con el isotipo crece, destella en gris y deja
+   ver el render), halo gris detras, seda de luz encima y letras con eco. */
+.inicio { position:relative; min-height:100svh; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:clamp(1.1rem,3.4vh,2.4rem); padding:calc(var(--barra) + 1.2rem) 0 3rem; overflow:hidden; }
 
-.inicio-texto { position:relative; z-index:2;
-  display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:clamp(1.5rem,4vw,4rem);
-  align-items:end; padding:0 var(--margen) clamp(3rem,9vh,6rem); }
-@media (max-width:900px){ .inicio-texto { grid-template-columns:1fr; gap:1.4rem } }
+.halo-inicio { position:absolute; left:50%; top:58%; width:min(150vw,1700px); height:min(92vh,920px);
+  translate:-50% -50%; pointer-events:none; opacity:0;
+  background:radial-gradient(closest-side, rgba(176,180,192,.30), rgba(120,124,134,.09) 62%, transparent);
+  animation:halo 4.4s var(--suave) .2s forwards; }
+@keyframes halo { 0% { opacity:0 } 38% { opacity:.75 } 56% { opacity:1 } 100% { opacity:.5 } }
+:root.claro .halo-inicio { display:none; }
 
-/* El titulo recorta el mismo render que tiene detras: no es una capa
-   sobre la imagen, es la imagen leida a traves de las letras. */
-.titular { font-size:clamp(2.6rem,7.2vw,8.4rem); font-weight:800; letter-spacing:-.055em;
-  line-height:.88; text-transform:uppercase; margin-bottom:.7rem; white-space:nowrap; }
-.titular .letra { animation-duration:1.3s; }
-@media (max-width:900px){ .titular { font-size:clamp(2.6rem,12.4vw,5.4rem); } }
+.cap-inicio { position:relative; z-index:2; margin:0; text-align:center; font-weight:400; color:var(--tinta);
+  font-size:clamp(1.15rem,2.5vw,2.1rem); line-height:1.2; letter-spacing:-.01em; }
+.cap-inicio .l { display:block; white-space:nowrap; }
+
+.escena-inicio { position:relative; z-index:2; width:min(88vw,1180px);
+  height:min(60svh, calc(min(88vw,1180px) * .56)); perspective:2400px; container-type:inline-size; }
+.pantalla { position:absolute; inset:0; border-radius:clamp(18px,2.4vw,34px); overflow:hidden; background:#08080a;
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.2), 0 70px 160px rgba(0,0,0,.85), 0 0 120px rgba(190,194,206,.14);
+  transform:rotateX(var(--rx,6deg)) rotateY(var(--ry,-9deg)); transform-origin:50% 60%; will-change:transform;
+  opacity:0; animation:encender .8s var(--suave) .1s forwards; }
+@keyframes encender { to { opacity:1 } }
+.pantalla #render-inicio { position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  transform:scale(1.18); opacity:0; animation:asentar 3.2s var(--salida) 1.8s forwards; will-change:transform; }
+@keyframes asentar { to { transform:scale(1.05); opacity:1 } }
+.velo-pantalla { position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(5,5,6,.86) 0%, rgba(5,5,6,.38) 34%, rgba(5,5,6,0) 62%); }
+.pantalla .seda { position:absolute; inset:0; z-index:1; mix-blend-mode:screen; opacity:0;
+  animation:aparecerSeda 3.4s var(--suave) 2.3s forwards; }
+
+/* Todo lo de la portada espera: sus animaciones arrancan al abrir la puerta,
+   asi los retardos de abajo se cuentan desde el toque, no desde la carga. */
+.inicio *, .inicio *::before, .inicio *::after { animation-play-state:paused; }
+html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::after { animation-play-state:running; }
+.pantalla { color:#f7f8fa; }
+.pantalla .titular .letra, .pantalla .subtitular span, .pantalla .inicio-aparte .dato { color:#f7f8fa; }
+
+/* El bloque que crece desde el isotipo y llena el panel */
+.bloque { position:absolute; left:50%; top:50%; translate:-50% -50%; z-index:4; opacity:0;
+  width:clamp(84px,11cqw,150px); height:clamp(84px,11cqw,150px); border-radius:clamp(22px,3.4cqw,40px);
+  background:radial-gradient(120% 120% at 30% 20%, #f1f2f5, #dcdee3 55%, #b9bcc4);
+  box-shadow:0 0 90px rgba(210,214,224,.55), inset 0 0 40px rgba(255,255,255,.55);
+  display:grid; place-items:center; overflow:hidden; pointer-events:none;
+  animation:brotarBloque .8s var(--salida) .2s forwards,
+            crecerBloque 1.05s cubic-bezier(.87,0,.13,1) 1.0s forwards,
+            apagarBloque 1s var(--suave) 2.05s forwards; }
+.bloque img { width:46%; height:auto; display:block; animation:apagarIso .45s var(--suave) 1.45s forwards; }
+@keyframes brotarBloque { from { opacity:0; scale:.6 } to { opacity:1; scale:1 } }
+@keyframes crecerBloque { to { width:100%; height:100%; border-radius:0 } }
+@keyframes apagarBloque { to { opacity:0 } }
+@keyframes apagarIso { to { opacity:0; scale:.8 } }
+
+.inicio-texto { position:absolute; left:0; right:0; bottom:0; z-index:3;
+  padding:0 clamp(1.1rem,4.4cqw,3.4rem) clamp(1.1rem,4.6cqw,3.2rem); }
+.titular { font-size:clamp(2rem,10.4cqw,8.2rem); font-weight:800; letter-spacing:-.055em;
+  line-height:.9; text-transform:uppercase; margin-bottom:.7rem; white-space:nowrap; }
+.titular .letra { animation-duration:1.3s, 1.9s; }
 .subtitular { overflow:hidden; padding-bottom:.14em; margin-bottom:-.14em; }
 .subtitular span { display:block; transform:translateY(115%);
-  animation:emerger 1.15s var(--salida) 3.5s forwards;
-  font-family:var(--mono); font-size:clamp(.6rem,1.35vw,.78rem); letter-spacing:.24em;
+  animation:emerger 1.15s var(--salida) 2.7s forwards;
+  font-family:var(--mono); font-size:clamp(.54rem,1.5cqw,.78rem); letter-spacing:.24em;
   text-transform:uppercase; color:var(--n-200); }
 @keyframes emerger { to { transform:translateY(0) } }
 
-.inicio-aparte { opacity:0; animation:aparecer 1.2s ease 3.9s forwards; padding-bottom:.5rem; }
-.inicio-aparte p { color:var(--tenue); font-size:clamp(.9rem,1.1vw,1rem); max-width:40ch; }
-.inicio-aparte .dato { font-family:var(--mono); font-size:.6rem; letter-spacing:.2em;
-  text-transform:uppercase; color:var(--debil); margin-top:1rem;
-  display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; }
+.inicio-aparte { position:absolute; z-index:3; top:clamp(.9rem,3cqw,2rem); right:clamp(1.1rem,4.4cqw,3.4rem);
+  opacity:0; animation:aparecer 1.2s ease 3s forwards; }
+.inicio-aparte .dato { font-family:var(--mono); font-size:clamp(.5rem,1.3cqw,.62rem); letter-spacing:.2em;
+  text-transform:uppercase; color:var(--n-200);
+  display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; justify-content:flex-end; }
 .inicio-aparte .dato .sep { width:16px; height:1px; background:var(--linea-fuerte); }
 @keyframes aparecer { to { opacity:1 } }
 
-.baja { position:absolute; left:50%; bottom:1.4rem; z-index:3; transform:translateX(-50%);
+.baja { position:absolute; left:50%; bottom:1rem; z-index:3; transform:translateX(-50%);
   display:flex; flex-direction:column; align-items:center; gap:.5rem;
   font-family:var(--mono); font-size:.53rem; letter-spacing:.22em; text-transform:uppercase; color:var(--debil);
-  opacity:0; animation:aparecer 1s ease 4.4s forwards; }
-.baja .hilo { width:1px; height:34px; background:linear-gradient(to bottom, var(--linea-fuerte), transparent); }
+  opacity:0; animation:aparecer 1s ease 3.4s forwards; }
+.baja .hilo { width:1px; height:30px; background:linear-gradient(to bottom, var(--linea-fuerte), transparent); }
 .baja .hilo::after { content:''; display:block; width:1px; height:12px; background:var(--tinta);
   animation:gotear 2.2s var(--suave) infinite; }
-@keyframes gotear { 0% { transform:translateY(-12px); opacity:0 } 40% { opacity:1 } 100% { transform:translateY(34px); opacity:0 } }
+@keyframes gotear { 0% { transform:translateY(-12px); opacity:0 } 40% { opacity:1 } 100% { transform:translateY(30px); opacity:0 } }
+@media (max-height:640px) { .baja { display:none; } }
 
 /* ============ PROYECTOS — vitrina a sangre ==================== */
 .vitrina { display:flex; width:100%; flex:1; min-height:clamp(420px,56vh,760px); overflow:hidden;
@@ -795,7 +844,7 @@ body.bloqueado .fono-nav {
    abre de abajo arriba. Es lo que hace que la seccion "entre" en vez
    de aparecer ya montada. */
 .hoja { position:relative; flex:1 1 0; min-width:0; overflow:hidden; cursor:pointer;
-  border-right:1px solid rgba(11,12,16,.5); transition:flex-grow .9s var(--salida);
+  border-right:1px solid rgba(5,5,6,.5); transition:flex-grow .9s var(--salida);
   clip-path:inset(0 0 100% 0); }
 /* Cada hoja se observa por su cuenta y entra cuando le toca, con un
    retraso propio. Antes se disparaba la vitrina entera de una vez: en
@@ -810,7 +859,7 @@ body.bloqueado .fono-nav {
 .vitrina:hover .hoja { flex-grow:.74; }
 .vitrina .hoja:hover { flex-grow:2.4; }
 @media (max-width:860px){
-  .hoja { flex:none; height:52vh; border-right:none; border-bottom:1px solid rgba(11,12,16,.5); }
+  .hoja { flex:none; height:52vh; border-right:none; border-bottom:1px solid rgba(5,5,6,.5); }
   .vitrina:hover .hoja, .vitrina .hoja:hover { flex-grow:1; }
   /* En tactil no hay cursor que señalar: la ficha de cada hoja va
      siempre desplegada y el rotulo vertical sobra. */
@@ -826,7 +875,7 @@ body.bloqueado .fono-nav {
   filter:saturate(.72) brightness(.6); }
 .hoja:hover .hoja-img img { transform:scale(1); filter:saturate(1) brightness(1); }
 .hoja-velo { position:absolute; inset:0;
-  background:linear-gradient(to top, rgba(11,12,16,.92) 0%, rgba(11,12,16,.34) 42%, rgba(11,12,16,.06) 100%); }
+  background:linear-gradient(to top, rgba(5,5,6,.92) 0%, rgba(5,5,6,.34) 42%, rgba(5,5,6,.06) 100%); }
 
 /* El nombre en vertical sale por la izquierda cuando la hoja se abre.
    El desplazamiento va en el CONTENEDOR, no en el texto: dentro de un
@@ -1560,13 +1609,13 @@ body.bloqueado .fono-nav {
 .hoja:active .hoja-img img { transform:scale(1.04); }
 .enlace:active { transform:scale(.97); }
 .tarjeta-pie { position:absolute; left:0; right:0; bottom:0; z-index:2; padding:1rem 1.2rem; color:#fff;
-  overflow:hidden; background:linear-gradient(to top, rgba(11,12,16,.88), transparent); }
+  overflow:hidden; background:linear-gradient(to top, rgba(5,5,6,.88), transparent); }
 .tarjeta-pie h4 { font-size:1rem; font-weight:500; }
 .tarjeta-pie .tipo { font-family:var(--mono); font-size:.54rem; letter-spacing:.18em;
   text-transform:uppercase; opacity:.76; margin-top:.15rem; }
 .tarjeta .sello { position:absolute; top:.8rem; right:.8rem; z-index:2;
   font-family:var(--mono); font-size:.5rem; letter-spacing:.16em; text-transform:uppercase;
-  background:rgba(11,12,16,.55); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.14);
+  background:rgba(5,5,6,.55); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.14);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
   color:#fff; padding:.28rem .6rem; border-radius:999px; }
 
@@ -1719,8 +1768,8 @@ body.bloqueado .fono-nav {
           margin-bottom:.55rem; border-radius:16px; }
   .hoja:last-child { margin-bottom:0; }
   .hoja-img img { filter:saturate(.95) brightness(.86); transform:scale(1.02); }
-  .hoja-velo { background:linear-gradient(to top, rgba(11,12,16,.96) 0%,
-               rgba(11,12,16,.55) 34%, rgba(11,12,16,.06) 62%); }
+  .hoja-velo { background:linear-gradient(to top, rgba(5,5,6,.96) 0%,
+               rgba(5,5,6,.55) 34%, rgba(5,5,6,.06) 62%); }
   .hoja-rotulo { display:none; }
   .hoja-abierta { padding:1.1rem 1.2rem 1.2rem; }
   .hoja-abierta > *, .hoja-abierta > * > * { overflow:visible; transform:none !important; }
@@ -1849,7 +1898,8 @@ body.bloqueado .fono-nav {
 @media (max-width:700px){
   .seccion { padding-top:1.1rem; }
   /* La portada se lleva la pantalla entera: ya no hay barra que esquivar. */
-  .inicio  { padding-top:0; }
+  .inicio  { padding-top:4.2rem; }
+  .escena-inicio { width:88vw; height:min(62svh, 118vw); }
   /* Sin barra que descontar. La holgura del dock la pone el
      `padding-bottom` de `.seccion-cuerpo`, no este alto. */
   #contacto { min-height:100svh; }
@@ -1892,7 +1942,8 @@ body.bloqueado .fono-nav {
 @media (prefers-reduced-motion:reduce){
   *, *::before, *::after { animation:none !important; transition:none !important; }
   .mascara-marca { display:none }
-  .lamina img { opacity:1; transform:none }
+  .pantalla, .pantalla #render-inicio { opacity:1; transform:none }
+  .bloque { display:none }
   /* Las letras arrancan con blur(16px): sin animacion que lo retire,
      el titular se quedaba borroso. No basta con devolver la opacidad. */
   .titular .letra, .letra { opacity:1 !important; filter:none !important; }
@@ -1917,8 +1968,10 @@ body.bloqueado .fono-nav {
 (function () {
   try {
     var g = localStorage.getItem('stick-tema');
-    var claro = g ? g === 'claro'
-                  : matchMedia('(prefers-color-scheme: light)').matches;
+    /* NEGRO POR DEFECTO, tambien si el sistema pide claro: el portafolio se
+       presenta en negro y solo pasa a claro si alguien lo elige con el disco. */
+    var claro = g === 'claro';
+    if (!location.hash) document.documentElement.classList.add('puerta');
     if (claro) document.documentElement.classList.add('claro');
   } catch (e) { /* sin almacenamiento: se queda en oscuro, que es el de casa */ }
 })();
@@ -1962,6 +2015,11 @@ body.bloqueado .fono-nav {
 
 <div class="mascara-marca">
   <canvas class="seda" id="seda-entrada" aria-hidden="true"></canvas>
+  <button class="entrar" id="entrar" type="button" aria-label="Entrar al portafolio">
+    <span>Entrar</span>
+    <span class="disco"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+  </button>
   <div class="marca-entrada">
     <svg viewBox="0 0 3572 1412" role="img" aria-label="STICK INDUSTRIES">
       <defs>
@@ -1990,28 +2048,35 @@ body.bloqueado .fono-nav {
 
 <!-- ===================== INICIO ===================== -->
 <section class="inicio" id="inicio">
-  <div class="lamina">
-    <canvas class="seda" id="seda-portada" aria-hidden="true"></canvas>
-    <!-- La portada es la unica imagen con el `srcset` escrito a mano: es la
-         primera que se pide y no puede esperar a que corra el JS. Las tres
-         tallas son las reales, medidas por `preparar-tallas.py`. -->
-    <img id="render-inicio" src="assets/renders/cantabria-23-09.webp"
-         srcset="assets/renders/cantabria-23-09@sm.webp 900w,
-                 assets/renders/cantabria-23-09.webp 1600w,
-                 assets/renders/cantabria-23-09@2x.webp 2560w"
-         sizes="100vw" alt="Render de patio interior — Lote 23, Villas de Cantabria"
-         fetchpriority="high">
-  </div>
-  <div class="inicio-texto">
-    <div>
-      <h1 class="titular" id="titular" data-texto="PORTAFOLIO"></h1>
-      <div class="subtitular"><span>Ingeniero civil · Visualización arquitectónica</span></div>
-    </div>
-    <div class="inicio-aparte">
-      <div class="dato mono">
-        <span>Kevin Gil</span><span class="sep"></span>
-        <span>Bucaramanga, Colombia</span>
+  <div class="halo-inicio"></div>
+  <h2 class="cap-inicio" aria-label="Ingeniero civil y visualizador">
+    <span class="l" data-texto="Ingeniero civil" aria-hidden="true"></span>
+    <span class="l" data-texto="y visualizador" aria-hidden="true"></span>
+  </h2>
+  <div class="escena-inicio">
+    <div class="pantalla">
+      <!-- La portada es la unica imagen con el `srcset` escrito a mano: es la
+           primera que se pide y no puede esperar a que corra el JS. Las tres
+           tallas son las reales, medidas por `preparar-tallas.py`. -->
+      <img id="render-inicio" src="assets/renders/cantabria-23-09.webp"
+           srcset="assets/renders/cantabria-23-09@sm.webp 900w,
+                   assets/renders/cantabria-23-09.webp 1600w,
+                   assets/renders/cantabria-23-09@2x.webp 2560w"
+           sizes="min(88vw,1180px)" alt="Render de patio interior — Lote 23, Villas de Cantabria"
+           fetchpriority="high">
+      <div class="velo-pantalla"></div>
+      <canvas class="seda" id="seda-portada" aria-hidden="true"></canvas>
+      <div class="inicio-aparte">
+        <div class="dato mono">
+          <span>Kevin Gil</span><span class="sep"></span>
+          <span>Bucaramanga, Colombia</span>
+        </div>
       </div>
+      <div class="inicio-texto">
+        <h1 class="titular" id="titular" data-texto="PORTAFOLIO"></h1>
+        <div class="subtitular"><span>Ingeniero civil · Visualización arquitectónica</span></div>
+      </div>
+      <div class="bloque" aria-hidden="true"><img src="assets/marca/isotipo.svg" alt=""></div>
     </div>
   </div>
   <div class="baja"><span>Desplace</span><span class="hilo"></span></div>
@@ -2498,29 +2563,43 @@ function repartir(el, texto, retraso, paso = .045) {
 /* Arranca CON la capa todavia puesta, no despues: las letras suben
    mientras la marca se disuelve, y por ese solape no hay un instante en que
    la pantalla este vacia esperando. */
-repartir(document.getElementById('titular'), 'PORTAFOLIO', 3.9, .06);
+repartir(document.getElementById('titular'), 'PORTAFOLIO', 2.0, .06);
+document.querySelectorAll('.cap-inicio .l').forEach((l, i) => repartir(l, l.dataset.texto, .5 + i * .3, .04));
 
-/* La capa de bienvenida se retira del DOM cuando su animacion termina — y
-   tambien si NO termina. Chrome congela las animaciones de una pestana en
-   segundo plano: quien abre el enlace en una pestana de fondo y vuelve al
-   rato se encontraba la capa entera todavia puesta. El plazo se cuenta
-   desde que la pagina se ve, no desde que se carga. */
+/* LA PUERTA DE ENTRADA
+
+   La capa de bienvenida es ahora una puerta: se queda en STICK INDUSTRIES con
+   la seda detras hasta que alguien toca la pantalla, el boton, o pulsa Intro o
+   Espacio. Entonces `abierto` echa a andar la portada (todas sus animaciones
+   estaban en pausa) y la capa se disuelve despacio. Con un enlace directo
+   (#proyectos...) o con `prefers-reduced-motion` no hay puerta.
+
+   Una capa que cubre la ventana puede tragarse todos los clics si su animacion
+   no llega a correr (pestaña en segundo plano): por eso, abierta, deja de
+   recibir el puntero y se retira por plazo aunque la animacion no acabe. */
 (() => {
   const capa = document.querySelector('.mascara-marca');
   if (!capa) return;
-  const retirar = () => capa.classList.add('fuera');
-  /* `animationend` SUBE desde los hijos: con `{ once:true }` a secas, la
-     primera animacion hija que terminaba (la flecha, a 1,4 s) retiraba la capa
-     y el logo se quedaba en «STIC». Solo vale la de la propia capa. */
-  capa.addEventListener('animationend', e => { if (e.target === capa) retirar(); });
+  const html = document.documentElement;
+  const retirar = () => { capa.classList.add('fuera'); html.classList.remove('puerta'); };
+  /* `animationend` SUBE desde los hijos: solo vale la de la propia capa. */
+  capa.addEventListener('animationend', e => { if (e.target === capa && capa.classList.contains('abierta')) retirar(); });
 
-  let reloj = null;
-  const armar = () => {
-    if (document.hidden || reloj) return;
-    reloj = setTimeout(retirar, 6400);   // la coreografia acaba a los 4,85 s
+  const abrir = (sinPuerta) => {
+    if (html.classList.contains('abierto')) return;
+    html.classList.add('abierto');
+    html.classList.remove('puerta');
+    if (sinPuerta) { retirar(); return; }
+    capa.classList.add('abierta');
+    setTimeout(retirar, 2600);
   };
-  document.addEventListener('visibilitychange', armar);
-  armar();
+  capa.addEventListener('click', () => abrir());
+  document.addEventListener('keydown', e => {
+    if (html.classList.contains('abierto')) return;
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrir(); }
+  });
+  if (location.hash || quieto()) abrir(true);
+  else document.getElementById('entrar')?.focus({ preventScroll:true });
 })();
 
 
@@ -2537,10 +2616,10 @@ repartir(document.getElementById('titular'), 'PORTAFOLIO', 3.9, .06);
   if (typeof crearSeda !== 'function') return;
   const html = document.documentElement;
   const esClaro = () => html.classList.contains('claro');
-  const montar = (id, fase, escala) => {
+  const montar = (id, fase, escala, siempreOscura) => {
     const c = document.getElementById(id);
     if (!c) return null;
-    try { const s = crearSeda(c, { claro: esClaro(), fase, escala }); return s && { c, s }; }
+    try { const s = crearSeda(c, { claro: !siempreOscura && esClaro(), fase, escala }); return s && { c, s }; }
     catch (e) { c.remove(); return null; }
   };
   const bucle = (inst, intensidad, activo) => {
@@ -2558,7 +2637,7 @@ repartir(document.getElementById('titular'), 'PORTAFOLIO', 3.9, .06);
   };
   const reactivar = [];
   new MutationObserver(() => {
-    [entrada, portada].forEach(i => { if (i) i.s.claro = esClaro(); });
+    if (entrada) entrada.s.claro = esClaro();
     reactivar.forEach(f => f());
   }).observe(html, { attributes:true, attributeFilter:['class'] });
 
@@ -2578,7 +2657,7 @@ repartir(document.getElementById('titular'), 'PORTAFOLIO', 3.9, .06);
   } else if (entrada) entrada.c.remove();
 
   // --- La portada: sobre el render, solo mientras se ve ---
-  const portada = montar('seda-portada', 3.7, .7);
+  const portada = montar('seda-portada', 3.7, .7, true);
   if (portada) {
     if (quieto()) { portada.s.tam(); portada.s.pintar(5, 1); portada.c.style.animation = 'none'; portada.c.style.opacity = '.4'; }
     else {
@@ -2591,6 +2670,29 @@ repartir(document.getElementById('titular'), 'PORTAFOLIO', 3.9, .06);
       b.arrancar();
     }
   }
+})();
+
+/* La pantalla de la portada respira: se endereza al bajar y sigue el puntero
+   un poco. Un bucle corto que se detiene al alcanzar el destino. */
+(() => {
+  const p = document.querySelector('.pantalla');
+  if (!p || quieto()) return;
+  let rx = 6, ry = -9, tx = 6, ty = -9, mx = .5, my = .5, raf = 0;
+  const alvo = () => {
+    const s = Math.min(1, scrollY / (innerHeight * .8));
+    tx = (6 + (my - .5) * -4) * (1 - s);
+    ty = (-9 + (mx - .5) * 7) * (1 - s);
+    if (!raf) raf = requestAnimationFrame(paso);
+  };
+  const paso = () => {
+    raf = 0;
+    rx += (tx - rx) * .075; ry += (ty - ry) * .075;
+    p.style.setProperty('--rx', rx.toFixed(3) + 'deg');
+    p.style.setProperty('--ry', ry.toFixed(3) + 'deg');
+    if (Math.abs(tx - rx) + Math.abs(ty - ry) > .01) raf = requestAnimationFrame(paso);
+  };
+  addEventListener('scroll', alvo, { passive:true });
+  addEventListener('pointermove', e => { mx = e.clientX / innerWidth; my = e.clientY / innerHeight; alvo(); }, { passive:true });
 })();
 
 document.querySelectorAll('.palabras').forEach(t => {

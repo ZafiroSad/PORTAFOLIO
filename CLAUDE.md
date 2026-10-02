@@ -15,21 +15,35 @@ Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 ### v35 (RAMA `seda`, sin publicar) — 2026-10-01
 
 Pedido: efectos tomados de un reel de referencia (@textura.eu), **en grises**,
-lo mas fieles y suaves posible, y un reel para el inicio.
+lo mas fieles y suaves posible; fondo **negro**; portada recreada como el reel;
+entrada que **espera** hasta que se toque.
 
-- **`assets/seda.js`**: hilos de luz en un solo fragment shader, funcion pura del
-  tiempo (sirve para web y para video). Modo claro: tinta oscura sobre papel.
-- **Entrada**: la seda corre detras de la marca. **Corregido un fallo previo**:
-  `animationend` subia desde los hijos y retiraba la capa a ~1,4 s (el logo se
-  quedaba en «STIC»); ahora solo cuenta el de la propia capa.
-- **Portada**: seda sobre el render con `screen` (en claro `multiply`), solo
-  corre mientras se ve; con `prefers-reduced-motion` pinta un fotograma.
-- **Eco tipografico** en las letras: `@property --eco` animada, sombras en cascada.
+- **Negro por defecto**: `--base:#050506`, masas del campo en grises neutros, y
+  el tema oscuro manda aunque el sistema pida claro (solo pasa a claro si se
+  elige con el disco). El modo claro sigue existiendo.
+- **LA PUERTA**: la capa de entrada ya no se disuelve sola. Se queda en
+  STICK INDUSTRIES con la seda detras y un boton «Entrar»; avanza al tocar la
+  pantalla, el boton, o con Intro/Espacio. Enlace directo (#hash) o
+  `prefers-reduced-motion`: sin puerta. Mientras espera, `html.puerta` bloquea
+  el scroll; al abrir, `html.abierto` echa a andar la portada (sus animaciones
+  estaban en pausa, asi los retardos cuentan desde el toque).
+- **Portada = el reel**: rotulo superior, panel con perspectiva que sigue el
+  puntero y se endereza al bajar, halo gris, bloque con el isotipo que crece y
+  destella, render, seda encima (siempre el shader oscuro: el panel es oscuro en
+  los dos temas), titular con eco.
+- **`assets/seda.js`**: hilos de luz, un fragment shader, funcion pura del
+  tiempo (web y video). **Eco tipografico**: `@property --eco`.
+- **Corregido un fallo previo**: `animationend` subia desde los hijos y retiraba
+  la capa a ~1,4 s (el logo se quedaba en «STIC»).
 - **Reel 9:16 de 19 s** (HyperFrames, fuera del repo, en
-  `Downloads\seda-portafolioeel`): apertura de pantalla, bloque que crece y
-  destella, seda, textos con eco, cierre con la marca.
-- **Pendiente de decision**: reel nuevo reemplaza o convive con el actual;
-  version 16:9; fluidez del destello entre secciones al hacer scroll.
+  `Downloads\seda-portafolioeel`).
+- **Herramientas de verificacion** (en `Downloads\seda-portafolio\herramientas`,
+  no estan en el repo): capturas con el tiempo de las animaciones congelado.
+  Congelar con `getAnimations()` y fijar `currentTime` es lo unico fiable: el
+  reloj real del navegador no deja capturar la entrada.
+- **Pendiente**: reel nuevo reemplaza o convive con el actual; version 16:9;
+  destello entre secciones al hacer scroll; revisar las fichas de proyecto y el
+  visor sobre el negro nuevo.
 
 ### v34 — 2026-09-16
 
