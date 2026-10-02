@@ -41,15 +41,13 @@ void main(){
  float t=uT*.12+uF;
  float E=.5*uR.y/min(uR.x,uR.y);          // mitad del alto visible
  float X=.5*uR.x/min(uR.x,uR.y);          // mitad del ancho visible
- // Dos estelas que BARREN TODA LA PANTALLA, como en la referencia: un manojo
- // grueso de hilos con resplandor que cruza de lado a lado.
- //  A: casi vertical; su recorrido es el ANCHO (entra por un borde y sale por el otro).
- //  B: mas horizontal; su recorrido es el ALTO, y uP la empuja para acompanar al titulo.
- float thA=1.2+.4*sin(uT*.11+uF);
- float offA=1.05*max(X,E)*sin(uT*.21+uF);
- float thB=.15-.45*sin(uT*.09+1.+uF);
- float offB=uP+.95*E*sin(uT*.16+2.5+uF);
- float L=estela(rot(uv,thA),t,offA,.18*sin(uT*.13),0.,1.)+.85*estela(rot(uv,thB),t*.9,offB,-.2*sin(uT*.1),2.7,-1.);
+ // UNA estela que barre toda la pantalla, como en la referencia: un manojo
+ // grueso de hilos con resplandor que cruza de lado a lado. Su orientacion
+ // gira despacio entre horizontal, diagonal y vertical, y su recorrido va de un
+ // borde al otro. uP la empuja en vertical para acompanar al titulo de la seccion.
+ float th=.6+.95*sin(uT*.1+uF);
+ float off=1.05*max(X,E)*sin(uT*.2+uF);
+ float L=estela(rot(uv-vec2(0.,uP),th),t,off,.16*sin(uT*.13),0.,1.);
  L=min(L,1.7);
  float v=1.-dot(uv*.55,uv*.55);
  L=L*uI*v;

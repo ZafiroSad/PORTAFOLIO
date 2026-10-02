@@ -2494,7 +2494,7 @@ repartir(document.getElementById('titular'), 'PORTAFOLIO', 1.2, .06);
     return mejor == null ? 0 : (H / 2 - mejor) / m;
   };
 
-  const pintarFijo = () => { s.tam(); s.pintar(3.2, esClaro() ? .3 : .34, objetivo()); };
+  const pintarFijo = () => { s.tam(); s.pintar(3.2, esClaro() ? .32 : .38, objetivo()); };
 
   const cuadro = (ahora) => {
     id = 0;
@@ -2504,7 +2504,7 @@ repartir(document.getElementById('titular'), 'PORTAFOLIO', 1.2, .06);
       vel += ((Math.abs(dy) / dt) - vel) * .12;           // px/ms suavizado
       yAntes = scrollY; tAntes = ahora;
       desp += (objetivo() - desp) * .05;
-      const base = html.classList.contains('puerta') ? 1.05 : (esClaro() ? .3 : .34);
+      const base = html.classList.contains('puerta') ? 1.05 : (esClaro() ? .32 : .38);
       const intensidad = base + Math.min(.22, vel * .4);
       s.tam();
       s.pintar((ahora - t0) / 1000 + scrollY * .0016, intensidad, desp);
