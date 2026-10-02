@@ -641,6 +641,39 @@ body.bloqueado .fono-nav {
 }
 @keyframes cruzar { to { transform:translateX(-50%) scaleX(1); } }
 
+
+/* ============ SEDA — hilos de luz en grises ====================
+   Un shader (assets/seda.js) pintado en dos sitios: detras de la marca
+   durante la entrada, y sobre el render de la portada, fundido con
+   `screen` (en claro, `multiply`) para que SOLO sume luz o sombra y el
+   render siga siendo lo mas brillante de la pantalla. */
+.seda { position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none; }
+.mascara-marca .seda { opacity:0; animation:entrarSeda 2.6s var(--suave) .15s forwards; }
+@keyframes entrarSeda { to { opacity:.62 } }
+.lamina .seda { z-index:1; mix-blend-mode:screen; opacity:0;
+  animation:aparecerSeda 3.2s var(--suave) 3.6s forwards;
+  -webkit-mask-image:linear-gradient(to bottom, #000 0%, #000 55%, transparent 96%);
+          mask-image:linear-gradient(to bottom, #000 0%, #000 55%, transparent 96%); }
+:root.claro .lamina .seda { mix-blend-mode:multiply; }
+@keyframes aparecerSeda { to { opacity:.4 } }
+.lamina::after { z-index:2; }
+
+/* ECO TIPOGRAFICO. Al asentarse, cada letra arrastra copias suyas hacia
+   arriba que se pliegan sobre ella. Una propiedad registrada (`--eco`) se
+   anima de 0,42em a 0 y las sombras la leen: asi la estela es continua y no
+   hay capas duplicadas en el DOM. Es el gesto del texto que "se descompone"
+   y vuelve, sin rebote: decelera largo y llega quieto. */
+@property --eco { syntax:'<length>'; inherits:true; initial-value:0px; }
+.letra { --eco:0px; filter:blur(4px);
+  text-shadow:0 calc(var(--eco) * -1) 0 color-mix(in srgb, currentColor 46%, transparent),
+              0 calc(var(--eco) * -2) 0 color-mix(in srgb, currentColor 28%, transparent),
+              0 calc(var(--eco) * -3.2) 0 color-mix(in srgb, currentColor 13%, transparent);
+  animation-name:asentarLetra, plegarEco; animation-duration:.95s, 1.5s;
+  animation-timing-function:var(--salida), var(--salida); animation-fill-mode:forwards, both; }
+@keyframes plegarEco { from { --eco:.62em } to { --eco:0em } }
+.titular .letra { animation-duration:1.3s, 1.9s; }
+.palabras span i { --eco:0px; }
+
 /* ============ Secciones ======================================= */
 /* Sin `content-visibility`: ahorraba descarga inicial, pero deja las
    secciones sin maquetar y `offsetTop` devuelve la altura ESTIMADA —
@@ -1928,6 +1961,7 @@ body.bloqueado .fono-nav {
 <nav class="fono-nav glass-dock" id="fono-nav" aria-label="Navegación principal"></nav>
 
 <div class="mascara-marca">
+  <canvas class="seda" id="seda-entrada" aria-hidden="true"></canvas>
   <div class="marca-entrada">
     <svg viewBox="0 0 3572 1412" role="img" aria-label="STICK INDUSTRIES">
       <defs>
@@ -1957,6 +1991,7 @@ body.bloqueado .fono-nav {
 <!-- ===================== INICIO ===================== -->
 <section class="inicio" id="inicio">
   <div class="lamina">
+    <canvas class="seda" id="seda-portada" aria-hidden="true"></canvas>
     <!-- La portada es la unica imagen con el `srcset` escrito a mano: es la
          primera que se pide y no puede esperar a que corra el JS. Las tres
          tallas son las reales, medidas por `preparar-tallas.py`. -->
@@ -2189,6 +2224,7 @@ body.bloqueado .fono-nav {
   <p class="reel-mudo mono">El navegador bloqueó el sonido · actívelo en el control de volumen</p>
 </div>
 
+<script src="assets/seda.js"></script>
 <script>
 /* =================================================================
    CONTACTO
@@ -2473,7 +2509,10 @@ repartir(document.getElementById('titular'), 'PORTAFOLIO', 3.9, .06);
   const capa = document.querySelector('.mascara-marca');
   if (!capa) return;
   const retirar = () => capa.classList.add('fuera');
-  capa.addEventListener('animationend', retirar, { once:true });
+  /* `animationend` SUBE desde los hijos: con `{ once:true }` a secas, la
+     primera animacion hija que terminaba (la flecha, a 1,4 s) retiraba la capa
+     y el logo se quedaba en «STIC». Solo vale la de la propia capa. */
+  capa.addEventListener('animationend', e => { if (e.target === capa) retirar(); });
 
   let reloj = null;
   const armar = () => {
@@ -2482,6 +2521,76 @@ repartir(document.getElementById('titular'), 'PORTAFOLIO', 3.9, .06);
   };
   document.addEventListener('visibilitychange', armar);
   armar();
+})();
+
+
+/* =================================================================
+   SEDA — la entrada y la portada
+
+   El mismo shader dos veces: detras de la marca mientras se dibuja, y sobre
+   el render cuando aparece. Cada instancia corre solo mientras se ve: la de
+   la entrada muere con la capa, la de la portada se detiene al salir de
+   pantalla y con la pestaña en segundo plano. Con `prefers-reduced-motion`
+   pinta UN fotograma y no anima.
+   ================================================================= */
+(() => {
+  if (typeof crearSeda !== 'function') return;
+  const html = document.documentElement;
+  const esClaro = () => html.classList.contains('claro');
+  const montar = (id, fase, escala) => {
+    const c = document.getElementById(id);
+    if (!c) return null;
+    try { const s = crearSeda(c, { claro: esClaro(), fase, escala }); return s && { c, s }; }
+    catch (e) { c.remove(); return null; }
+  };
+  const bucle = (inst, intensidad, activo) => {
+    const t0 = performance.now();
+    let id = 0, vivo = true;
+    const paso = () => {
+      id = 0;
+      if (!vivo || !activo()) return;
+      inst.s.tam();
+      inst.s.pintar((performance.now() - t0) / 1000, intensidad());
+      id = requestAnimationFrame(paso);
+    };
+    const arrancar = () => { if (!id && vivo) id = requestAnimationFrame(paso); };
+    return { arrancar, parar() { vivo = false; cancelAnimationFrame(id); } };
+  };
+  const reactivar = [];
+  new MutationObserver(() => {
+    [entrada, portada].forEach(i => { if (i) i.s.claro = esClaro(); });
+    reactivar.forEach(f => f());
+  }).observe(html, { attributes:true, attributeFilter:['class'] });
+
+  // --- La entrada: detras de la marca, hasta que la capa se retira ---
+  const capa = document.querySelector('.mascara-marca');
+  const entrada = montar('seda-entrada', 0, .7);
+  if (entrada && capa) {
+    if (quieto()) { entrada.s.tam(); entrada.s.pintar(2.5, 1); }
+    else {
+      const b = bucle(entrada, () => 1, () => !capa.classList.contains('fuera') && !document.hidden);
+      b.arrancar();
+      document.addEventListener('visibilitychange', b.arrancar);
+      new MutationObserver(() => {
+        if (capa.classList.contains('fuera')) { b.parar(); entrada.s.borrar(); entrada.c.remove(); }
+      }).observe(capa, { attributes:true, attributeFilter:['class'] });
+    }
+  } else if (entrada) entrada.c.remove();
+
+  // --- La portada: sobre el render, solo mientras se ve ---
+  const portada = montar('seda-portada', 3.7, .7);
+  if (portada) {
+    if (quieto()) { portada.s.tam(); portada.s.pintar(5, 1); portada.c.style.animation = 'none'; portada.c.style.opacity = '.4'; }
+    else {
+      let visible = true;
+      const b = bucle(portada, () => 1, () => visible && !document.hidden);
+      new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible) b.arrancar(); },
+        { threshold:0 }).observe(portada.c.parentElement);
+      document.addEventListener('visibilitychange', b.arrancar);
+      reactivar.push(b.arrancar);
+      b.arrancar();
+    }
+  }
 })();
 
 document.querySelectorAll('.palabras').forEach(t => {
