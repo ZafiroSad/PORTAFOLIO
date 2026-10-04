@@ -2453,18 +2453,15 @@ repartir(document.getElementById('titular'), 'PORTAFOLIO', 1.2, .06);
 
 
 /* =================================================================
-   LA ESTELA — fondo de toda la pagina, con sentido
+   LA ESTELA — fondo de toda la pagina
 
    Un lienzo fijo detras del contenido (el mismo shader de assets/seda.js).
-   Tres reglas hacen que no sea adorno:
-     1. GUIA: la vena luminosa se desliza hasta quedar detras del titulo de la
-        seccion que se esta leyendo (el `.cabeza` mas cercano al centro), con
-        suavizado. Al volver arriba, descansa en el centro, detras del logo.
-     2. RESPONDE: el desplazamiento mueve su corriente y, segun la velocidad,
-        la enciende un poco; al parar, se aquieta.
-     3. SE CALLA: mas tenue en claro y bajo cualquier capa abierta, y se pausa
-        con la pestaña en segundo plano. Con movimiento reducido pinta un
-        fotograma y no anima.
+   NO ES INTERACTIVA: su movimiento depende solo del tiempo. El desplazamiento,
+   el puntero y las secciones no le dicen nada —ni su posicion, ni su corriente,
+   ni su brillo—, asi que se ve igual de viva en cualquier lugar de la pagina.
+   Unicas dos concesiones, ninguna de comportamiento: mas tenue en claro, y
+   se pausa con la pestaña oculta o con una capa abierta. Con movimiento
+   reducido pinta un fotograma y no anima.
    ================================================================= */
 (() => {
   const c = document.getElementById('seda-fondo');
@@ -2477,37 +2474,17 @@ repartir(document.getElementById('titular'), 'PORTAFOLIO', 1.2, .06);
   new MutationObserver(() => { s.claro = esClaro(); if (quieto()) pintarFijo(); })
     .observe(html, { attributes:true, attributeFilter:['class'] });
 
-  const cabezas = [...document.querySelectorAll('.cabeza')];
   const t0 = performance.now();
-  let desp = 0, vel = 0, yAntes = scrollY, tAntes = t0, id = 0;
-
-  const objetivo = () => {
-    const H = innerHeight, m = Math.min(innerWidth, H);
-    if (html.classList.contains('puerta') || scrollY < H * .55) return 0;
-    let mejor = null, dmin = 1e9;
-    for (const el of cabezas) {
-      const r = el.getBoundingClientRect();
-      if (r.bottom < -H * .2 || r.top > H * 1.2) continue;
-      const cy = r.top + r.height * .5, d = Math.abs(cy - H * .42);
-      if (d < dmin) { dmin = d; mejor = cy; }
-    }
-    return mejor == null ? 0 : (H / 2 - mejor) / m;
-  };
-
-  const pintarFijo = () => { s.tam(); s.pintar(3.2, esClaro() ? .32 : .38, objetivo()); };
+  let id = 0;
+  const intensidad = () => html.classList.contains('puerta') ? 1.05 : (esClaro() ? .32 : .38);
+  const pintarFijo = () => { s.tam(); s.pintar(3.2, intensidad(), 0); };
 
   const cuadro = (ahora) => {
     id = 0;
     if (document.hidden) return;
     if (!document.body.classList.contains('bloqueado')) {
-      const dt = Math.max(1, ahora - tAntes), dy = scrollY - yAntes;
-      vel += ((Math.abs(dy) / dt) - vel) * .12;           // px/ms suavizado
-      yAntes = scrollY; tAntes = ahora;
-      desp += (objetivo() - desp) * .05;
-      const base = html.classList.contains('puerta') ? 1.05 : (esClaro() ? .32 : .38);
-      const intensidad = base + Math.min(.22, vel * .4);
       s.tam();
-      s.pintar((ahora - t0) / 1000 + scrollY * .0016, intensidad, desp);
+      s.pintar((ahora - t0) / 1000, intensidad(), 0);
     }
     id = requestAnimationFrame(cuadro);
   };
