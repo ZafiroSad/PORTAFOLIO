@@ -50,13 +50,13 @@ blanco con letra negra, y la estela detras de todo con sentido.
 - **EL REEL SE QUITO**: seccion, entrada del menu, capa y JS. Menu: Inicio ·
   Proyectos · Sobre mi · Suite · Contacto. Los MP4 viejos `assets/video/reel*.mp4`
   (~15 MB + 1440p) quedaron SIN USO; borrarlos es decision de Kevin. Los reels
-  nuevos (v1 de 19 s y v2 de 24,5 s, 9:16) viven en `Downloads\seda-portafolio\`
+  nuevos (v1 de 19 s y v2 de 24,5 s, 9:16) vivían en `Downloads\seda-portafolio\` (el Señor Stick borró la carpeta el 2026-10-16)
   (`reel`, `reel-v2`) fuera del repo.
 - **Corregido un fallo previo**: `animationend` subia desde los hijos y retiraba
   la capa de entrada a ~1,4 s (el logo se quedaba en «STIC»).
 - **Verificacion**: capturas con el tiempo de las animaciones congelado
   (`getAnimations()` + `currentTime`); es lo unico fiable, el reloj real no deja
-  capturar la entrada. Herramientas en `Downloads\seda-portafolio\herramientas`.
+  capturar la entrada. Las herramientas estaban en `Downloads\seda-portafolio\herramientas` (borradas el 2026-10-16).
 - **Pendiente**: revisar fichas de proyecto y visor sobre el negro; destello
   entre secciones; decidir si el reel nuevo vuelve algun dia (y como).
 
