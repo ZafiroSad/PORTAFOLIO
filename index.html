@@ -929,7 +929,7 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
    y pasa a decir «asi trabajo». Sin cajas: el resplandor sale de
    drop-shadow sobre el propio PNG, asi que toma su silueta. */
 .sobre-marco { position:relative; }
-.flujo { display:grid; grid-template-columns:repeat(3, minmax(0,1fr));
+.flujo { display:grid; grid-template-columns:repeat(4, minmax(0,1fr));
   gap:clamp(1.2rem,3vw,2.6rem); margin-top:clamp(1.2rem,2.6vh,2rem);
   padding-top:clamp(1.1rem,2.2vh,1.6rem); border-top:1px solid var(--linea); }
 .etapa { position:relative; opacity:0; transform:translateY(20px);
@@ -959,7 +959,47 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
   filter:drop-shadow(0 0 15px rgba(var(--c),.95)) drop-shadow(0 0 38px rgba(var(--c),.45)); }
 .util.negativo:hover img { filter:invert(1) brightness(1.15) drop-shadow(0 0 16px rgba(255,255,255,.45)); }
 .util:hover b { color:var(--tenue); }
+.flujo.visible .etapa:nth-child(4) { transition-delay:.30s }
+/* Sin logo servible (ETABS, ATLAS, Python): la sigla en un disco del mismo
+   tamaño que los logos, con el resplandor del color de su marca. */
+.util .sigla { width:clamp(36px,3.6vw,48px); height:clamp(36px,3.6vw,48px);
+  display:grid; place-items:center; border-radius:12px; font-style:normal;
+  font-family:var(--mono); font-size:.8rem; font-weight:600; letter-spacing:.02em;
+  color:rgb(var(--c)); border:1.5px solid rgba(var(--c),.75);
+  box-shadow:0 0 14px rgba(var(--c),.28), inset 0 0 10px rgba(var(--c),.12);
+  animation:respiraUtil var(--f,5s) var(--suave) infinite alternate; animation-delay:var(--d,0s); }
+:root.claro .util .sigla { color:var(--tinta); }
+@media (max-width:1180px) and (min-width:901px){ .flujo { grid-template-columns:repeat(2, minmax(0,1fr)) } }
 @media (max-width:900px){ .flujo { grid-template-columns:1fr; gap:1.8rem } }
+
+/* ESTRUCTURAS. Las portadas son dibujos sobre blanco: en la hoja se ven
+   ENTERAS (contain) sobre un papel, no recortadas como un render. */
+.hoja.lamina .hoja-img { background:#f4f4f2; }
+.hoja.lamina .hoja-img img { object-fit:contain; padding:2%; }
+/* Las laminas de la galeria se leen sobre papel claro en los dos temas:
+   un plano invertido deja de ser el plano que se emitio. */
+.galeria.laminas figure { background:#f4f4f2; }
+.galeria.laminas figure img { object-fit:contain; }
+
+/* El alcance de una ficha de ingenieria: que hizo Kevin, en una linea de
+   prosa y fichas cortas. Usa las mismas `.partes` de la suite. */
+.alcance { padding:clamp(1.4rem,4vh,2.6rem) var(--margen) 0; }
+.alcance-cuerpo { max-width:880px; margin:0 auto; }
+.alcance-cuerpo p { margin:.7rem 0 0; font-size:clamp(.95rem,1.4vw,1.1rem); line-height:1.6;
+  color:var(--n-200); max-width:62ch; }
+.alcance-enlace { margin-top:1.4rem; display:inline-flex; }
+
+/* La suite: estado y enlace de cada app. */
+.banco-cabeza { display:flex; align-items:center; gap:.8rem; flex-wrap:wrap; }
+.banco-estado { font-family:var(--mono); font-size:.55rem; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--tinta); padding:.35rem .62rem; border-radius:999px;
+  border:1px solid var(--linea); background:var(--relleno); }
+.banco-abrir { display:inline-flex; align-items:center; gap:.5rem; margin-top:1.2rem;
+  font-family:var(--mono); font-size:.6rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--base, #050506); background:var(--tinta); padding:.62rem 1rem; border-radius:999px;
+  text-decoration:none; transition:transform .35s var(--resorte), opacity .3s var(--suave); }
+.banco-abrir:hover { transform:translateY(-2px); }
+:root.claro .banco-abrir { color:#fff; }
 
 /* LA STICK SUITE — un banco, no una vitrina
    ==================================================================
@@ -1897,6 +1937,7 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
     <span class="gota" id="gota"></span>
     <a href="#inicio" data-reiniciar>Inicio</a>
     <a href="#proyectos">Proyectos</a>
+    <a href="#estructuras">Estructuras</a>
     <a href="#sobre">Sobre mí</a>
     <a href="#suite">Suite</a>
     <a href="#contacto">Contacto</a>
@@ -1955,7 +1996,7 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
   <div class="inicio-texto">
     <div>
       <h1 class="titular" id="titular" data-texto="PORTAFOLIO"></h1>
-      <div class="subtitular"><span>Ingeniero civil · Visualización arquitectónica</span></div>
+      <div class="subtitular"><span>Ingeniero civil · Estructuras, BIM y visualización</span></div>
     </div>
     <div class="inicio-aparte">
       <div class="dato mono">
@@ -1988,6 +2029,27 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
   </div>
 </section>
 
+<!-- ===================== ESTRUCTURAS =====================
+     La ingenieria va en su propia seccion y no mezclada con los renders: un
+     plano y una fachada se leen distinto, y quien busca un calculista tiene
+     que encontrar el calculo sin pasar por las cocinas. Usa la misma vitrina
+     que Proyectos; la ficha añade el ALCANCE (que hizo Kevin) y, si existe,
+     el modelo 3D navegable. Las laminas van recortadas SIN rotulo ni nombres
+     de terceros (decision del Señor Stick, 2026-11-25). -->
+<section class="seccion" id="estructuras">
+  <div class="seccion-cuerpo">
+    <div class="cabeza acolchado">
+      <div>
+        <div class="etiqueta revelar"><span>Ingeniería</span></div>
+        <h2 class="palabras" data-texto="Estructuras."></h2>
+      </div>
+      <p class="suite-entrada asoma">Modelado estructural en Revit, análisis en ETABS y
+         detallado según la NSR-10: del modelo a la lámina que se construye.</p>
+    </div>
+    <div class="vitrina" id="vitrina-est"></div>
+  </div>
+</section>
+
 <!-- ===================== SOBRE MÍ ===================== -->
 <section class="seccion" id="sobre">
   <div class="seccion-cuerpo acolchado sobre-marco">
@@ -1996,23 +2058,25 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
       <div class="cabeza">
         <div>
           <div class="etiqueta revelar"><span>Quién</span></div>
-          <h2 class="palabras" data-texto="Ingeniero civil y visualizador."></h2>
+          <h2 class="palabras" data-texto="Ingeniero que construye sus herramientas."></h2>
         </div>
       </div>
 
       <div class="bio">
         <div class="asoma">
           <p class="destacado">Diseño para construir, no solo para impresionar.</p>
-          <p>No separo la arquitectura de la ingeniería ni la técnica de la tecnología. Cada
-             proyecto parte de <strong>un único modelo digital</strong> del que se generan las
-             visualizaciones, los planos y la información necesaria para construir con precisión.</p>
-          <p>Mi trabajo combina ingeniería civil, criterio estructural y sensibilidad arquitectónica
-             para que la estética y la viabilidad técnica avancen en la misma dirección.
-             Paralelamente, desarrollo aplicaciones y herramientas propias que optimizan mi flujo de
-             trabajo y me permiten ofrecer soluciones más eficientes que las de un proceso
-             convencional.</p>
-          <p>No busco únicamente representar proyectos. Busco comprenderlos, optimizarlos y hacerlos
-             mejores antes de que lleguen a la obra.</p>
+          <p>Me formo como ingeniero civil en la UPB —diez semestres culminados— y trabajo donde
+             se cruzan la estructura, el modelo BIM y la imagen. Cada proyecto parte de <strong>un único modelo digital</strong>: de él
+             salen el análisis, los planos de detalle, las cantidades y las visualizaciones, sin
+             volver a dibujar lo que ya existe.</p>
+          <p>He modelado y detallado estructuras de concreto en Revit bajo la <strong>NSR-10</strong>,
+             analizado en ETABS y llevado ese trabajo a láminas revisadas por un ingeniero
+             estructural. En obra, como practicante residente, controlo lo que se construye contra
+             lo que se dibujó.</p>
+          <p>Cuando una tarea se repite, la automatizo: escribí <strong>ATLAS</strong>, que diseña el
+             acero desde ETABS, y <strong>STICK PRO</strong>, 26 herramientas para Revit que hoy son
+             un producto. Busco equipos donde ese criterio técnico y esa forma de trabajar
+             ahorren horas reales.</p>
         </div>
 
         <div class="bio-trayecto asoma" style="--r:.12s">
@@ -2050,13 +2114,13 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
         <div class="etiqueta revelar"><span>Software propio</span></div>
         <h2 class="palabras" data-texto="La STICK SUITE."></h2>
       </div>
-      <p class="suite-entrada asoma">Siete aplicaciones escritas para resolver lo que el
-         trabajo pedía y no existía. Las tres primeras resuelven obra.</p>
+      <p class="suite-entrada asoma" id="suite-entrada">Aplicaciones escritas para resolver lo que
+         el trabajo pedía y no existía. Las marcadas con punto son de ingeniería.</p>
     </div>
 
     <div class="suite" id="suite-rejilla">
       <div class="banco vidrio" id="suite-banco" role="tabpanel" aria-live="polite"></div>
-      <div class="tira" id="suite-tira" role="tablist" aria-label="Las siete aplicaciones"></div>
+      <div class="tira" id="suite-tira" role="tablist" aria-label="Las aplicaciones"></div>
     </div>
   </div>
 </section>
@@ -2078,7 +2142,7 @@ html.abierto .inicio *, html.abierto .inicio *::before, html.abierto .inicio *::
       <div class="hoja-vida asoma">
         <a class="btn-todos vidrio" href="compartir/kevin-gil-cv.pdf" download="kevin-gil-cv.pdf">
           <span>Descargar la hoja de vida</span>
-          <span class="cuenta" id="cuenta-cv">PDF · 1 página</span>
+          <span class="cuenta" id="cuenta-cv">PDF · 2 páginas</span>
           <span class="disco"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
             ><path d="M12 4v12M7 12l5 5 5-5M5 20h14"/></svg></span>
@@ -2164,7 +2228,7 @@ const CONTACTO = {
 
 /* =================================================================
    CATALOGO
-   Espeja la carpeta  02. WORK\03. STICK INDUSTRIES\99. RECURSOS MARCA\PROYECTOS
+   Espeja la carpeta  02. WORK\03. STICK INDUSTRIES\99. MARCA\PROYECTOS
    PORTAFOLIO : los cuatro de PRINCIPALES abren la vitrina y los de
    SECUNDARIOS completan el indice.
 
@@ -2250,10 +2314,47 @@ const SECUNDARIOS = [
     texto:'Cocina oscura con listones verticales en madera y encimera clara. El estudio buscaba controlar el contraste: mucho mueble negro exige que la luz de trabajo quede exactamente donde se va a instalar.' }
 ];
 
-const TODOS = [...PRINCIPALES, ...SECUNDARIOS];
+/* INGENIERIA ESTRUCTURAL — seccion propia (#estructuras).
+   Las imagenes son RECORTES de las laminas emitidas, sin rotulo y con los
+   nombres de terceros borrados (`herramientas/preparar-laminas.py`), y
+   capturas del modelo. Campos propios:
+   alcance  lo que hizo Kevin, en fichas cortas (dato tecnico, va en mono)
+   enlace   modelo 3D navegable, si existe: {url, rotulo}
+   La portada es la vista que explica la estructura (isometrico o 3D), no
+   una lamina: el equivalente de la fachada en arquitectura.
+   lamina   la portada es un dibujo sobre blanco: se ve entera, sobre papel. */
+const ESTRUCTURALES = [
+  { slug:'gambita', arch:'gambita', titulo:'Gambita', tipo:'Estructura de concreto · 3 niveles',
+    grupo:'estructural', lugar:'Gámbita, Santander', anio:'2026', estado:'Emitido · REV-11',
+    coord:[5.946,-73.344],
+    portada:1, piezas:[1,10,2,3,6,9,4,5,7,8], extra:[], lamina:true,
+    alcance:['Modelo estructural en Revit', 'Pórticos de concreto + PlacaFácil', 'Cimentación con zapatas',
+             'Despiece de vigas y columnas', 'Escaleras diseñadas con ATLAS', 'Láminas E01–E11 · 11 revisiones'],
+    texto:'Vivienda de tres niveles y cubierta en pórticos de concreto con entrepiso PlacaFácil. Modelé la estructura en Revit y emití el juego completo de planos —cimentación, plantas, despieces, escaleras y mampostería no estructural— a lo largo de once revisiones con el ingeniero estructural.' },
+
+  { slug:'lote-132', arch:'lote132', titulo:'Lote 132 · Loma Reserva', tipo:'Predimensionamiento · 3 niveles',
+    grupo:'estructural', lugar:'Santander', anio:'2026', estado:'Emitido · REV-4',
+    coord:[7.07,-73.10],
+    portada:8, piezas:[8,2,1,3,4,5,6,7], extra:[], lamina:true,
+    alcance:['Predimensionamiento NSR-10', 'Títulos B y C', 'Modelo en Revit y ETABS',
+             'Acero propuesto con ATLAS', 'Planos 1:50 · REV-0 a REV-4'],
+    texto:'Vivienda de tres niveles con sótano y cubierta. Predimensioné columnas, vigas, viguetas y riostras bajo los Títulos B y C de la NSR-10, armé el modelo para ETABS y usé ese análisis para que ATLAS propusiera el acero de vigas y columnas.' },
+
+  { slug:'mezanine', arch:'mezanine', titulo:'Mezanine para horno de 5 t', tipo:'Estructura metálica',
+    grupo:'estructural', lugar:'Santander', anio:'2026', estado:'Prácticas',
+    coord:[7.12,-73.12],
+    portada:1, piezas:[1,2], extra:[],
+    alcance:['ETABS 23 por script (Python)', 'AISC 360-10 / NSR-10', 'Tres variantes comparadas',
+             'D/C ≤ 0,45 en todos los perfiles', 'Anclaje a viga existente', 'Visor 3D propio'],
+    enlace:{ url:'visor/mezanine-3d.html', rotulo:'Abrir el modelo 3D' },
+    texto:'Plataforma metálica de 3,50 × 2,30 m para un horno de cinco toneladas, anclada a una viga de concreto existente. Generé los modelos de ETABS con scripts, comparé tres variantes y elegí la más liviana que cumple: 827 kg de acero, con el sismo resuelto por la lámina como diafragma.' }
+];
+
+const TODOS = [...PRINCIPALES, ...SECUNDARIOS, ...ESTRUCTURALES];
 
 const GRUPOS = [
   { clave:'todos',       nombre:'Todos' },
+  { clave:'estructural', nombre:'Estructural' },
   { clave:'vivienda',    nombre:'Vivienda' },
   { clave:'corporativo', nombre:'Sede corporativa' },
   { clave:'carpinteria', nombre:'Carpintería' }
@@ -2261,115 +2362,142 @@ const GRUPOS = [
 
 /* Formacion y trayectoria, en orden cronologico */
 const HITOS = [
-  { anio:'2021', escudo:'assets/logos/sja.webp', sigla:'CBSJA',
+  { anio:'2021', escudo:'assets/logos/sja.webp', sigla:'CBSJA', tipo:'formacion',
     titulo:'Bachiller Académico Bilingüe', estado:null,
-    detalle:'Colegio Bilingüe San Juan de Ávila. Inglés B2 certificado por IELTS.' },
+    detalle:'Colegio Bilingüe San Juan de Ávila.' },
 
-  { anio:'2022', escudo:'assets/logos/upb.webp', sigla:'UPB',
-    titulo:'Ingeniería Civil', estado:'9 semestres',
+  { anio:'2022', escudo:'assets/logos/upb.webp', sigla:'UPB', tipo:'formacion',
+    titulo:'Ingeniería Civil', estado:'10 semestres',
     detalle:'Universidad Pontificia Bolivariana, seccional Bucaramanga. Promedio ponderado 4.3 / 5.' },
 
-  { anio:'2023', escudo:null, sigla:'OBRA',
+  { anio:'2023', escudo:null, sigla:'OBRA', tipo:'trabajo',
     titulo:'Ayudante de obra', estado:null,
     detalle:'Replanteo, control de material y manejo de cuadrilla en obra de vivienda.' },
 
-  { anio:'2025', escudo:null, sigla:'SSI',
+  { anio:'2025', escudo:null, sigla:'SSI', tipo:'formacion',
     titulo:'Congreso XOpen Internacional', estado:null,
     detalle:'Sociedad Santandereana de Ingeniería. Participación en la competencia de puentes.' },
 
-  { anio:'2025', escudo:'assets/logos/uis.webp', sigla:'UIS',
-    titulo:'Curso de Modelado BIM y Gestión de la Construcción a través de Autodesk REVIT',
-    estado:'50 horas',
-    detalle:'Asociación Centro de Estudios de Ingeniería Civil UIS.' },
+  { anio:'2025', escudo:'assets/logos/uis.webp', sigla:'UIS', tipo:'certificado',
+    titulo:'Modelado BIM y gestión de la construcción con Revit', estado:'50 horas',
+    detalle:'Asociación Centro de Estudios de Ingeniería Civil UIS (ASCEIC).' },
 
-  { anio:'2026', escudo:'assets/logos/upb.webp', sigla:'UPB',
+  { anio:'2026', escudo:'assets/logos/upb.webp', sigla:'UPB', tipo:'trabajo',
     titulo:'Representante estudiantil', estado:'Facultad',
     detalle:null },
 
-  { anio:'2026', escudo:'assets/marca/v3s.png', sigla:'V3S',
+  { anio:'2026', escudo:null, sigla:'IA', tipo:'certificado',
+    titulo:'IA práctica', estado:'Google',
+    detalle:'Certificado de finalización de Google: IA Práctica para Marketing.' },
+
+  { anio:'2026', escudo:null, sigla:'EN', tipo:'certificado',
+    titulo:'Inglés B2', estado:'EF SET',
+    detalle:'EF SET English Certificate: B2 Upper Intermediate.' },
+
+  { anio:'2026', escudo:'assets/logos/claudecode.webp', sigla:'AI', tipo:'certificado',
+    titulo:'Claude Code in Action', estado:'Anthropic',
+    detalle:'Desarrollo de software asistido por IA: la base con la que escribe sus herramientas.' },
+
+  { anio:'2026', escudo:null, sigla:'PR', tipo:'trabajo',
+    titulo:'Practicante ingeniero residente', estado:'Prácticas',
+    detalle:'Modelado arquitectónico, estructural e hidrosanitario en Revit, cantidades de obra y diseño de elementos puntuales: cubiertas, piscina, escalera metálica y un mezanine para un horno de 5 t.' },
+
+  { anio:'2026', escudo:'assets/marca/v3s.png', sigla:'V3S', tipo:'trabajo',
     titulo:'VISUAL 3D STUDIO', estado:'Fundador',
     detalle:'Estudio propio de render y modelado para arquitectos y constructoras.' },
 
-  { anio:'2026', escudo:'assets/marca/isotipo-claro.svg', sigla:'SI',
+  { anio:'2026', escudo:'assets/marca/isotipo-claro.svg', sigla:'SI', tipo:'trabajo',
     titulo:'STICK INDUSTRIES', estado:'Actual',
-    detalle:'Marca personal con la que continúa el trabajo de VISUAL 3D STUDIO: modelado, render y planos, más las aplicaciones propias de cálculo y control de obra.' },
+    detalle:'Marca personal: modelado y detallado estructural, render y planos, y el software propio — ATLAS, STICK PRO y la STICK SUITE.' },
 
-  { anio:'2026', escudo:'assets/logos/upb.webp', sigla:'UPB',
+  { anio:'2026', escudo:null, sigla:'SENA', tipo:'certificado',
+    titulo:'Construcción de pavimento articulado', estado:'120 horas',
+    detalle:'Servicio Nacional de Aprendizaje SENA. Aprobado con evaluación Apto.' },
+
+  { anio:'2026', escudo:'assets/logos/upb.webp', sigla:'UPB', tipo:'formacion',
     titulo:'Especialización en Vías Terrestres', estado:'Cursando',
-    detalle:'Universidad Pontificia Bolivariana, seccional Bucaramanga.' },
+    detalle:'Universidad Pontificia Bolivariana. Sus talleres se vuelven herramientas en STICK VIAS.' },
 
-  { anio:'Próximo', escudo:null, sigla:'···',
+  { anio:'Próximo', escudo:null, sigla:'···', tipo:'formacion',
     titulo:'Especialización en Estructuras', estado:'Proyectada',
-    detalle:'Diseño sismorresistente y cimentaciones: el cálculo que ATLAS automatiza, para poder ampliarlo y responder por sus resultados.' }
+    detalle:'Diseño sismorresistente y cimentaciones: el cálculo que ATLAS automatiza, para ampliarlo y responder por sus resultados.' }
 ];
 
-/* Los logos no van en rejilla ni en cajas: forman una constelacion
-   por el borde de Sobre mi. color = el de la marca, del que sale su
-   resplandor; negativo = logos negros, que sobre fondo oscuro hay que
-   invertir para que se vean. */
+/* Herramientas por etapa del trabajo. color = el de la marca, del que sale
+   su resplandor; negativo = logos negros, que sobre fondo oscuro se invierten.
+   Sin `logo` se pinta su `sigla` en un disco: ETABS, ATLAS y Python no tienen
+   aqui un logo que se pueda servir. */
 const UTILES = [
   { nombre:'Revit',       logo:'assets/logos/revit.webp',      color:'54,142,235',  etapa:0 },
   { nombre:'AutoCAD',     logo:'assets/logos/autocad.webp',    color:'229,16,80',   etapa:0 },
   { nombre:'Civil 3D',    logo:'assets/logos/civil3d.webp',    color:'196,19,126',  etapa:0 },
   { nombre:'SketchUp',    logo:'assets/logos/sketchup.webp',   color:'23,124,180',  etapa:0 },
-  { nombre:'D5 Render',   logo:'assets/logos/d5.webp',         color:'138,86,246',  etapa:1 },
-  { nombre:'Twinmotion',  logo:'assets/logos/twinmotion.webp', color:'236,240,248', etapa:1, negativo:true },
-  { nombre:'Claude Code', logo:'assets/logos/claudecode.webp', color:'217,119,87',  etapa:2 },
-  { nombre:'ChatGPT',     logo:'assets/logos/chatgpt.webp',    color:'116,170,156', etapa:2, negativo:true }
+  { nombre:'ETABS',       sigla:'ET',                          color:'90,160,220',  etapa:1 },
+  { nombre:'ATLAS',       sigla:'A',                           color:'200,200,205', etapa:1 },
+  { nombre:'Excel',       logo:'assets/logos/excel.webp',      color:'33,163,102',  etapa:1 },
+  { nombre:'D5 Render',   logo:'assets/logos/d5.webp',         color:'138,86,246',  etapa:2 },
+  { nombre:'Twinmotion',  logo:'assets/logos/twinmotion.webp', color:'236,240,248', etapa:2, negativo:true },
+  { nombre:'Python',      sigla:'Py',                          color:'255,212,59',  etapa:3 },
+  { nombre:'Claude Code', logo:'assets/logos/claudecode.webp', color:'217,119,87',  etapa:3 },
+  { nombre:'ChatGPT',     logo:'assets/logos/chatgpt.webp',    color:'116,170,156', etapa:3, negativo:true }
 ];
 
 /* LA STICK SUITE — las aplicaciones propias.
 
-   `partes` es lo que cada app resuelve HOY, sacado de su propio README, no
-   de lo que promete la hoja de ruta: de ATLAS entran los modulos marcados
-   como operativos y no los siete que siguen pendientes, y de QUANTITY los
-   tres capitulos disponibles y no los tres por hacer. Una lista de funciones
-   que todavia no existen es la clase de cosa que un ingeniero desmonta en
-   dos segundos.
+   `partes` es lo que cada app resuelve HOY, sacado de su propia bitacora, no
+   de la hoja de ruta. Una lista de funciones que todavia no existen es la
+   clase de cosa que un ingeniero desmonta en dos segundos.
 
-   Las de ASSETS y BUDGETS salieron de sus propias bitacoras y no de una
-   suposicion: ASSETS declara sus cuatro pestañas en la estructura de
-   componentes —Resumen, Inversiones, Depositos, Ganancias— y de BUDGETS su
-   bitacora nombra Movimientos, Cuentas, Categorias y Metas. De cada una
-   entran las tres que dicen algo; el resumen o inicio no cuenta, que es el
-   tablero y no una funcion.
+   `obra:true` = de ingenieria: van primero y llevan el punto en la tira.
+   `url` solo cuando la app tiene una pagina publica que se abre sin cuenta;
+   las que guardan datos personales en un servidor (BUDGETS, ASSETS, AROS) no
+   enlazan. `estado` es su momento real, de su bitacora.
 
-   `plataforma` es el dato tecnico, y va en mono porque lo dice el STICK UI
-   SYSTEM. ATLAS es la unica de escritorio: se instala, no se abre.
-
-   El icono lo escribe `herramientas/preparar-suite.py` desde el LOGO.png de
-   cada app, que vive en el computador de Kevin. Si faltara, el `onerror`
-   deja su INICIAL. ATLAS es el unico con `null` de verdad — no tiene icono
-   dibujado, asi que su «A» no es un respaldo sino lo definitivo. */
+   El icono lo escribe `herramientas/preparar-suite.py`. Sin icono, su
+   INICIAL: ATLAS, VIAS y DLI no tienen uno dibujado. PROJECTS salio de la
+   vitrina (2026-11-25): no se usa. FIT paso a ser LIFE. */
 const APPS = [
-  { nombre:'ATLAS',    icono:null,                          plataforma:'Escritorio',
-    que:'Cálculo estructural según la NSR-10.',       obra:true,
-    partes:['Ejes y niveles', 'Predimensionamiento', 'Vista 3D'] },
-  { nombre:'AROS',     icono:'assets/suite/aros.webp',      plataforma:'Navegador',
-    que:'Residencia y supervisión de obra.',          obra:true,
-    partes:['Documentos', 'Asistente con IA', 'Obra en curso'] },
-  { nombre:'QUANTITY', icono:'assets/suite/quantity.webp',  plataforma:'Navegador',
-    que:'Cantidades de obra y despiece de acero.',    obra:true,
+  { nombre:'ATLAS',     icono:null,                          plataforma:'Escritorio · Python', estado:'v0.29',
+    que:'Cálculo estructural según la NSR-10: del modelo de ETABS al acero de vigas y columnas, con despiece en DXF y barras modeladas en Revit.', obra:true,
+    partes:['Predimensionamiento', 'Cargas Título B', 'Acero desde ETABS', 'Escaleras', 'Despiece DXF', 'Memoria en Word'] },
+  { nombre:'STICK PRO', icono:'assets/suite/stickpro.webp',  plataforma:'Complemento de Revit 2026', estado:'Producto',
+    que:'26 herramientas en seis paneles para modelar, armar, cuantificar y documentar estructuras en Revit, con la NSR-10 citada en cada regla.', obra:true,
+    url:'https://zafirosad.github.io/stick-pro/',
+    partes:['Estructura', 'Acero', 'Cantidades', 'Planos', 'Modelo', 'Presentación'] },
+  { nombre:'VIAS',      icono:null,                          plataforma:'Escritorio · Python', estado:'Especialización',
+    que:'Software de la Especialización en Vías Terrestres: cada taller se vuelve una herramienta validada contra el ejemplo del docente.', obra:true,
+    partes:['Geotecnia vial', 'Muros por Rankine'] },
+  { nombre:'QUANTITY',  icono:'assets/suite/quantity.webp',  plataforma:'Navegador', estado:'Pública',
+    que:'Cantidades de obra y despiece de acero, con salida a Excel.', obra:true,
+    url:'https://zafirosad.github.io/STICK-QUANTITY/',
     partes:['Mampostería', 'Concreto y formaleta', 'Despiece de acero'] },
-
-  { nombre:'PROJECTS', icono:'assets/suite/projects.webp',  plataforma:'Navegador',
-    que:'Contratos y finanzas por proyecto.',
-    partes:['Contratos', 'Abonos', 'Colaboradores'] },
-  { nombre:'ASSETS',   icono:'assets/suite/assets.webp',    plataforma:'Navegador',
+  { nombre:'DLI',       icono:null,                          plataforma:'Escritorio', estado:'En uso',
+    que:'Convierte la cartilla de hierros de Excel al archivo .dli de la figuradora, sin digitar barra por barra.', obra:true,
+    partes:['Cartilla de Excel', 'Archivo .dli', 'Figuradora'] },
+  { nombre:'AROS',      icono:'assets/suite/aros.webp',      plataforma:'Navegador · IA', estado:'En uso',
+    que:'Residencia y supervisión de obra con un asistente de IA, pensada para trabajar con señal pobre.', obra:true,
+    partes:['Obras', 'Documentos', 'Asistente con IA'] },
+  { nombre:'RECEIPT',   icono:'assets/suite/receipt.webp',   plataforma:'Navegador', estado:'Pública',
+    que:'Cuentas de cobro, cotizaciones, recibos y actas de entrega en PDF, desde cualquier dispositivo.',
+    url:'https://zafirosad.github.io/STICK-RECEIPT/',
+    partes:['Cuentas de cobro', 'Cotizaciones', 'Actas de entrega'] },
+  { nombre:'BUDGETS',   icono:'assets/suite/budgets.webp',   plataforma:'Navegador · Supabase', estado:'Uso diario',
+    que:'Finanzas personales con registro desde el teléfono.',
+    partes:['Movimientos', 'Cuentas', 'Metas de ahorro'] },
+  { nombre:'ASSETS',    icono:'assets/suite/assets.webp',    plataforma:'Navegador · Supabase', estado:'En uso',
     que:'Portafolio de inversiones.',
     partes:['Inversiones', 'Depósitos', 'Ganancias'] },
-  { nombre:'BUDGETS',  icono:'assets/suite/budgets.webp',   plataforma:'Navegador',
-    que:'Finanzas personales.',
-    partes:['Movimientos', 'Cuentas', 'Metas de ahorro'] },
-  { nombre:'FIT',      icono:'assets/suite/fit.webp',       plataforma:'Navegador',
-    que:'Entrenamiento de fuerza.',
-    partes:['Rutinas', 'Progreso', 'Nutrición'] }
+  { nombre:'LIFE',      icono:'assets/suite/life.webp',      plataforma:'Navegador', estado:'En uso',
+    que:'Panel de vida: hábitos, ánimo y prioridades de la semana.',
+    url:'https://zafirosad.github.io/STICK-LIFE/',
+    partes:['Hábitos', 'Ánimo', 'Prioridades'] }
 ];
 
 const ETAPAS = [
-  { n:'01', t:'Modelo',         d:'El proyecto se levanta en tres dimensiones con las medidas con que se va a construir, en Revit o SketchUp según el encargo.' },
-  { n:'02', t:'Representación', d:'Del mismo archivo salen las imágenes fijas y los recorridos, renderizados en D5 o Twinmotion.' },
-  { n:'03', t:'Apoyo',          d:'Cálculo estructural, cantidades de material y control de obra con las aplicaciones propias.' }
+  { n:'01', t:'Modelo',          d:'El proyecto se levanta en tres dimensiones con las medidas con que se va a construir: Revit para estructura y arquitectura, SketchUp para estudios rápidos.' },
+  { n:'02', t:'Cálculo',         d:'Análisis en ETABS y diseño del acero con ATLAS según la NSR-10; cantidades y cartillas en Excel.' },
+  { n:'03', t:'Representación',  d:'Del mismo archivo salen las imágenes fijas y los recorridos, renderizados en D5 o Twinmotion.' },
+  { n:'04', t:'Automatización',  d:'Lo que se repite se programa: Python sobre las API de Revit y ETABS, con IA como herramienta de desarrollo.' }
 ];
 
 let PALETAS = {};
@@ -2389,7 +2517,7 @@ const ruta2x = (a, i) => `assets/renders/${clave(a,i)}@2x.webp`;
    ruitoque-01 —la portada de Punta Ruitoque— eran 424 KB en vez de 347.
    A mano esto se desincroniza el dia que entre un render; por eso lo
    escribe el script y no la mano. */
-const TALLAS = {"cantabria-1-01":[900,1600,2560],"cantabria-1-02":[900,1600,2560],"cantabria-1-03":[900,1600,2560],"cantabria-1-04":[900,1600,2560],"cantabria-1-05":[900,1600,2560],"cantabria-1-06":[900,1600,2560],"cantabria-1-07":[900,1600,2560],"cantabria-1-08":[900,1600,2560],"cantabria-1-09":[900,1600,2560],"cantabria-1-10":[900,1600,2560],"cantabria-1-11":[900,1600,2560],"cantabria-1-12":[900,1600,2560],"cantabria-1-13":[900,1600,2560],"cantabria-1-14":[900,1600,2560],"cantabria-1-15":[900,1600,2560],"cantabria-23-01":[900,1600,2560],"cantabria-23-02":[900,1600,2560],"cantabria-23-03":[900,1600,2560],"cantabria-23-04":[900,1600,2560],"cantabria-23-05":[900,1600,2560],"cantabria-23-06":[900,1600,2560],"cantabria-23-07":[900,1280,0],"cantabria-23-08":[900,1376,0],"cantabria-23-09":[900,1600,2560],"cantabria-23-10":[900,1600,2560],"cantabria-23-11":[900,1600,2560],"cantabria-23-12":[900,1600,2560],"cantabria-23-13":[900,1600,2560],"casa-will-01":[900,1600,2560],"casa-will-02":[900,1600,2560],"casa-will-03":[900,1600,2560],"cazadores-01":[900,1600,2560],"cazadores-02":[900,1600,2560],"cazadores-03":[900,1600,2560],"cazadores-04":[900,1600,2560],"cazadores-05":[900,1600,2560],"cazadores-06":[900,1600,2560],"cazadores-07":[900,1600,2560],"cazadores-08":[900,1600,2560],"cazadores-09":[900,1600,2560],"cazadores-10":[900,1600,2253],"cazadores-11":[900,1600,2560],"cazadores-12":[900,1600,2560],"cazadores-13":[900,1600,2560],"cazadores-14":[900,1600,2560],"coincafex-01":[900,1600,1672],"coincafex-02":[900,1600,1677],"coincafex-03":[900,1600,1672],"coincafex-04":[900,1600,1672],"coincafex-05":[900,1600,1672],"coincafex-06":[900,1600,1677],"coincafex-09":[900,1600,1920],"coincafex-10":[900,1600,1677],"lebrija-01":[900,1600,1679],"lebrija-02":[900,1600,2560],"lebrija-03":[900,1392,0],"lebrija-04":[900,1600,2560],"lebrija-05":[900,1152,0],"lebrija-06":[900,1600,2560],"lebrija-07":[900,1600,2560],"lebrija-08":[900,1600,2560],"lebrija-09":[900,1600,2560],"lebrija-10":[900,1600,2560],"lebrija-11":[900,1600,2560],"lebrija-12":[900,1600,2560],"lebrija-13":[900,1266,0],"lebrija-14":[900,1439,0],"lebrija-15":[900,1439,0],"lebrija-16":[900,1510,0],"lebrija-17":[900,1600,2560],"mediterranea-01":[900,1600,1638],"mediterranea-02":[900,1430,0],"mediterranea-03":[900,1386,0],"punta-01":[900,1600,2560],"punta-02":[900,1600,2560],"punta-03":[900,1600,2560],"punta-04":[900,1600,2560],"punta-05":[900,1344,0],"punta-06":[900,1600,2560],"punta-07":[900,1600,2560],"punta-08":[900,1600,2560],"punta-09":[900,1600,2560],"punta-10":[900,1600,2560],"punta-11":[900,1600,2560],"punta-12":[900,1600,2560],"punta-13":[900,1600,2560],"punta-14":[900,1600,2560],"punta-15":[900,1600,2560],"punta-16":[900,1600,2560],"punta-17":[900,1600,2560],"punta-18":[900,1600,2560],"punta-19":[900,1600,2560],"punta-20":[900,1600,2560],"punta-21":[900,1600,2560],"punta-22":[900,1600,2560],"ruitoque-01":[900,1536,0],"ruitoque-02":[900,1536,0]};
+const TALLAS = {"cantabria-1-01":[900,1600,2560],"cantabria-1-02":[900,1600,2560],"cantabria-1-03":[900,1600,2560],"cantabria-1-04":[900,1600,2560],"cantabria-1-05":[900,1600,2560],"cantabria-1-06":[900,1600,2560],"cantabria-1-07":[900,1600,2560],"cantabria-1-08":[900,1600,2560],"cantabria-1-09":[900,1600,2560],"cantabria-1-10":[900,1600,2560],"cantabria-1-11":[900,1600,2560],"cantabria-1-12":[900,1600,2560],"cantabria-1-13":[900,1600,2560],"cantabria-1-14":[900,1600,2560],"cantabria-1-15":[900,1600,2560],"cantabria-23-01":[900,1600,2560],"cantabria-23-02":[900,1600,2560],"cantabria-23-03":[900,1600,2560],"cantabria-23-04":[900,1600,2560],"cantabria-23-05":[900,1600,2560],"cantabria-23-06":[900,1600,2560],"cantabria-23-07":[900,1280,0],"cantabria-23-08":[900,1376,0],"cantabria-23-09":[900,1600,2560],"cantabria-23-10":[900,1600,2560],"cantabria-23-11":[900,1600,2560],"cantabria-23-12":[900,1600,2560],"cantabria-23-13":[900,1600,2560],"casa-will-01":[900,1600,2560],"casa-will-02":[900,1600,2560],"casa-will-03":[900,1600,2560],"cazadores-01":[900,1600,2560],"cazadores-02":[900,1600,2560],"cazadores-03":[900,1600,2560],"cazadores-04":[900,1600,2560],"cazadores-05":[900,1600,2560],"cazadores-06":[900,1600,2560],"cazadores-07":[900,1600,2560],"cazadores-08":[900,1600,2560],"cazadores-09":[900,1600,2560],"cazadores-10":[900,1600,2253],"cazadores-11":[900,1600,2560],"cazadores-12":[900,1600,2560],"cazadores-13":[900,1600,2560],"cazadores-14":[900,1600,2560],"coincafex-01":[900,1600,1672],"coincafex-02":[900,1600,1677],"coincafex-03":[900,1600,1672],"coincafex-04":[900,1600,1672],"coincafex-05":[900,1600,1672],"coincafex-06":[900,1600,1677],"coincafex-09":[900,1600,1920],"coincafex-10":[900,1600,1677],"gambita-01":[900,1600,2560],"gambita-02":[900,1600,2560],"gambita-03":[900,1600,2560],"gambita-04":[900,1600,2560],"gambita-05":[900,1600,2560],"gambita-06":[900,1600,2560],"gambita-07":[900,1600,2560],"gambita-08":[900,1600,2560],"gambita-09":[900,1600,2560],"gambita-10":[900,1600,2560],"lebrija-01":[900,1600,1679],"lebrija-02":[900,1600,2560],"lebrija-03":[900,1392,0],"lebrija-04":[900,1600,2560],"lebrija-05":[900,1152,0],"lebrija-06":[900,1600,2560],"lebrija-07":[900,1600,2560],"lebrija-08":[900,1600,2560],"lebrija-09":[900,1600,2560],"lebrija-10":[900,1600,2560],"lebrija-11":[900,1600,2560],"lebrija-12":[900,1600,2560],"lebrija-13":[900,1266,0],"lebrija-14":[900,1439,0],"lebrija-15":[900,1439,0],"lebrija-16":[900,1510,0],"lebrija-17":[900,1600,2560],"lote132-01":[900,1600,2560],"lote132-02":[900,1600,2560],"lote132-03":[900,1600,2560],"lote132-04":[900,1600,2560],"lote132-05":[900,1600,2560],"lote132-06":[900,1600,2560],"lote132-07":[900,1600,2560],"lote132-08":[900,1600,2560],"mediterranea-01":[900,1600,1638],"mediterranea-02":[900,1430,0],"mediterranea-03":[900,1386,0],"mezanine-01":[900,1600,2560],"mezanine-02":[900,1600,2560],"punta-01":[900,1600,2560],"punta-02":[900,1600,2560],"punta-03":[900,1600,2560],"punta-04":[900,1600,2560],"punta-05":[900,1344,0],"punta-06":[900,1600,2560],"punta-07":[900,1600,2560],"punta-08":[900,1600,2560],"punta-09":[900,1600,2560],"punta-10":[900,1600,2560],"punta-11":[900,1600,2560],"punta-12":[900,1600,2560],"punta-13":[900,1600,2560],"punta-14":[900,1600,2560],"punta-15":[900,1600,2560],"punta-16":[900,1600,2560],"punta-17":[900,1600,2560],"punta-18":[900,1600,2560],"punta-19":[900,1600,2560],"punta-20":[900,1600,2560],"punta-21":[900,1600,2560],"punta-22":[900,1600,2560],"ruitoque-01":[900,1536,0],"ruitoque-02":[900,1536,0]};
 const SUFIJO = ['@sm', '', '@2x'];
 const juego  = (a, i) => {
   const k = clave(a, i), anchos = TALLAS[k];
@@ -2521,6 +2649,7 @@ document.querySelectorAll('.palabras').forEach(t => {
 const DIBUJOS = {
   '#inicio':    '<path d="M3 10.6 12 3.6l9 7v9.2a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   '#proyectos': '<path d="M3 6.5 12 2l9 4.5-9 4.5z"/><path d="m3 12 9 4.5L21 12"/><path d="m3 17.3 9 4.5 9-4.5"/>',
+  '#estructuras': '<path d="M4 21V9l8-5 8 5v12"/><path d="M4 13h16M4 17h16M9 21v-8M15 21v-8"/>',
   '#sobre':     '<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c0-3.9 3.4-6.3 7.5-6.3s7.5 2.4 7.5 6.3"/>',
   '#suite':     '<rect x="3.2" y="3.2" width="7.2" height="7.2" rx="2"/><rect x="13.6" y="3.2" width="7.2" height="7.2" rx="2"/><rect x="3.2" y="13.6" width="7.2" height="7.2" rx="2"/><rect x="13.6" y="13.6" width="7.2" height="7.2" rx="2"/>',
   '#contacto':  '<path d="M20.5 11.6a7.9 7.9 0 0 1-8.5 7.9 9 9 0 0 1-2.6-.4L4.2 20.8l1.5-4.6a7.6 7.6 0 0 1-1.2-4.6A7.9 7.9 0 0 1 12 3.7a7.9 7.9 0 0 1 8.5 7.9z"/>',
@@ -2592,13 +2721,17 @@ addEventListener('pointermove', e => {
 /* =================================================================
    VITRINA
    ================================================================= */
-document.getElementById('vitrina').innerHTML = PRINCIPALES.map((p, i) => `
-  <article class="hoja" data-slug="${p.slug}" tabindex="0" role="button" aria-label="Ver ${p.titulo}"
+/* La misma vitrina sirve a Proyectos y a Estructuras. Las hojas de
+   estructuras llevan `lamina`: sus portadas son dibujos sobre blanco, y un
+   recorte `cover` de una hoja estrecha cortaria el modelo por la mitad. */
+const pintarVitrina = (id, lista, prioridad) => {
+  document.getElementById(id).innerHTML = lista.map((p, i) => `
+  <article class="hoja${p.lamina ? ' lamina' : ''}" data-slug="${p.slug}" tabindex="0" role="button" aria-label="Ver ${p.titulo}"
            style="--r:${(i * .14).toFixed(2)}s">
     <div class="hoja-img">
       <img src="${ruta(p.arch, p.portada)}" srcset="${juego(p.arch, p.portada)}"
            sizes="(max-width:860px) 100vw, 60vw" alt="${p.titulo}" decoding="async"
-           ${i ? 'loading="lazy"' : 'fetchpriority="high"'}>
+           ${i || !prioridad ? 'loading="lazy"' : 'fetchpriority="high"'}>
     </div>
     <div class="hoja-velo"></div>
     <div class="hoja-rotulo"><div class="hoja-vertical">${p.titulo}</div></div>
@@ -2609,6 +2742,9 @@ document.getElementById('vitrina').innerHTML = PRINCIPALES.map((p, i) => `
       <div><span class="entrar">Ver proyecto</span></div>
     </div>
   </article>`).join('');
+};
+pintarVitrina('vitrina', PRINCIPALES, true);
+pintarVitrina('vitrina-est', ESTRUCTURALES, false);
 
 document.getElementById('cuenta-todos').textContent = String(TODOS.length).padStart(2,'0');
 
@@ -2792,7 +2928,9 @@ document.getElementById('flujo').innerHTML = ETAPAS.map((e, k) => `
         <span class="util${u.negativo ? ' negativo' : ''}"
               style="--c:${u.color}; --f:${(4.2 + (k * 3 + i) % 5 * .6).toFixed(1)}s;
                      --d:${((k * 3 + i) * .42).toFixed(2)}s">
-          <img src="${u.logo}" alt="${u.nombre}" loading="lazy"><b>${u.nombre}</b>
+          ${u.logo
+            ? `<img src="${u.logo}" alt="${u.nombre}" loading="lazy">`
+            : `<i class="sigla" aria-hidden="true">${u.sigla}</i>`}<b>${u.nombre}</b>
         </span>`).join('')}
     </div>
   </div>`).join('');
@@ -2841,10 +2979,13 @@ function abrir(i) {
       : `<i class="banco-fondo inicial" aria-hidden="true">${a.nombre[0]}</i>`}
     <span class="banco-marca">${dibujo(a)}</span>
     <span class="banco-texto">
-      <b class="n">${a.nombre}</b>
+      <span class="banco-cabeza"><b class="n">${a.nombre}</b>${a.estado ? `<span class="banco-estado">${a.estado}</span>` : ''}</span>
       <span class="d">${a.que}</span>
       <span class="m">${a.plataforma}</span>
       ${a.partes ? `<span class="partes">${a.partes.map(t => `<span>${t}</span>`).join('')}</span>` : ''}
+      ${a.url ? `<a class="banco-abrir" href="${a.url}" target="_blank" rel="noopener">Abrir ${a.nombre}
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>` : ''}
     </span>`;
   teclas.forEach((t, k) => {
     t.setAttribute('aria-selected', k === i);
@@ -3057,12 +3198,25 @@ function pintarFicha(p) {
             </svg>
             <div class="cifra mono" id="aro-cifra">00</div>
           </div>
-          <div class="rot">Imágenes<br>del proyecto</div>
+          <div class="rot">${p.grupo === 'estructural' ? 'Láminas<br>y vistas' : 'Imágenes<br>del proyecto'}</div>
         </div>
       </div>
     </div>
 
-    <div class="galeria" id="galeria">${filas}</div>
+    ${p.alcance ? `
+      <div class="alcance asoma">
+        <div class="alcance-cuerpo">
+          <div class="etiqueta">Alcance</div>
+          <p>${p.texto}</p>
+          <div class="partes">${p.alcance.map(t => `<span>${t}</span>`).join('')}</div>
+          ${p.enlace ? `<a class="btn-todos vidrio alcance-enlace" href="${p.enlace.url}" target="_blank" rel="noopener">
+            <span>${p.enlace.rotulo}</span>
+            <span class="disco"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span></a>` : ''}
+        </div>
+      </div>` : ''}
+
+    <div class="galeria${p.lamina ? ' laminas' : ''}" id="galeria">${filas}</div>
 
     ${extra.length ? `
       <div class="mas-filo" id="mas-filo">
@@ -3598,7 +3752,7 @@ const campo     = document.querySelector('.campo');
 /* `#inicio` entra en la lista: sin el, arriba del todo NINGUNA seccion
    estaba activa y el dock del telefono —que ahora es la unica navegacion
    que hay ahi— se quedaba sin pildora justo en lo primero que se ve. */
-const secciones = [...document.querySelectorAll('#inicio, #proyectos, #sobre, #suite, #contacto')];
+const secciones = [...document.querySelectorAll('#inicio, #proyectos, #estructuras, #sobre, #suite, #contacto')];
 /* Las dos barras —la de arriba y la del telefono— se resaltan juntas: una
    sola lista y un solo sitio donde decidir cual esta activa. */
 const enlacesMenu = [...document.querySelectorAll('.menu a, .fono-nav a')];

@@ -25,7 +25,7 @@ import numpy as np
 from PIL import Image
 from skimage import measure
 
-ORIGEN = Path(r"C:\Users\kevin\Documents\KEVIN\02. WORK\03. STICK INDUSTRIES\99. RECURSOS MARCA\LOGO BLANCO.png")
+ORIGEN = Path(r"C:\Users\kevin\Documents\KEVIN\02. WORK\03. STICK INDUSTRIES\99. MARCA\01. LOGOS\LOGO BLANCO.png")
 DESTINO = Path(__file__).resolve().parent.parent / "assets" / "marca" / "stick-industries.svg"
 
 ESCALA = 4           # factor del viewBox (no se remuestrea la imagen)

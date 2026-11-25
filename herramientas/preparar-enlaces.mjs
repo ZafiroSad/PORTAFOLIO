@@ -35,7 +35,7 @@ function catalogo() {
     }
     return eval(html.slice(ini, j + 1));
   };
-  return [...arreglo('PRINCIPALES'), ...arreglo('SECUNDARIOS')];
+  return [...arreglo('PRINCIPALES'), ...arreglo('SECUNDARIOS'), ...arreglo('ESTRUCTURALES')];
 }
 
 const escapar = (s) =>

@@ -1,29 +1,30 @@
 /**
- * Compone la hoja de vida en PDF a partir de los datos que ya estan en el sitio.
+ * Compone la hoja de vida en PDF (A4, dos hojas) para enviar a empleadores.
  *
- * POR QUE EXISTE. Un portafolio se mira; una hoja de vida se pide, se adjunta a
- * un correo y se imprime. Cualquier proceso —una practica, una oficina, una
- * licitacion— la pide en PDF, y hasta ahora habia que escribirla aparte y
- * mantenerla sincronizada a mano con el sitio.
+ * POR QUE EXISTE. Un portafolio se mira; una hoja de vida se pide, se adjunta
+ * a un correo y se imprime. Esta version (2026-11-25) se reescribio para
+ * buscar empleo: lidera con lo estructural y el software propio, y lleva una
+ * franja de imagenes para que se recuerde.
  *
- * Aqui el CV NO tiene datos propios: lee el trayecto, las herramientas, el
- * catalogo y el contacto del `index.html`. Si el sitio cambia, se vuelve a
- * correr esto y el PDF cuenta lo mismo que el sitio, sin desviarse.
+ * DE DONDE SALEN LOS DATOS. Lo que el sitio ya cuenta se LEE del index.html
+ * —contacto, catalogo, aplicaciones— para que el PDF no se desvie del sitio.
+ * Lo que una hoja de vida necesita y el sitio no dice (logros por cargo,
+ * certificados con su entidad, competencias) se escribe AQUI, en `CV`.
  *
- *   node herramientas/preparar-cv.mjs
+ *   node herramientas/preparar-cv.mjs              PDF en compartir/
+ *   node herramientas/preparar-cv.mjs --conservar  deja el HTML para medirlo
  *
- * Se imprime con el Chrome que ya esta instalado (`--print-to-pdf`) porque es
- * el unico motor de esta maquina que respeta CSS de verdad: tipografia,
- * cuadricula y color salen como se disenaron, no aproximados.
+ * Se imprime con el Chrome instalado (`--print-to-pdf`): es el unico motor de
+ * esta maquina que respeta el CSS de verdad.
  */
 import {execFileSync} from 'node:child_process';
 import {existsSync, readFileSync, writeFileSync, unlinkSync} from 'node:fs';
 import {dirname, resolve} from 'node:path';
-import {fileURLToPath} from 'node:url';
+import {fileURLToPath, pathToFileURL} from 'node:url';
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SALIDA = resolve(RAIZ, 'compartir', 'kevin-gil-cv.pdf');
-const SITIO = 'https://zafirosad.github.io/PORTAFOLIO';
+const SITIO = 'zafirosad.github.io/PORTAFOLIO';
 
 const CHROME = [
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
@@ -48,199 +49,310 @@ function datos() {
     return eval('(' + html.slice(ini, fin + 1) + ')');
   };
   return {
-    HITOS: arreglo('HITOS'),
-    UTILES: arreglo('UTILES'),
-    ETAPAS: arreglo('ETAPAS'),
     PROYECTOS: [...arreglo('PRINCIPALES'), ...arreglo('SECUNDARIOS')],
+    ESTRUCTURALES: arreglo('ESTRUCTURALES'),
+    APPS: arreglo('APPS'),
     CONTACTO: objeto('CONTACTO'),
   };
 }
 
-const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+/* ---------------------------------------------------------------------
+   Lo que solo dice la hoja de vida. Cada afirmacion sale de la bitacora de
+   su proyecto: nada de cifras redondas ni de logros que no se puedan
+   mostrar en una entrevista.
+   --------------------------------------------------------------------- */
+const CV = {
+  nombre: 'Kevin Stick Gil Arévalo',
+  oficio: 'Ingeniería civil · Estructuras · BIM · Automatización',
+  perfil: `Estudiante de último año de Ingeniería Civil en la UPB <b>(10 semestres, promedio 4.3/5)</b>
+    con experiencia real en <b>modelado y detallado estructural en Revit</b>, análisis en <b>ETABS</b>
+    y diseño bajo la <b>NSR-10</b>. Mi diferencial es que programo mis propias herramientas: escribí
+    <b>ATLAS</b>, que diseña el acero de vigas y columnas a partir de ETABS, y <b>STICK PRO</b>, un
+    complemento de 26 herramientas para Revit que hoy es un producto. Trabajo con autonomía,
+    aprendo rápido y entrego láminas listas para revisión.`,
+  cifras: [
+    ['10', 'semestres'], ['4.3', 'promedio / 5'], ['11', 'revisiones emitidas · Gambita'], ['26', 'herramientas Revit'],
+  ],
+  experiencia: [
+    { cargo: 'Practicante ingeniero residente', donde: 'Belval', cuando: '2026 · actual',
+      logros: [
+        'Modelado arquitectónico, estructural e hidrosanitario en <b>Revit</b>; cantidades de obra extraídas del modelo y verificadas 1:1 contra sus tablas.',
+        'Diseño de un <b>mezanine metálico para un horno de 5 t</b>: modelos de ETABS 23 generados por script en Python, tres variantes comparadas (AISC 360-10 / NSR-10) y la elegida con 827 kg de acero y D/C ≤ 0,45.',
+        'Cálculo y planos de cubiertas, piscina y escalera metálica del Lote 23 Villas de Cantabria; visor 3D propio para presentar la solución.',
+      ] },
+    { cargo: 'Modelador y detallador estructural', donde: 'Proyectos con oficina de diseño estructural', cuando: '2026',
+      logros: [
+        '<b>Gambita</b> — vivienda en pórticos de concreto: modelo en Revit y juego completo de láminas E01–E11 (cimentación, plantas, despieces, escaleras y mampostería), llevado por 11 revisiones con el ingeniero revisor.',
+        '<b>Lote 132 · Loma Reserva</b> — predimensionamiento NSR-10 (Títulos B y C) de columnas, vigas, viguetas y riostras; modelo para ETABS y acero propuesto con ATLAS; planos 1:50 hasta REV-4.',
+      ] },
+    { cargo: 'Fundador', donde: 'STICK INDUSTRIES (antes VISUAL 3D STUDIO)', cuando: '2026 · actual',
+      logros: [
+        'Visualización arquitectónica para arquitectos y constructoras: {P} proyectos y {I} imágenes publicadas en el portafolio.',
+        'Desarrollo de software propio para ingeniería y gestión (ver Software propio).',
+      ] },
+    { cargo: 'Representante estudiantil', donde: 'Facultad de Ingeniería Civil · UPB', cuando: '2026', logros: [] },
+    { cargo: 'Ayudante de obra', donde: 'Obra de vivienda', cuando: '2023',
+      logros: ['Replanteo, control de material y manejo de cuadrilla.'] },
+  ],
+  formacion: [
+    ['Ingeniería Civil', 'Universidad Pontificia Bolivariana, Bucaramanga', '2022 – hoy · 10 semestres'],
+    ['Especialización en Vías Terrestres', 'Universidad Pontificia Bolivariana', 'Cursando'],
+    ['Bachiller Académico Bilingüe', 'Colegio Bilingüe San Juan de Ávila', '2021'],
+  ],
+  certificados: [
+    ['Construcción de pavimento articulado', 'SENA · 120 h', '2026'],
+    ['Claude Code in Action', 'Anthropic', '2026'],
+    ['IA Práctica', 'Google', '2026'],
+    ['English Certificate B2', 'EF SET', '2026'],
+    ['Modelado BIM y gestión con Revit', 'ASCEIC – UIS · 50 h', '2025'],
+    ['Congreso XOpen · competencia de puentes', 'Soc. Santandereana de Ingeniería', '2025'],
+  ],
+  software: [
+    ['Diseño y BIM', 'Revit (EST · ARQ · MEP), ETABS, AutoCAD, Civil 3D, SketchUp'],
+    ['Representación', 'D5 Render, Twinmotion'],
+    ['Programación', 'Python (API de Revit y ETABS), HTML/JS, IA aplicada'],
+    ['Oficina', 'Excel avanzado, Word, PDF técnico'],
+  ],
+  normas: 'NSR-10 (Títulos A, B, C, E, K) · ACI 318-19 · AISC 360-10',
+  idiomas: [['Español', 'Nativo'], ['Inglés', 'B2 · EF SET 2026 · IELTS 2021']],
+  competencias: ['Autonomía', 'Aprendizaje rápido', 'Pensamiento analítico', 'Comunicación técnica', 'Trabajo en equipo', 'Orden y rigor'],
+  /* El software que va en la hoja: el de ingenieria. Las de finanzas y
+     vida personal no le dicen nada a quien contrata un ingeniero. */
+  apps: ['ATLAS', 'STICK PRO', 'QUANTITY', 'DLI', 'AROS', 'VIAS'],
+  galeria: [
+    ['gambita-01', 'Gambita · modelo estructural'],
+    ['gambita-06', 'Gambita · escaleras E09'],
+    ['mezanine-01', 'Mezanine 5 t · ETABS'],
+    ['cantabria-23-09', 'Lote 23 · visualización'],
+  ],
+};
 
-/** Los hitos que son formacion y los que son trabajo, en dos columnas. */
-const ES_TRABAJO = new Set(['Ayudante de obra', 'VISUAL 3D STUDIO', 'STICK INDUSTRIES',
-                            'Representante estudiantil']);
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const img = (k) => pathToFileURL(resolve(RAIZ, 'assets', 'renders', `${k}@sm.webp`)).href;
+const icono = (ruta) => ruta ? pathToFileURL(resolve(RAIZ, ruta)).href : null;
 
 function hoja(d) {
   const logo = readFileSync(resolve(RAIZ, 'assets/marca/stick-industries.svg'), 'utf8')
     .replace('<svg', '<svg class="logo"');
+  const qr = pathToFileURL(resolve(RAIZ, 'compartir', 'qr-portafolio.png')).href;
+  const nImg = d.PROYECTOS.reduce((n, p) => n + p.piezas.length + (p.extra?.length || 0), 0);
 
-  const trabajo = d.HITOS.filter((h) => ES_TRABAJO.has(h.titulo)).reverse();
-  const formacion = d.HITOS.filter((h) => !ES_TRABAJO.has(h.titulo)).reverse();
+  const experiencia = CV.experiencia.map((e) => `
+    <li class="exp">
+      <div class="linea"><span class="cargo">${e.cargo}</span><span class="cuando">${e.cuando}</span></div>
+      <div class="donde">${e.donde}</div>
+      ${e.logros.length ? `<ul class="logros">${e.logros.map((l) =>
+        `<li>${l.replace('{P}', d.PROYECTOS.length).replace('{I}', nImg)}</li>`).join('')}</ul>` : ''}
+    </li>`).join('');
 
-  const bloque = (h) => `
-      <li>
-        <div class="linea">
-          <span class="titulo">${esc(h.titulo)}</span>
-          ${h.estado ? `<span class="estado">${esc(h.estado)}</span>` : ''}
-          <span class="anio">${esc(h.anio)}</span>
-        </div>
-        ${h.detalle ? `<p>${esc(h.detalle)}</p>` : ''}
-      </li>`;
+  const apps = CV.apps.map((n) => d.APPS.find((a) => a.nombre === n)).filter(Boolean).map((a) => `
+    <li class="app">
+      <span class="app-ic">${a.icono ? `<img src="${icono(a.icono)}" alt="">` : `<i>${a.nombre[0]}</i>`}</span>
+      <span class="app-tx"><b>${esc(a.nombre)}</b> <em>${esc(a.plataforma)}</em><br>${esc(a.que)}</span>
+    </li>`).join('');
 
-  const porEtapa = d.ETAPAS.map((e, i) => `
-      <li>
-        <span class="etapa">${esc(e.t)}</span>
-        <span class="lista">${d.UTILES.filter((u) => u.etapa === i).map((u) => esc(u.nombre)).join(' · ')}</span>
-      </li>`).join('');
-
-  // Solo los cuatro que abren la vitrina del sitio. Una hoja de vida no es un
-  // inventario: lista lo que sostiene el argumento y remite al resto.
-  const destacados = d.PROYECTOS.slice(0, 4);
-  const obra = destacados.map((p) => `
-      <li>
-        <span class="titulo">${esc(p.titulo)}</span>
-        <span class="meta">${esc([p.tipo, p.lugar, p.anio].join(' · '))}</span>
-      </li>`).join('')
-    + `<li class="resto">y ${d.PROYECTOS.length - destacados.length} proyectos más en el portafolio</li>`;
-
-  const totalPiezas = d.PROYECTOS.reduce((n, p) => n + p.piezas.length + (p.extra?.length || 0), 0);
+  const tri = (lista) => lista.map(([a, b, c]) => `
+    <li><div class="linea"><b>${esc(a)}</b><span class="cuando">${esc(c)}</span></div><span class="sub">${esc(b)}</span></li>`).join('');
 
   return `<!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><title>Kevin Gil — Hoja de vida</title>
+<html lang="es"><head><meta charset="UTF-8"><title>Kevin Gil Arévalo — Hoja de vida</title>
 <style>
-  @page { size: A4; margin: 0; }
+  @page { size:A4; margin:0; }
   * { margin:0; padding:0; box-sizing:border-box; }
-
-  /* Century Gothic es la tipografia de la marca; llega con Windows. La mono
-     del sitio no tiene equivalente impreso, asi que el dato tecnico va en
-     Consolas, que es la que usa el resto del material de marca. */
   :root {
-    --tinta:#15161b; --suave:#4a4d57; --debil:#8b8f9a;
-    --arena:#a4906a; --linea:#d9dbe0;
-    --sans:"Century Gothic", "Questrial", system-ui, sans-serif;
-    --mono:"Consolas", "Cascadia Mono", monospace;
+    --tinta:#14151a; --suave:#454852; --debil:#8a8e99; --linea:#dcdee3;
+    --grafito:#15161b; --grafito-2:#22242b; --claro:#f1f2f4; --acento:#a4906a;
+    --sans:"Century Gothic","Questrial",system-ui,sans-serif;
+    --mono:"Consolas","Cascadia Mono",monospace;
   }
-  /* ALTURA EXACTA, no minima: con min-height mas el relleno el cuerpo medía
-     325 mm y Chrome partia el CV en dos hojas. Una hoja de vida que se desborda
-     a una segunda pagina casi vacia se lee como un descuido.
-     (Sin comillas invertidas en estos comentarios: todo este bloque vive
-     dentro de un template string y una sola lo cerraria antes de tiempo.) */
-  /* Sin altura fija. Con height + padding el cuerpo desbordaba y Chrome
-     sacaba una segunda hoja casi vacia; midiendolo con el cuerpo a 150 mm
-     seguian saliendo dos, asi que el problema no era la altura sino fijarla.
-     Fluyendo, el numero de hojas lo decide el contenido, que es lo correcto.
-     (Sin comillas invertidas en estos comentarios: este bloque vive dentro
-     de un template string y una sola lo cerraria antes de tiempo.) */
-  body { width:210mm; padding:12mm 15mm 8mm;
-         font-family:var(--sans); color:var(--tinta); font-size:9.1pt; line-height:1.5;
+  body { font-family:var(--sans); color:var(--tinta); font-size:8.6pt; line-height:1.45;
          -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  /* DOS HOJAS EXPLICITAS, no flujo libre: cada una mide un A4 exacto y su
+     contenido se reparte a mano. Asi la barra lateral oscura llega al pie y
+     ninguna seccion se parte entre hojas. */
+  .pagina { width:210mm; height:297mm; display:grid; grid-template-columns:66mm 1fr;
+            overflow:hidden; break-after:page; position:relative; }
+  .pagina:last-child { break-after:auto; }
 
-  header { display:flex; justify-content:space-between; align-items:flex-start;
-           gap:10mm; padding-bottom:4mm; border-bottom:1.6pt solid var(--tinta); }
-  .logo { width:44mm; height:auto; fill:var(--tinta); display:block; }
-  h1 { font-size:21pt; letter-spacing:-.01em; line-height:1.05; margin-top:3mm; }
-  .oficio { font-family:var(--mono); font-size:7.6pt; letter-spacing:.22em;
-            text-transform:uppercase; color:var(--suave); margin-top:1.6mm; }
-  .contacto { font-family:var(--mono); font-size:7.6pt; line-height:2; text-align:right;
-              color:var(--suave); white-space:nowrap; }
-  .contacto b { color:var(--tinta); font-weight:400; }
+  /* --- barra lateral --- */
+  aside { background:var(--grafito); color:#e9eaee; padding:13mm 7mm 10mm 9mm;
+          display:flex; flex-direction:column; gap:6mm; }
+  aside .logo { width:40mm; height:auto; fill:#fff; display:block; }
+  aside h3 { font-family:var(--mono); font-size:6.6pt; letter-spacing:.24em; text-transform:uppercase;
+             color:var(--acento); padding-bottom:1.6mm; margin-bottom:2.4mm;
+             border-bottom:.5pt solid rgba(255,255,255,.14); }
+  aside ul { list-style:none; }
+  aside li { margin-bottom:1.9mm; }
+  .contacto li { font-family:var(--mono); font-size:7.3pt; color:#d5d7dd; display:flex; gap:2mm; }
+  .contacto li span { color:var(--debil); min-width:5mm; }
+  .chips { display:flex; flex-wrap:wrap; gap:1.4mm; }
+  .chips span { font-size:7pt; padding:.9mm 2.2mm; border-radius:99px;
+                border:.5pt solid rgba(255,255,255,.22); color:#e4e5ea; }
+  .sw li b { display:block; font-size:7.6pt; color:#fff; }
+  .sw li span { font-size:7.4pt; color:#b9bcc5; line-height:1.4; }
+  .idioma { display:flex; justify-content:space-between; gap:2mm; font-size:7.6pt; }
+  .idioma em { font-style:normal; font-family:var(--mono); font-size:6.8pt; color:#b9bcc5; text-align:right; }
+  .qr { margin-top:auto; display:flex; gap:3mm; align-items:center; }
+  .qr img { width:19mm; height:19mm; border-radius:2mm; background:#fff; padding:1mm; }
+  .qr span { font-family:var(--mono); font-size:6.6pt; color:#b9bcc5; line-height:1.5; }
+  .qr b { color:#fff; font-weight:400; }
 
-  .perfil { margin:3.2mm 0 3.2mm; font-size:10.4pt; line-height:1.55; max-width:158mm; }
-  .perfil strong { font-weight:700; }
+  /* --- cuerpo --- */
+  main { padding:13mm 12mm 10mm 10mm; display:flex; flex-direction:column; gap:5mm; }
+  .nombre h1 { font-size:24pt; line-height:1.02; letter-spacing:-.02em; font-weight:700; }
+  .oficio { margin-top:2.2mm; font-family:var(--mono); font-size:7.4pt; letter-spacing:.2em;
+            text-transform:uppercase; color:var(--acento); }
+  .perfil { font-size:9.2pt; line-height:1.55; color:#2a2c33; }
+  .perfil b { color:var(--tinta); }
+  .cifras { display:grid; grid-template-columns:repeat(4,1fr); gap:2.4mm; }
+  .cifra { background:var(--claro); border-radius:2.4mm; padding:2.6mm 3mm; }
+  .cifra b { display:block; font-size:16pt; line-height:1; letter-spacing:-.02em; }
+  .cifra span { display:block; margin-top:1.2mm; font-family:var(--mono); font-size:6pt;
+                letter-spacing:.12em; text-transform:uppercase; color:var(--suave); line-height:1.35; }
+  main h2 { font-family:var(--mono); font-size:7pt; letter-spacing:.26em; text-transform:uppercase;
+            color:var(--tinta); display:flex; align-items:center; gap:3mm; margin-bottom:3mm; }
+  main h2::after { content:''; flex:1; height:.6pt; background:var(--linea); }
+  main ul { list-style:none; }
+  .linea { display:flex; align-items:baseline; gap:3mm; }
+  .cuando { margin-left:auto; font-family:var(--mono); font-size:7pt; color:var(--debil); white-space:nowrap; }
+  .exp { margin-bottom:3.4mm; break-inside:avoid; }
+  .cargo { font-weight:700; font-size:9.6pt; }
+  .donde { font-size:8pt; color:var(--acento); margin-top:.3mm; }
+  .logros { margin-top:1.3mm; }
+  .logros li { position:relative; padding-left:3.6mm; margin-bottom:1mm; color:#33353c; font-size:8.3pt; }
+  .logros li::before { content:''; position:absolute; left:.4mm; top:1.9mm; width:1.4mm; height:1.4mm;
+                       border-radius:50%; background:var(--acento); }
+  .lista li { margin-bottom:2.2mm; break-inside:avoid; }
+  .lista.cols { gap:0 6mm; align-items:start; }
+  .lista b { font-size:8.8pt; }
+  .sub { display:block; color:var(--suave); font-size:7.9pt; }
 
-  /* SIN break-inside aqui. Con el, el segundo bloque no cabia entero en lo
-     que quedaba de hoja y saltaba completo a una segunda, dejando un tercio
-     de la primera en blanco. Lo que no debe partirse es cada seccion. */
-  .rejilla { display:grid; grid-template-columns:1fr 1fr; gap:9mm; align-items:start; }
-  .columna { display:flex; flex-direction:column; gap:4mm; }
-  section { break-inside:avoid; }
-  h2 { font-family:var(--mono); font-size:7.4pt; letter-spacing:.26em; text-transform:uppercase;
-       color:var(--arena); padding-bottom:1.6mm; margin-bottom:3.4mm;
-       border-bottom:.6pt solid var(--linea); }
-
-  ul { list-style:none; }
-  /* 1,8 mm y no 2,4: con el curso de la UIS a su nombre completo (tres
-     renglones) la columna de Formacion crecio ~11 mm y el pie saltaba a
-     una segunda hoja. */
-  li { margin-bottom:1.8mm; break-inside:avoid; }
-  .linea { display:flex; align-items:baseline; gap:2.4mm; }
-  .titulo { font-weight:700; font-size:9.6pt; }
-  .estado { font-family:var(--mono); font-size:6.6pt; letter-spacing:.14em; text-transform:uppercase;
-            color:var(--suave); border:.5pt solid var(--linea); border-radius:99px; padding:.4mm 1.6mm; }
-  .anio { margin-left:auto; font-family:var(--mono); font-size:7.4pt; color:var(--debil); }
-  li p { color:var(--suave); font-size:8.5pt; line-height:1.45; margin-top:.6mm; }
-
-  .oficio-lista li { display:flex; gap:3mm; align-items:baseline; margin-bottom:2.4mm; }
-  .etapa { font-weight:700; min-width:26mm; }
-  .lista { color:var(--suave); }
-
-  .obra li { display:flex; flex-direction:column; margin-bottom:2.1mm; }
-  .obra .resto { font-family:var(--mono); font-size:7.2pt; color:var(--arena);
-                 letter-spacing:.12em; margin-top:1mm; }
-  .obra .meta { font-family:var(--mono); font-size:7.2pt; color:var(--debil); letter-spacing:.05em; }
-
-  .cifras { display:flex; gap:8mm; margin:1mm 0 0; }
-  .cifra b { display:block; font-size:17pt; line-height:1.1; }
-  .cifra span { font-family:var(--mono); font-size:6.8pt; letter-spacing:.18em;
-                text-transform:uppercase; color:var(--debil); }
-
-  footer { margin-top:3mm; padding-top:3.4mm; border-top:.6pt solid var(--linea);
-           display:flex; justify-content:space-between; align-items:center;
-           font-family:var(--mono); font-size:7.2pt; letter-spacing:.16em;
-           text-transform:uppercase; color:var(--debil); }
-  .pie-marco { display:block; }
+  /* --- hoja 2 --- */
+  .galeria { display:grid; grid-template-columns:1fr 1fr; gap:2.4mm; }
+  .galeria figure { position:relative; border-radius:2.4mm; overflow:hidden; background:#f4f4f2;
+                    height:44mm; border:.5pt solid var(--linea); }
+  .galeria img { width:100%; height:100%; object-fit:cover; display:block; }
+  .galeria figure.dibujo img { object-fit:contain; padding:1.5mm; }
+  .galeria figcaption { position:absolute; left:2mm; bottom:1.6mm; font-family:var(--mono); font-size:6.2pt;
+                        letter-spacing:.08em; color:#fff; background:rgba(20,21,26,.78);
+                        padding:.7mm 1.8mm; border-radius:99px; }
+  .apps { display:grid; grid-template-columns:1fr 1fr; gap:2.6mm 4mm; }
+  .app { display:flex; gap:2.6mm; align-items:flex-start; break-inside:avoid; }
+  .app-ic { flex:none; width:8.5mm; height:8.5mm; border-radius:2.2mm; background:var(--grafito);
+            display:grid; place-items:center; }
+  .app-ic img { width:5.4mm; height:5.4mm; object-fit:contain; }
+  .app-ic i { font-style:normal; font-family:var(--mono); color:#fff; font-size:9pt; }
+  .app-tx { font-size:7.6pt; color:#33353c; line-height:1.4; }
+  .app-tx b { color:var(--tinta); font-size:8.4pt; }
+  .app-tx em { font-style:normal; font-family:var(--mono); font-size:6.3pt; color:var(--debil);
+               letter-spacing:.06em; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:6mm; }
+  .pie { margin-top:auto; padding-top:3mm; border-top:.6pt solid var(--linea); display:flex;
+         justify-content:space-between; font-family:var(--mono); font-size:6.6pt; letter-spacing:.16em;
+         text-transform:uppercase; color:var(--debil); }
+  .cabeza-2 { display:flex; justify-content:space-between; align-items:baseline;
+              padding-bottom:3mm; border-bottom:1.4pt solid var(--tinta); }
+  .cabeza-2 b { font-size:12pt; }
+  .cabeza-2 span { font-family:var(--mono); font-size:7pt; letter-spacing:.18em; text-transform:uppercase; color:var(--debil); }
 </style></head>
 <body>
-<div class="pie-marco">
-  <header>
+
+<!-- ================= HOJA 1 ================= -->
+<section class="pagina">
+  <aside>
+    ${logo}
     <div>
-      ${logo}
-      <h1>Kevin Stick Gil Arévalo</h1>
-      <div class="oficio">Ingeniero civil · Visualización arquitectónica</div>
+      <h3>Contacto</h3>
+      <ul class="contacto">
+        <li><span>T</span>${esc(d.CONTACTO.telefono)}</li>
+        <li><span>@</span>${esc(d.CONTACTO.correo)}</li>
+        <li><span>◎</span>Bucaramanga, Colombia</li>
+        <li><span>↗</span>${SITIO}</li>
+      </ul>
     </div>
-    <div class="contacto">
-      <b>${esc(d.CONTACTO.telefono)}</b><br>
-      ${esc(d.CONTACTO.correo)}<br>
-      Bucaramanga, Colombia<br>
-      ${SITIO.replace('https://', '')}
+    <div>
+      <h3>Software</h3>
+      <ul class="sw">${CV.software.map(([a, b]) => `<li><b>${a}</b><span>${b}</span></li>`).join('')}</ul>
     </div>
-  </header>
-
-  <p class="perfil">Diseño para construir, no solo para impresionar. Cada proyecto parte de
-     <strong>un único modelo digital</strong> del que salen las visualizaciones, los planos y la
-     información necesaria para construir con precisión.</p>
-
-  <div class="cifras">
-    <div class="cifra"><b>${d.PROYECTOS.length}</b><span>Proyectos</span></div>
-    <div class="cifra"><b>${totalPiezas}</b><span>Imágenes</span></div>
-    <div class="cifra"><b>9</b><span>Semestres</span></div>
-    <div class="cifra"><b>4.3</b><span>Promedio / 5</span></div>
-  </div>
-
-  <!-- DOS COLUMNAS, no dos rejillas apiladas. Trayectoria es mas corta que
-       Formacion, y con dos rejillas ese desnivel dejaba un hueco muerto que
-       empujaba el segundo bloque a una hoja nueva. Asi cada columna sigue
-       hacia abajo con lo suyo y el hueco desaparece. -->
-  <div class="rejilla" style="margin-top:6mm">
-    <div class="columna">
-      <section>
-        <h2>Trayectoria</h2>
-        <ul>${trabajo.map(bloque).join('')}</ul>
-      </section>
-      <section>
-        <h2>Herramientas</h2>
-        <ul class="oficio-lista">${porEtapa}</ul>
-      </section>
+    <div>
+      <h3>Normas</h3>
+      <p style="font-size:7.4pt;color:#d5d7dd;line-height:1.5">${CV.normas}</p>
     </div>
-    <div class="columna">
-      <section>
-        <h2>Formación</h2>
-        <ul>${formacion.map(bloque).join('')}</ul>
-      </section>
-      <section>
-        <h2>Obra representada</h2>
-        <ul class="obra">${obra}</ul>
-      </section>
+    <div>
+      <h3>Idiomas</h3>
+      ${CV.idiomas.map(([a, b]) => `<div class="idioma" style="margin-bottom:1.6mm"><span>${a}</span><em>${b}</em></div>`).join('')}
     </div>
-  </div>
+    <div>
+      <h3>Competencias</h3>
+      <div class="chips">${CV.competencias.map((c) => `<span>${c}</span>`).join('')}</div>
+    </div>
+    <div class="qr">
+      <img src="${qr}" alt="">
+      <span><b>Portafolio</b><br>proyectos, láminas<br>y software</span>
+    </div>
+  </aside>
 
-  <footer>
-    <span>Portafolio completo · ${SITIO.replace('https://', '')}</span>
-    <span>Stick Industries</span>
-  </footer>
-</div>
+  <main>
+    <div class="nombre">
+      <h1>${CV.nombre}</h1>
+      <div class="oficio">${CV.oficio}</div>
+    </div>
+    <p class="perfil">${CV.perfil}</p>
+    <div class="cifras">${CV.cifras.map(([n, t]) => `<div class="cifra"><b>${n}</b><span>${t}</span></div>`).join('')}</div>
+    <section>
+      <h2>Experiencia</h2>
+      <ul>${experiencia}</ul>
+    </section>
+    <section>
+      <h2>Formación</h2>
+      <ul class="lista">${tri(CV.formacion.map(([a, b, c]) => [a, b, c]))}</ul>
+    </section>
+  </main>
+</section>
+
+<!-- ================= HOJA 2 ================= -->
+<section class="pagina">
+  <aside>
+    ${logo}
+    <div>
+      <h3>Proyectos estructurales</h3>
+      <ul class="sw">${d.ESTRUCTURALES.map((p) => `<li><b>${esc(p.titulo)}</b><span>${esc(p.tipo)} · ${esc(p.estado)}</span></li>`).join('')}</ul>
+    </div>
+    <div>
+      <h3>En línea</h3>
+      <ul class="sw">
+        <li><b>Portafolio</b><span>zafirosad.github.io/<br>PORTAFOLIO</span></li>
+        <li><b>STICK PRO</b><span>zafirosad.github.io/<br>stick-pro</span></li>
+      </ul>
+    </div>
+    <div class="qr">
+      <img src="${qr}" alt="">
+      <span><b>Escanee</b><br>láminas, renders<br>y modelo 3D</span>
+    </div>
+  </aside>
+
+  <main>
+    <div class="cabeza-2"><b>${CV.nombre}</b><span>Hoja de vida · 2 / 2</span></div>
+    <section>
+      <h2>Trabajo seleccionado</h2>
+      <div class="galeria">${CV.galeria.map(([k, t]) => `
+        <figure class="${k.startsWith('gambita') ? 'dibujo' : ''}"><img src="${img(k)}" alt=""><figcaption>${t}</figcaption></figure>`).join('')}
+      </div>
+    </section>
+    <section>
+      <h2>Software propio</h2>
+      <ul class="apps">${apps}</ul>
+    </section>
+    <section>
+      <h2>Cursos y certificados</h2>
+      <ul class="lista cols">${tri(CV.certificados)}</ul>
+    </section>
+    <div class="pie">
+      <span>Referencias disponibles a solicitud</span>
+      <span>Stick Industries</span>
+    </div>
+  </main>
+</section>
 </body></html>`;
 }
 
@@ -251,13 +363,11 @@ function main() {
   writeFileSync(temporal, hoja(d), 'utf8');
 
   execFileSync(CHROME, [
-    '--headless', '--disable-gpu', '--no-pdf-header-footer',
+    '--headless', '--disable-gpu', '--no-pdf-header-footer', '--allow-file-access-from-files',
     `--print-to-pdf=${SALIDA}`,
-    'file:///' + temporal.replace(/\\/g, '/'),
+    pathToFileURL(temporal).href,
   ], {stdio: 'pipe'});
 
-  // `--conservar` deja el HTML al lado del PDF para poder medirlo en un
-  // navegador cuando la paginacion no sale como se espera.
   if (!process.argv.includes('--conservar')) unlinkSync(temporal);
   console.log(`compartir/kevin-gil-cv.pdf  ${(readFileSync(SALIDA).length / 1024).toFixed(0)} KB`);
 }

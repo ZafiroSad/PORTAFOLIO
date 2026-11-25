@@ -1,0 +1,572 @@
+<title>Mezanine Horno 5 t</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600&display=swap">
+<style>
+/* Layout: visor 3D a la izquierda como plano de trabajo, ficha tecnica a la derecha (apilada en movil). */
+:root {
+  --bg: #eef1f4;
+  --panel: #ffffff;
+  --ink: #17202b;
+  --muted: #5d6876;
+  --line: #d5dbe2;
+  --accent: #1f5f9f;
+  --stage: #e3e8ed;
+  --floor: #cfd6dd;
+  --grid: #b3bcc6;
+  --tag-bg: rgba(255,255,255,.92);
+  --ok: #2f8a52;
+  --warn: #b7791f;
+  --font-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-cond: "IBM Plex Sans Condensed", "Arial Narrow", "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161c; --panel: #171e26; --ink: #e2e8ef; --muted: #96a2b0; --line: #2a3440;
+    --accent: #6ea8e6; --stage: #0d1217; --floor: #1d252e; --grid: #2f3a46;
+    --tag-bg: rgba(23,30,38,.92); --ok: #5cc285; --warn: #e2a948; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161c; --panel: #171e26; --ink: #e2e8ef; --muted: #96a2b0; --line: #2a3440;
+  --accent: #6ea8e6; --stage: #0d1217; --floor: #1d252e; --grid: #2f3a46;
+  --tag-bg: rgba(23,30,38,.92); --ok: #5cc285; --warn: #e2a948; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-sans); font-size: 14px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 28px;
+}
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 20px; margin-bottom: 14px; }
+h1 { font-family: var(--font-cond); font-size: 26px; letter-spacing: .01em; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); font-size: 13px; }
+.sub b { color: var(--ink); font-weight: 500; }
+.app { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start; }
+@media (max-width: 900px) { .app { grid-template-columns: minmax(0, 1fr); } }
+
+/* Visor */
+.viewer { position: relative; background: var(--stage); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; height: min(74vh, 760px); min-height: 380px; }
+@media (max-width: 900px) { .viewer { height: 62vh; } }
+#stage, #stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.toolbar { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; flex-wrap: wrap; gap: 8px; pointer-events: none; z-index: 3; }
+.group { display: flex; background: var(--tag-bg); border: 1px solid var(--line); border-radius: 5px; overflow: hidden; pointer-events: auto; }
+.group button { font: 500 12px var(--font-sans); color: var(--ink); background: transparent; border: 0; padding: 6px 10px; cursor: pointer; }
+.group button + button { border-left: 1px solid var(--line); }
+.group button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.group button:focus-visible, .toggles input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.toggles { position: absolute; left: 10px; bottom: 10px; display: flex; flex-wrap: wrap; gap: 4px 12px; background: var(--tag-bg); border: 1px solid var(--line); border-radius: 5px; padding: 6px 10px; z-index: 3; font-size: 12px; max-width: calc(100% - 20px); }
+.toggles label { display: flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap; }
+.hint { position: absolute; right: 10px; bottom: 10px; font-size: 11px; color: var(--muted); z-index: 2; text-align: right; }
+@media (max-width: 640px) { .hint { display: none; } }
+.labels { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.tag { position: absolute; transform: translate(-50%, -50%); font: 500 11px var(--font-mono); white-space: nowrap; background: var(--tag-bg); color: var(--ink); border: 1px solid var(--line); border-radius: 3px; padding: 1px 6px; }
+.tag.dim { border: 0; background: transparent; color: var(--accent); font-weight: 500; text-shadow: 0 0 3px var(--stage), 0 0 3px var(--stage); }
+.tip { position: absolute; z-index: 4; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px; font-size: 12px; min-width: 170px; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+.tip strong { display: block; font-size: 13px; }
+.tip .mono { font-family: var(--font-mono); }
+.scale { position: absolute; right: 10px; top: 52px; z-index: 3; background: var(--tag-bg); border: 1px solid var(--line); border-radius: 5px; padding: 6px 10px; font-size: 11px; }
+.scale .bar { width: 150px; height: 8px; border-radius: 2px; background: linear-gradient(90deg, #3a9d5d, #9bbf3a 50%, #e0a526 75%, #d2453b); margin: 4px 0 2px; }
+.scale .ticks { display: flex; justify-content: space-between; font-family: var(--font-mono); color: var(--muted); }
+
+/* Ficha */
+aside { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+h2 { font-family: var(--font-cond); font-size: 15px; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 8px; color: var(--muted); }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+th { text-align: left; font-weight: 500; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; padding: 0 6px 6px 0; border-bottom: 1px solid var(--line); }
+td { padding: 7px 6px 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+td.num, th.num { text-align: right; padding-right: 0; padding-left: 6px; font-family: var(--font-mono); white-space: nowrap; }
+tr.total td { border-bottom: 0; font-weight: 600; }
+.sw { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: 0; }
+.perfil { font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
+.el small { display: block; color: var(--muted); font-size: 11px; }
+.dc { display: inline-block; min-width: 38px; text-align: center; border-radius: 3px; padding: 0 4px; color: #fff; font-weight: 500; }
+ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+li { color: var(--ink); }
+li span { color: var(--muted); }
+.crit { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-size: 12.5px; }
+.kv dd { margin: 0; font-family: var(--font-mono); text-align: right; }
+.kv dt { color: var(--muted); }
+.flag { border-left: 3px solid var(--warn); padding: 6px 10px; background: color-mix(in srgb, var(--warn) 9%, transparent); font-size: 12.5px; border-radius: 0 4px 4px 0; }
+.vhead { display: flex; flex-direction: column; gap: 4px; }
+.vhead .name { font-family: var(--font-cond); font-size: 20px; line-height: 1.2; }
+.vhead p { margin: 0; color: var(--muted); font-size: 12.5px; }
+.pill { display: inline-block; font: 600 10.5px var(--font-sans); letter-spacing: .06em; text-transform: uppercase; color: var(--ok); border: 1px solid var(--ok); border-radius: 10px; padding: 0 7px; margin-left: 6px; vertical-align: 3px; }
+.group.variants button { font-weight: 600; }
+</style>
+
+<header>
+  <h1>Mezanine Horno 5 t</h1>
+  <div class="sub"><b>3,50 × 2,30 m · nivel +3,05 m</b> · Sin cruz, anclado a la viga existente · ETABS 23, AISC 360-10 / NSR-10</div>
+</header>
+
+<div class="app">
+  <section class="viewer" aria-label="Modelo 3D del mezanine">
+    <div id="stage"></div>
+    <div class="labels" id="labels"></div>
+    <div class="toolbar">
+      <div class="group" role="group" aria-label="Vista">
+        <button id="v-iso" aria-pressed="true">Isométrica</button>
+        <button id="v-front" aria-pressed="false">Frente</button>
+        <button id="v-side" aria-pressed="false">Lateral</button>
+        <button id="v-plan" aria-pressed="false">Planta</button>
+      </div>
+      <div class="group" role="group" aria-label="Color">
+        <button id="c-role" aria-pressed="true">Por elemento</button>
+        <button id="c-dc" aria-pressed="false">Por uso D/C</button>
+      </div>
+    </div>
+    <div class="scale" id="scale" hidden>
+      Demanda / capacidad
+      <div class="bar"></div>
+      <div class="ticks"><span>0</span><span>0,5</span><span>1,0</span></div>
+    </div>
+    <div class="toggles">
+      <label><input type="checkbox" id="t-oven" checked> Horno</label>
+      <label><input type="checkbox" id="t-deck" checked> Lámina alfajor</label>
+      <label><input type="checkbox" id="t-tags" checked> Etiquetas</label>
+      <label><input type="checkbox" id="t-dims" checked> Cotas</label>
+      <label><input type="checkbox" id="t-man" checked> Persona 1,75 m</label>
+    </div>
+    <div class="hint">Arrastrar: girar · Rueda: zoom · Clic derecho: mover<br>Pase el cursor sobre un perfil para ver su ficha</div>
+    <div class="tip" id="tip" hidden></div>
+  </section>
+
+  <aside>
+    <div class="vhead">
+      <div class="name" id="v-name"></div>
+      <p id="v-desc"></p>
+    </div>
+
+    <div>
+      <h2>Perfiles</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Elemento</th><th>Perfil</th><th class="num">D/C</th><th class="num">kg</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <p class="crit">Criterio: el perfil más liviano con D/C ≤ 0,90, flecha en servicio ≤ L/500 y mínimos prácticos. Horno de diseño: 7 t.</p>
+    </div>
+
+    <div>
+      <h2>Cómo resiste el sismo</h2>
+      <ul id="notes"></ul>
+    </div>
+
+    <div>
+      <h2>Reacciones y control</h2>
+      <dl class="kv" id="kv"></dl>
+    </div>
+
+    <div>
+      <h2>Por qué no más livianos</h2>
+      <ul id="why"></ul>
+    </div>
+
+    <div class="flag" id="flag"></div>
+  </aside>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function () {
+  // ---------- resultados de ETABS por variante ----------
+  const ROLE = {
+    VP: { name: "Vigas principales", short: "Viga principal", color: "#2f6fb5" },
+    VG: { name: "Viguetas", short: "Vigueta", color: "#3a9488" },
+    VF: { name: "Viga frontal", short: "Viga frontal", color: "#7b67b9" },
+    C:  { name: "Columnas", short: "Columna", color: "#c47c2a" },
+    PA: { name: "Cruz frontal", short: "Diagonal de la cruz", color: "#b9505c" },
+  };
+  const VG_ROW = { perfil: "IPE 140", dc: 0.40, kg: 148, extra: "5 uds @ 0,58 m · flecha L/743" };
+  const DECK_KG = 401;
+  const WHY_COMMON = [
+    ["IPE 200 en vigas principales", "resiste (D/C 0,57), pero flecha ≈ L/460"],
+    ["IPE 120 en viguetas", "D/C 0,58, flecha ≈ L/440"],
+  ];
+  const V = {
+    D: {
+      name: "Sin cruz, anclado a la viga existente", rec: true,
+      desc: "El frente queda libre. El sismo lo lleva la lámina soldada hasta los anclajes en la viga existente; las columnas solo cargan peso.",
+      roles: {
+        VP: { perfil: "IPE 220", dc: 0.45, kg: 183, extra: "2 uds · L = 3,50 m · flecha L/621" },
+        VG: VG_ROW,
+        VF: { perfil: "IPE 120", dc: 0.13, kg: 24, extra: "L = 2,30 m · articulada" },
+        C:  { perfil: "Tubo 100×100×4", dc: 0.10, kg: 71, extra: "2 uds · A500 Gr C · solo gravedad · base articulada" },
+      },
+      notes: [
+        ["Lámina alfajor como diafragma", "soldada con cordones continuos o a tramos cortos a vigas y viguetas; punteada no sirve"],
+        ["Columnas", "no se sostienen solas de lado: en el montaje se apuntalan hasta que el anclaje y la lámina queden terminados"],
+        ["Anclaje en la viga existente", "IPE de lado, a ras con su cara superior: placa de extremo con 4 pernos pasantes de 5/8\" y contraplaca, para 19,2 kN en X y 21,0 kN en Y"],
+      ],
+      kv: [["Cada apoyo en viga existente", "27,6 kN"], ["Sismo en ese apoyo, X / Y", "19,2 / 21,0 kN"], ["Cada base de columna", "≈ 31 kN"], ["Deriva", "la fija la estructura existente"], ["Paso libre al frente", "2,20 × 2,83 m"]],
+      why: [["Tubo 75×75×3,2", "también resiste (0,25), pero su pared de 3,2 mm se abolla con un golpe en el paso"]],
+      flag: "Viga existente: al recibir los IPE de lado sufre torsión (Tu = 3,0 kN·m, por encima del umbral de 1,27 kN·m) y necesita estribos cerrados #3 cada 35 cm o menos. Faltan su refuerzo y su luz (con ≤ 4 m cumple a flexión), y confirmar que aguanta unos 20 kN de empuje lateral.",
+    },
+  };
+  const ORDER = ["VP", "VG", "VF", "C", "PA"];
+
+  function dcColor(r) {
+    const stops = [[0, "#3a9d5d"], [0.5, "#9bbf3a"], [0.75, "#e0a526"], [1, "#d2453b"]];
+    r = Math.max(0, Math.min(1, r));
+    for (let i = 0; i < stops.length - 1; i++) {
+      const [a, ca] = stops[i], [b, cb] = stops[i + 1];
+      if (r <= b) return new THREE.Color(ca).lerp(new THREE.Color(cb), (r - a) / (b - a));
+    }
+    return new THREE.Color(stops[stops.length - 1][1]);
+  }
+  const fmt = (n) => n.toFixed(2).replace(".", ",");
+  const li = (pairs) => pairs.map(([a, b]) => `<li>${a} <span>${b}</span></li>`).join("");
+
+  function fillPanel(k) {
+    const v = V[k];
+    document.getElementById("v-name").innerHTML = v.name + (v.rec ? '<span class="pill">Elegida</span>' : "");
+    document.getElementById("v-desc").textContent = v.desc;
+    let html = "", total = DECK_KG;
+    for (const r of ORDER) {
+      const d = v.roles[r]; if (!d) continue;
+      total += d.kg;
+      html += `<tr><td class="el"><span class="sw" style="background:${ROLE[r].color}"></span>${ROLE[r].name}<small>${d.extra}</small></td>` +
+        `<td class="perfil">${d.perfil}</td><td class="num"><span class="dc" style="background:${dcColor(d.dc).getStyle()}">${fmt(d.dc)}</span></td><td class="num">${d.kg}</td></tr>`;
+    }
+    html += `<tr><td class="el">Lámina alfajor 1/4"<small>8,05 m², soldada a vigas y viguetas</small></td><td class="perfil">e = 6,35 mm</td><td class="num">—</td><td class="num">${DECK_KG}</td></tr>`;
+    html += `<tr class="total"><td>Total acero</td><td></td><td></td><td class="num">≈ ${total}</td></tr>`;
+    document.getElementById("rows").innerHTML = html;
+    document.getElementById("notes").innerHTML = li(v.notes);
+    document.getElementById("kv").innerHTML = v.kv.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
+    document.getElementById("why").innerHTML = li(WHY_COMMON.concat(v.why));
+    document.getElementById("flag").textContent = v.flag;
+  }
+
+  // ---------- escena ----------
+  // Coordenadas del modelo: X = 3,50 (vigas principales), Y = 2,30, Z vertical.
+  const S = (x, y, z) => new THREE.Vector3(x, z, -y);
+  const T = 3.05;
+  const stage = document.getElementById("stage");
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  stage.appendChild(renderer.domElement);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(38, 1, 0.05, 200);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.maxPolarAngle = Math.PI * 0.495;
+  controls.minDistance = 2; controls.maxDistance = 30;
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x7d848c, 0.8));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.75);
+  sun.position.copy(S(7, -5, 9));
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  Object.assign(sun.shadow.camera, { left: -7, right: 7, top: 7, bottom: -7, near: 1, far: 30 });
+  sun.shadow.bias = -0.0004;
+  scene.add(sun);
+  sun.target.position.copy(S(1.75, 1.15, 0)); scene.add(sun.target);
+
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0xcfd6dd, roughness: 1 });
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(14, 12), floorMat);
+  floor.rotation.x = -Math.PI / 2; floor.position.copy(S(1.75, 1.15, 0)); floor.receiveShadow = true;
+  scene.add(floor);
+  let grid = null;
+
+  // ---------- secciones ----------
+  function iShape(h, b, tf, tw) {
+    const s = new THREE.Shape(), o = -h / 2;
+    const p = [[-b/2,-h/2],[b/2,-h/2],[b/2,-h/2+tf],[tw/2,-h/2+tf],[tw/2,h/2-tf],[b/2,h/2-tf],[b/2,h/2],[-b/2,h/2],[-b/2,h/2-tf],[-tw/2,h/2-tf],[-tw/2,-h/2+tf],[-b/2,-h/2+tf]];
+    p.forEach(([x, y], i) => i ? s.lineTo(x, y + o) : s.moveTo(x, y + o));
+    return s;
+  }
+  function tubeShape(b, t) {
+    const s = new THREE.Shape();
+    s.moveTo(-b/2, -b/2); s.lineTo(b/2, -b/2); s.lineTo(b/2, b/2); s.lineTo(-b/2, b/2);
+    const h = new THREE.Path(), c = b / 2 - t;
+    h.moveTo(-c, -c); h.lineTo(-c, c); h.lineTo(c, c); h.lineTo(c, -c);
+    s.holes.push(h);
+    return s;
+  }
+  function angleShape(a, t) {
+    const s = new THREE.Shape(), c = 0.018;
+    [[0,0],[a,0],[a,t],[t,t],[t,a],[0,a]].forEach(([x, y], i) => i ? s.lineTo(x - c, y - c) : s.moveTo(x - c, y - c));
+    return s;
+  }
+  const SEC = {
+    IPE220: iShape(0.220, 0.110, 0.0092, 0.0059),
+    IPE140: iShape(0.140, 0.073, 0.0069, 0.0047),
+    IPE120: iShape(0.120, 0.064, 0.0063, 0.0044),
+    T100: tubeShape(0.100, 0.004),
+  };
+
+  const pickables = [], members = [], byVariant = [];
+  const steel = (color) => new THREE.MeshStandardMaterial({ color, metalness: 0.35, roughness: 0.5 });
+  function only(obj, vars) { obj.userData.only = vars; byVariant.push(obj); return obj; }
+
+  function member(shape, a, b, up, role, vars) {
+    const len = a.distanceTo(b);
+    const geo = new THREE.ExtrudeGeometry(shape, { depth: len, bevelEnabled: false, curveSegments: 1 });
+    const mesh = new THREE.Mesh(geo, steel(ROLE[role].color));
+    const z = b.clone().sub(a).normalize();
+    const y = up.clone().sub(z.clone().multiplyScalar(up.dot(z))).normalize();
+    const x = new THREE.Vector3().crossVectors(y, z);
+    const m = new THREE.Matrix4().makeBasis(x, y, z); m.setPosition(a);
+    mesh.applyMatrix4(m);
+    mesh.castShadow = mesh.receiveShadow = true;
+    mesh.userData = { role };
+    scene.add(mesh); pickables.push(mesh); members.push(mesh);
+    if (vars) only(mesh, vars);
+    return mesh;
+  }
+  function box(w, h, d, pos, mat, info, vars, shadow = true) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    m.position.copy(pos); m.castShadow = shadow; m.receiveShadow = true;
+    if (info) { m.userData.info = info; pickables.push(m); }
+    if (vars) only(m, vars);
+    scene.add(m);
+    return m;
+  }
+  const UP = new THREE.Vector3(0, 1, 0), XW = new THREE.Vector3(1, 0, 0);
+  const concrete = new THREE.MeshStandardMaterial({ color: 0xb3afa7, roughness: 0.95 });
+  const ghost = new THREE.MeshStandardMaterial({ color: 0xb3afa7, roughness: 0.95, transparent: true, opacity: 0.28, depthWrite: false });
+  const plateMat = steel(0x6d747c), boltMat = steel(0x3c4249);
+
+  // vigas principales y viguetas
+  for (const y of [0, 2.3]) member(SEC.IPE220, S(0.112, y, T), S(3.56, y, T), UP, "VP");
+  for (let k = 1; k <= 5; k++) member(SEC.IPE140, S(3.5 * k / 6, 0.056, T), S(3.5 * k / 6, 2.244, T), UP, "VG");
+
+  // viga frontal IPE 120 articulada
+  member(SEC.IPE120, S(3.5, 0.056, T), S(3.5, 2.244, T), UP, "VF");
+
+  // columnas tubo 100x100x4 articuladas, platina y dado
+  const bot = T - 0.22 - 0.012;
+  for (const y of [0, 2.3]) {
+    box(0.45, 0.06, 0.45, S(3.5, y, 0.03), concrete, { t: "Dado de cimentación", d: "Concreto 21 MPa · aprox. 0,70 × 0,70 × 0,40 m bajo el piso · 25 kN en servicio" });
+    box(0.25, 0.012, 0.25, S(3.5, y, 0.066), plateMat, { t: "Platina de base", d: "250 × 250 × 12 mm · 4 anclajes · articulada" });
+    member(SEC.T100, S(3.5, y, 0.072), S(3.5, y, bot), XW, "C");
+    box(0.16, 0.012, 0.16, S(3.5, y, bot + 0.006), plateMat, { t: "Platina de capitel", d: "Recibe la viga principal y la frontal" });
+  }
+
+  // viga existente 20 x 35: su cara superior es el nivel del mezanine; los IPE llegan de lado
+  const beamTop = T;
+  box(0.20, 0.35, 4.6, S(0, 1.15, beamTop - 0.175), concrete, { t: "Viga existente", d: "Concreto 20 × 35 cm · cara superior a +3,05 m · recibe 27,6 kN y una torsión de 3,0 kN·m por apoyo · luz por confirmar" });
+  for (const y of [-1.1, 3.4]) box(0.25, beamTop - 0.35, 0.25, S(0, y, (beamTop - 0.35) / 2), ghost, { t: "Apoyo existente", d: "Posición supuesta: la luz real de la viga existente está por confirmar" }, null, false);
+  for (const y of [0, 2.3]) {
+    // placa de extremo soldada al IPE, contraplaca en la cara opuesta y 4 pernos pasantes de 5/8"
+    for (const sx of [1, -1]) box(0.012, 0.24, 0.15, S(sx * 0.106, y, beamTop - 0.12), plateMat,
+      sx > 0 ? { t: "Placa de extremo", d: "Soldada al IPE 220, a ras con la cara superior de la viga existente · 240 × 150 × 12 mm" }
+             : { t: "Contraplaca", d: "Cara opuesta de la viga existente: reparte el apriete de los pernos pasantes" });
+    for (const dz of [0.06, 0.18]) for (const dy of [-0.045, 0.045]) {
+      const bolt = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.245, 10), boltMat);
+      bolt.rotation.z = Math.PI / 2; bolt.position.copy(S(0, y + dy, beamTop - dz)); scene.add(bolt);
+      bolt.userData.info = { t: "Perno pasante 5/8\"", d: "A325 a través de los 20 cm de la viga: toma 27,6 kN vertical, 19,2 kN en X y 21,0 kN en Y por apoyo" };
+      pickables.push(bolt);
+    }
+  }
+
+  // lamina alfajor
+  function checkerTexture() {
+    const c = document.createElement("canvas"); c.width = c.height = 128;
+    const g = c.getContext("2d");
+    g.fillStyle = "#9aa2ab"; g.fillRect(0, 0, 128, 128);
+    g.strokeStyle = "#c3c9cf"; g.lineWidth = 6; g.lineCap = "round";
+    for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
+      const x = i * 32 + 16, y = j * 32 + 16, d = (i + j) % 2 ? 1 : -1;
+      g.beginPath(); g.moveTo(x - 7, y - 7 * d); g.lineTo(x + 7, y + 7 * d); g.stroke();
+    }
+    const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(14, 9);
+    return t;
+  }
+  const deckMat = new THREE.MeshStandardMaterial({ map: checkerTexture(), metalness: 0.4, roughness: 0.55, transparent: true, opacity: 0.62, depthWrite: false });
+  const deck = box(3.64, 0.00635, 2.41, S(1.745, 1.15, T + 0.0032), deckMat, { t: "Lámina alfajor 1/4\"", d: "6,35 mm · 401 kg · soldada a vigas y viguetas: trabaja como diafragma" }, null, false);
+  deck.renderOrder = 2;
+
+  // horno
+  const oven = new THREE.Group();
+  const ovenMat = new THREE.MeshStandardMaterial({ color: 0x5f646b, metalness: 0.6, roughness: 0.38 });
+  const ovenDark = new THREE.MeshStandardMaterial({ color: 0x33373c, metalness: 0.5, roughness: 0.5 });
+  const deckTop = T + 0.0064;
+  const shell = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.75, 2.8, 48), ovenMat);
+  shell.rotation.z = Math.PI / 2; shell.position.copy(S(1.75, 1.15, deckTop + 1.35)); oven.add(shell);
+  for (const x of [0.35, 3.15]) {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.035, 10, 48), ovenDark);
+    ring.rotation.y = Math.PI / 2; ring.position.copy(S(x, 1.15, deckTop + 1.35)); oven.add(ring);
+  }
+  const door = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.04, 40), ovenDark);
+  door.rotation.z = Math.PI / 2; door.position.copy(S(3.17, 1.15, deckTop + 1.35)); oven.add(door);
+  for (const x of [0.75, 2.75]) {
+    const sad = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.62, 1.3), ovenDark);
+    sad.position.copy(S(x, 1.15, deckTop + 0.31)); oven.add(sad);
+  }
+  const flue = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.45, 20), ovenDark);
+  flue.position.copy(S(2.7, 1.15, deckTop + 2.3)); oven.add(flue);
+  oven.traverse((o) => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; o.userData.info = { t: "Horno", d: "5 t reales, diseño con 7 t · Ø 1,50 m × 2,80 m · alto 2,10 m" }; pickables.push(o); } });
+  scene.add(oven);
+
+  // persona de escala, parada en el paso del frente
+  const man = new THREE.Group();
+  const manMat = new THREE.MeshStandardMaterial({ color: 0x8792a0, roughness: 0.9, transparent: true, opacity: 0.55 });
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.13, 1.45, 16), manMat);
+  body.position.copy(S(4.3, 1.15, 0.725)); man.add(body);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 12), manMat);
+  head.position.copy(S(4.3, 1.15, 1.63)); man.add(head);
+  scene.add(man);
+
+  // ---------- cotas y etiquetas ----------
+  const labelsEl = document.getElementById("labels");
+  const tags = [];
+  function tag(text, pos, cls, group, vars) {
+    const el = document.createElement("div"); el.className = "tag" + (cls ? " " + cls : ""); el.textContent = text;
+    labelsEl.appendChild(el); tags.push({ el, pos, group, vars });
+  }
+  const dimGroup = new THREE.Group(); scene.add(dimGroup);
+  const dimMat = new THREE.LineBasicMaterial({ color: 0x1f5f9f });
+  function dim(a, b, off, text, vars) {
+    const A = a.clone().add(off), B = b.clone().add(off);
+    const line = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([a, A, A, B, B, b]), dimMat);
+    dimGroup.add(line);
+    if (vars) only(line, vars);
+    tag(text, A.clone().add(B).multiplyScalar(0.5), "dim", "dims", vars);
+  }
+  dim(S(0, 0, T), S(3.5, 0, T), S(0, -0.45, 0), "3,50 m");
+  dim(S(3.5, 0, T), S(3.5, 2.3, T), new THREE.Vector3(0.55, 0, 0), "2,30 m");
+  dim(S(3.5, 0, 0), S(3.5, 0, T), S(0.35, -0.35, 0), "3,05 m");
+  tag("Paso libre 2,20 × 2,83 m", S(3.62, 1.15, 2.2), "dim", "dims");
+
+  tag("IPE 220", S(2.2, 0, T + 0.12), "", "tags");
+  tag("IPE 140 @ 0,58", S(0.583, 1.15, T + 0.1), "", "tags");
+  tag("IPE 120", S(3.5, 1.15, T + 0.12), "", "tags");
+  tag("Tubo 100×100×4", S(3.5, 0, 1.0), "", "tags");
+  tag("Viga existente 20×35", S(0, 3.0, beamTop - 0.17), "", "tags");
+  tag("Placa + pernos pasantes", S(0.12, 0, beamTop - 0.3), "", "tags");
+  tag("Horno 5 t (diseño 7 t)", S(1.75, 1.15, deckTop + 2.25), "", "oven");
+
+  // ---------- tema ----------
+  function applyTheme() {
+    const cs = getComputedStyle(document.documentElement);
+    floorMat.color.set(cs.getPropertyValue("--floor").trim() || "#cfd6dd");
+    dimMat.color.set(cs.getPropertyValue("--accent").trim() || "#1f5f9f");
+    if (grid) scene.remove(grid);
+    const gc = cs.getPropertyValue("--grid").trim() || "#b3bcc6";
+    grid = new THREE.GridHelper(12, 24, gc, gc);
+    grid.position.copy(S(1.75, 1.15, 0.001)); scene.add(grid);
+  }
+  applyTheme();
+  try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme); } catch (e) {}
+  new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  // ---------- estado: variante y color ----------
+  let variant = "D", mode = "role";
+  function recolor() {
+    for (const m of members) {
+      const d = V[variant].roles[m.userData.role];
+      m.material.color.copy(mode === "dc" && d ? dcColor(d.dc) : new THREE.Color(ROLE[m.userData.role].color));
+    }
+    document.getElementById("scale").hidden = mode !== "dc";
+    document.getElementById("c-role").setAttribute("aria-pressed", mode === "role");
+    document.getElementById("c-dc").setAttribute("aria-pressed", mode === "dc");
+  }
+  document.getElementById("c-role").onclick = () => { mode = "role"; recolor(); };
+  document.getElementById("c-dc").onclick = () => { mode = "dc"; recolor(); };
+
+  // ---------- vistas ----------
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const VIEWS = {
+    iso:   [S(7.6, -4.6, 5.4), S(1.6, 1.15, 1.5)],
+    front: [S(10, 1.15, 1.9), S(1.75, 1.15, 1.7)],
+    side:  [S(1.75, -8, 2.0), S(1.75, 1.15, 1.7)],
+    plan:  [S(1.76, 1.17, 10), S(1.75, 1.15, 1.3)],
+  };
+  let anim = null;
+  function view(name) {
+    const [p, t] = VIEWS[name];
+    for (const k of Object.keys(VIEWS)) document.getElementById("v-" + k).setAttribute("aria-pressed", k === name);
+    if (reduce) { camera.position.copy(p); controls.target.copy(t); return; }
+    anim = { p0: camera.position.clone(), t0: controls.target.clone(), p, t, s: performance.now() };
+  }
+  for (const k of Object.keys(VIEWS)) document.getElementById("v-" + k).onclick = () => view(k);
+  camera.position.copy(VIEWS.iso[0]); controls.target.copy(VIEWS.iso[1]);
+
+  // ---------- conmutadores ----------
+  const vis = { tags: true, dims: true, oven: true };
+  function bind(id, fn) { const el = document.getElementById(id); el.onchange = () => fn(el.checked); }
+  bind("t-oven", (v) => { oven.visible = v; vis.oven = v; });
+  bind("t-deck", (v) => { deck.visible = v; });
+  bind("t-tags", (v) => { vis.tags = v; });
+  bind("t-dims", (v) => { vis.dims = v; dimGroup.visible = v; });
+  bind("t-man", (v) => { man.visible = v; });
+
+  // ---------- ficha al pasar el cursor ----------
+  const tip = document.getElementById("tip");
+  const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
+  let hovered = null;
+  const shown = (o) => { for (; o; o = o.parent) if (!o.visible) return false; return true; };
+  function clearHover() { if (hovered) hovered.material.emissive.setHex(0); hovered = null; }
+  function pick(ev) {
+    const r = renderer.domElement.getBoundingClientRect();
+    ptr.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ptr, camera);
+    const hit = ray.intersectObjects(pickables.filter(shown), false)[0];
+    clearHover();
+    if (!hit) { tip.hidden = true; return; }
+    const o = hit.object, u = o.userData;
+    let title, body;
+    if (u.role) {
+      const d = V[variant].roles[u.role];
+      title = ROLE[u.role].short;
+      body = `<span class="mono">${d.perfil}</span> · D/C ${fmt(d.dc)}<br>${d.extra}`;
+      hovered = o; o.material.emissive.setHex(0x333333);
+    } else if (u.info) { title = u.info.t; body = u.info.d; }
+    else { tip.hidden = true; return; }
+    tip.innerHTML = `<strong>${title}</strong>${body}`;
+    tip.hidden = false;
+    const vr = stage.getBoundingClientRect();
+    let x = ev.clientX - vr.left + 14, y = ev.clientY - vr.top + 14;
+    x = Math.min(x, vr.width - tip.offsetWidth - 8); y = Math.min(y, vr.height - tip.offsetHeight - 8);
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  }
+  renderer.domElement.addEventListener("pointermove", (e) => { if (e.buttons === 0) pick(e); });
+  renderer.domElement.addEventListener("pointerdown", (e) => { if (e.pointerType !== "mouse") pick(e); });
+  renderer.domElement.addEventListener("pointerleave", () => { tip.hidden = true; clearHover(); });
+
+  // ---------- render ----------
+  function resize() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(stage);
+  resize();
+
+  const v = new THREE.Vector3();
+  function frame(now) {
+    if (anim) {
+      const k = Math.min(1, (now - anim.s) / 650), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      camera.position.lerpVectors(anim.p0, anim.p, e); controls.target.lerpVectors(anim.t0, anim.t, e);
+      if (k === 1) anim = null;
+    }
+    controls.update();
+    renderer.render(scene, camera);
+    const w = stage.clientWidth, h = stage.clientHeight;
+    for (const t of tags) {
+      let on = t.group === "dims" ? vis.dims : t.group === "oven" ? vis.tags && vis.oven : vis.tags;
+      if (t.vars && !t.vars.includes(variant)) on = false;
+      if (!on) { t.el.hidden = true; continue; }
+      v.copy(t.pos).project(camera);
+      if (v.z > 1) { t.el.hidden = true; continue; }
+      t.el.hidden = false;
+      t.el.style.left = ((v.x + 1) / 2) * w + "px";
+      t.el.style.top = ((1 - v.y) / 2) * h + "px";
+    }
+    requestAnimationFrame(frame);
+  }
+  fillPanel(variant); recolor();
+  requestAnimationFrame(frame);
+})();
+</script>

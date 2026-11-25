@@ -8,9 +8,58 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v34 — modo claro, que era la regla 4 del sistema y llevaba años sin cumplirse.**
+**v36 — estructuras, suite de 10 apps y hoja de vida de 2 hojas (local, sin publicar).**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v36 — 2026-11-25 (local, sin publicar): estructuras, suite nueva y hoja de vida para empleo
+
+Pedido: actualizar con todo lo nuevo y los certificados, sumar los proyectos
+ESTRUCTURALES, mejorar la seccion de apps y rehacer la hoja de vida para
+buscar empleo («general, exaltando mis virtudes»).
+
+- **Seccion nueva «Estructuras.»** (`#estructuras`, entre Proyectos y Sobre
+  mi; en el menu y en el dock con icono propio). Catalogo `ESTRUCTURALES`
+  (Gambita, Lote 132 · Loma Reserva, Mezanine horno 5 t), grupo
+  `estructural` en el archivo. Campos nuevos: `alcance` (fichas de lo que hizo
+  Kevin, se pintan en la ficha con su texto), `enlace` (modelo 3D) y `lamina`
+  (portada dibujo sobre papel: `contain` en la hoja y galeria sobre #f4f4f2).
+- **Laminas SIN rotulo ni nombres de terceros** (decision del Señor Stick):
+  `herramientas/preparar-laminas.py` recorta REV-11 de Gambita y REV-4 del
+  Lote 132 y TAPA en blanco toda linea con «Nicol», «Moreno» o «Acevedo»
+  antes de rasterizar. Las del mezanine son capturas del visor (Chrome
+  headless con swiftshader, 2x).
+- **`visor/mezanine-3d.html`**: copia del visor 3D del mezanine (three.js de
+  jsdelivr); la ficha lo abre con «Abrir el modelo 3D». Sin marcas de Belval.
+- **Suite**: 10 apps (ATLAS, STICK PRO, VIAS, QUANTITY, DLI, AROS, RECEIPT,
+  BUDGETS, ASSETS, LIFE). Fuera PROJECTS (no se usa) y FIT (ahora LIFE). Cada
+  app lleva `estado` y, si tiene pagina publica sin cuenta, `url` con boton
+  «Abrir». `preparar-suite.py` lee rutas completas (carpetas numeradas), usa
+  el alfa del PNG cuando lo trae (isotipo gris de STICK PRO) y escribe
+  stickpro, life y receipt. `fit.webp` borrado.
+- **Sobre mi**: titular «Ingeniero que construye sus herramientas.», bio
+  reescrita (estructura + BIM + software; «diez semestres culminados», sin
+  decir que ya es ingeniero graduado). Herramientas en CUATRO etapas: Modelo,
+  Calculo, Representacion, Automatizacion; ETABS, ATLAS y Python van con
+  sigla en disco (`sigla` en UTILES) porque no hay logo servible.
+- **Trayecto** (`HITOS`, ahora con `tipo`): UPB 10 semestres y 4.3;
+  practicante ingeniero residente (Belval, sin nombrarla en el sitio); SENA
+  pavimento articulado 120 h (2026-11-04); EF SET B2 (2026-03); Google IA
+  Practica (2026-01); Claude Code in Action (Anthropic, 2026-04).
+- **Hoja de vida** (`preparar-cv.mjs` reescrito): A4, DOS hojas explicitas con
+  barra lateral grafito. Hoja 1: perfil, cuatro cifras, experiencia con
+  logros (aqui si se nombra Belval), formacion. Hoja 2: cuatro imagenes de
+  trabajo, software propio (solo las de ingenieria), certificados. Lo que el
+  sitio ya dice se lee del index.html; lo propio del CV vive en la constante
+  `CV` del script. Boton del sitio: «PDF · 2 paginas».
+- `preparar-enlaces.mjs` incluye ESTRUCTURALES: `p/gambita`, `p/lote-132`,
+  `p/mezanine`.
+- **Verificado en vivo** (servir.py, :8899): escritorio 1440 y movil 375 sin
+  desborde horizontal ni errores de consola; ficha del mezanine con alcance y
+  enlace; galeria de Gambita; suite con STICK PRO abierto; PDF de 2 hojas.
+- **Pendiente**: publicar (push a main) con el visto bueno del Señor Stick;
+  revisar el modo claro de la seccion nueva; si se quiere, una captura propia
+  de ATLAS en la suite (la regla «icono, no captura» sigue vigente).
 
 ### v35 — 2026-10-01 (PUBLICADO en GitHub Pages)
 
@@ -1263,7 +1312,7 @@ cuenta el sitio. Se imprime con el Chrome instalado (`--print-to-pdf`).
   reducida —que a 32 px es un pelo horizontal— ni recortada contra el borde
   del cuadro, que se lee como un accidente de encuadre.
 - **Un solo archivo HTML.** El sitio no tiene estado ni datos dinámicos.
-- **El catálogo espeja la carpeta** `02. WORK\03. STICK INDUSTRIES\99. RECURSOS MARCA\
+- **El catálogo espeja la carpeta** `02. WORK\03. STICK INDUSTRIES\99. MARCA\
   PROYECTOS PORTAFOLIO`: los cuatro de `PRINCIPALES` abren la vitrina y los
   de `SECUNDARIOS` completan el índice.
 - **La portada de cada proyecto es su render de FACHADA**, sin excepción
@@ -1427,7 +1476,7 @@ En orden de impacto:
 ## Cómo verlo
 
 ```powershell
-cd "C:\Users\kevin\Documents\KEVIN\02. WORK\03. STICK INDUSTRIES\99. RECURSOS MARCA\PORTAFOLIO"
+cd "C:\Users\kevin\Documents\KEVIN\02. WORK\03. STICK INDUSTRIES\99. MARCA\02. PORTAFOLIO"
 python -m http.server 8899
 ```
 

@@ -23,14 +23,22 @@ from PIL import Image
 SUITE = Path(r"C:\Users\kevin\Documents\KEVIN\02. WORK\03. STICK INDUSTRIES\01. STICK SUITE")
 DESTINO = Path(__file__).resolve().parent.parent / "assets" / "suite"
 
-# ATLAS no esta: todavia no tiene icono y en el sitio va con su inicial.
+INDUSTRIES = SUITE.parent
+
+# ATLAS, VIAS y DLI no estan: no tienen icono dibujado y en el sitio van con
+# su inicial. Las apps viven en carpetas numeradas (`01. STICK AROS`...), asi
+# que la ruta va completa. STICK PRO no tiene LOGO.png: su isotipo blanco sobre
+# transparente sale de su carpeta de marca y da el mismo alfa.
 APPS = {
-    "aros": "STICK AROS",
-    "assets": "STICK ASSETS",
-    "budgets": "STICK BUDGETS",
-    "fit": "STICK FIT",
-    "projects": "STICK PROJECTS",
-    "quantity": "STICK QUANTITY",
+    "aros":     SUITE / "01. STICK AROS" / "LOGO.png",
+    "assets":   SUITE / "02. STICK ASSETS" / "LOGO.png",
+    "budgets":  SUITE / "04. STICK BUDGETS" / "LOGO.png",
+    "life":     SUITE / "05. STICK LIFE" / "LOGO.png",
+    "projects": SUITE / "06. STICK PROJECTS" / "LOGO.png",
+    "quantity": SUITE / "07. STICK QUANTITY" / "LOGO.png",
+    "receipt":  INDUSTRIES / "05. APPS" / "03. STICK RECEIPT" / "LOGO.png",
+    "stickpro": INDUSTRIES / "02. STICK REVIT PRO" / "03. MARCA" / "01-logo" / "png"
+                / "stickpro-isotipo-para-fondo-grafito.png",
 }
 
 FONDO, MARCA = 31.0, 255.0   # los dos niveles del PNG de origen
@@ -40,8 +48,14 @@ TOPE = 0.84                  # ningun icono pasa de esta fraccion del lienzo
 
 
 def preparar(origen: Path, salida: Path) -> str:
-    L = np.array(Image.open(origen).convert("L")).astype(np.float32)
-    alfa = np.clip((L - FONDO) / (MARCA - FONDO), 0, 1)
+    im = Image.open(origen)
+    if im.mode in ("RGBA", "LA") or "transparency" in im.info:
+        # Un PNG con transparencia ya trae el alfa: su color puede ser gris
+        # (el isotipo de STICK PRO lo es) y medirlo por luminancia lo apagaria.
+        alfa = np.array(im.convert("RGBA"))[..., 3].astype(np.float32) / 255
+    else:
+        L = np.array(im.convert("L")).astype(np.float32)
+        alfa = np.clip((L - FONDO) / (MARCA - FONDO), 0, 1)
     a8 = (alfa * 255).round().astype(np.uint8)
 
     ys, xs = np.where(a8 > 8)
@@ -71,8 +85,7 @@ def preparar(origen: Path, salida: Path) -> str:
 
 if __name__ == "__main__":
     DESTINO.mkdir(parents=True, exist_ok=True)
-    for clave, carpeta in APPS.items():
-        origen = SUITE / carpeta / "LOGO.png"
+    for clave, origen in APPS.items():
         if not origen.exists():
             print(f"{clave:9s} FALTA {origen}")
             continue
