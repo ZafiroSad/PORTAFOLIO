@@ -8,9 +8,34 @@ CV interactiva y portafolio de visualización arquitectónica.
 
 ## Estado actual
 
-**v36 — estructuras, suite de 10 apps y hoja de vida de 2 hojas (local, sin publicar).**
+**v37 — estructuras sobre negro, suite con destacadas, ETABS y Python (PUBLICADO).**
 Publicado en https://zafirosad.github.io/PORTAFOLIO/, repositorio público
 `ZafiroSad/PORTAFOLIO`.
+
+### v37 — 2026-11-25 (PUBLICADO): correcciones del Señor Stick sobre la v36
+
+- **Mezanine fuera** («eso no quiero que entre»): catalogo, imagenes, `visor/`
+  y enlace `p/mezanine` retirados.
+- **Herramientas**: fuera ATLAS y Excel; ETABS y Python con logo real
+  (`assets/logos/etabs.webp`, `python.webp`), no sigla.
+- **Suite rehecha**: ATLAS y STICK PRO como DESTACADAS (ventana con capturas
+  reales que rotan cada 4,5 s, cifras, partes, boton); el resto en rejilla de
+  4 columnas. **Deroga «icono, nunca captura» solo para las destacadas.**
+- **Hoja de vida**: se mantiene SU formato de Word (`Downloads\hoja-de-vida\
+  actualizar_hoja_de_vida.py` clona sus parrafos). `preparar-cv.mjs` retirado;
+  `compartir/kevin-gil-cv.pdf` es ese PDF. El original en Documents no se toco.
+- **Estructuras sin «pantallazos»**: Revit no se pudo controlar (aviso
+  «complemento sin firma» abierto y el Señor Stick fuera de casa), asi que
+  `preparar-laminas.py` TRATA las piezas: la isometria del modelo va «en
+  escena» (papel convertido en fondo oscuro con luz central y sombra de
+  contacto) y los planos van en NEGATIVO (trazo claro sobre #09090b, acero en
+  su color aclarado). En el sitio se ven enteras sobre ese mismo negro: no se
+  lee el borde de la imagen. Gambita 9 piezas (portada la isometria, luego la
+  isometria en alambre y la PlacaFacil), Lote 132 8 (portada la planta).
+  Recortes en fracciones de la pagina tal como se ve (hay paginas rotadas).
+- **Pendiente**: si el Señor Stick quiere vistas realistas propias desde
+  Revit (copias en `Downloads\vistas-estructurales\modelos`), aceptar el aviso
+  en su PC y exportarlas con StickAPI; sustituyen la 01 de cada proyecto.
 
 ### v36 — 2026-11-25 (local, sin publicar): estructuras, suite nueva y hoja de vida para empleo
 
